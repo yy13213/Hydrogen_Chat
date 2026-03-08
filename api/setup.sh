@@ -43,7 +43,7 @@ check_python() {
 
 # 创建虚拟环境
 create_venv() {
-    VENV_NAME="hydrogen_chat_api"
+    VENV_NAME="api_venv"
     
     if [ -d "$VENV_NAME" ]; then
         print_warning "虚拟环境 '$VENV_NAME' 已存在"
@@ -71,7 +71,7 @@ create_venv() {
 
 # 激活虚拟环境
 activate_venv() {
-    VENV_NAME="hydrogen_chat_api"
+    VENV_NAME="api_venv"
     print_info "激活虚拟环境..."
     
     if [ -f "$VENV_NAME/bin/activate" ]; then
@@ -182,11 +182,11 @@ start_services() {
                 print_info "使用 tmux 后台启动服务..."
                 
                 # 启动 Reranker 服务
-                tmux new-session -d -s reranker_service "source hydrogen_chat_api/bin/activate && python Reranker_dify2vll_port9583.py"
+                tmux new-session -d -s reranker_service "source api_venv/bin/activate && python Reranker_dify2vll_port9583.py"
                 print_info "Reranker 服务已在 tmux 会话 'reranker_service' 中启动"
                 
                 # 启动 Google AI 服务
-                tmux new-session -d -s google_ai_service "source hydrogen_chat_api/bin/activate && python Google_ai2dify_port6773.py"
+                tmux new-session -d -s google_ai_service "source api_venv/bin/activate && python Google_ai2dify_port6773.py"
                 print_info "Google AI 服务已在 tmux 会话 'google_ai_service' 中启动"
                 
                 echo
@@ -204,7 +204,7 @@ start_services() {
         3)
             print_info "跳过服务启动"
             print_info "你可以手动启动服务："
-            echo "  source hydrogen_chat_api/bin/activate"
+            echo "  source api_venv/bin/activate"
             echo "  python Reranker_dify2vll_port9583.py"
             echo "  python Google_ai2dify_port6773.py"
             ;;

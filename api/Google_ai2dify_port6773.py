@@ -4,15 +4,31 @@ from google import genai
 import uvicorn
 import os
 
+# 默认 API Key 配置（可选，方便测试使用）
+# 如果不需要默认值，请保持为空字符串
+DEFAULT_API_KEY = "AQ.Ab8RN6IS3rS-OE83s_ZhLeK4rRu8tGAhnVROpg3BwHjtTwvgYg"
+
 # 初始化 FastAPI 应用
 app = FastAPI(title="Gemini 3.1 API Proxy", description="A simple API wrapper for Gemini 3.1")
 
 # 初始化 Gemini 客户端
-# 注意：客户端会自动读取环境变量中的 GEMINI_API_KEY
+# 优先使用环境变量 GEMINI_API_KEY，如果未设置则使用默认值
+api_key = os.getenv("GEMINI_API_KEY", DEFAULT_API_KEY)
+
 try:
-    client = genai.Client()
+    if api_key:
+        client = genai.Client(api_key=api_key)
+        if os.getenv("GEMINI_API_KEY"):
+            print("✓ 使用环境变量中的 GEMINI_API_KEY")
+        else:
+            print("⚠ 使用默认的 API Key（环境变量未设置）")
+    else:
+        # 如果两者都为空，尝试让客户端自动读取
+        client = genai.Client()
+        print("✓ 让 Gemini 客户端自动检测 API Key")
 except Exception as e:
-    print(f"初始化 Gemini 客户端失败，请检查是否已设置 GEMINI_API_KEY 环境变量。错误信息: {e}")
+    print(f"❌ 初始化 Gemini 客户端失败，请检查 API Key 配置。错误信息: {e}")
+    print(f"提示: 可以设置环境变量 GEMINI_API_KEY 或在代码中配置 DEFAULT_API_KEY")
 
 # 定义请求体的数据校验模型
 class GenerateRequest(BaseModel):

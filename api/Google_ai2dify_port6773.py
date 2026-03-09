@@ -25,13 +25,24 @@ async def reverse_proxy(path: str, request: Request):
     """
     将收到的所有请求原封不动地转发给 Google 官方 API，并将结果原路返回。
     """
-    # 1. 拼接真实的 Google API 地址
+    # === 🌟 核心修复：路径清洗 ===
+    # 1. 修复 Dify/前端常见的路径拼接错误（消除多余的 v1/）
+    if path.startswith("v1/v1beta/"):
+        path = path.replace("v1/v1beta/", "v1beta/", 1)
+        
+    # 2. 隐藏福利：如果你在客户端选了 OpenAI 格式，自动映射到 Google 官方的 OpenAI 兼容端点
+    if path.endswith("chat/completions"):
+        path = "v1beta/openai/chat/completions"
+
+    # 3. 拼接真实的 Google API 地址
     target_url = f"https://generativelanguage.googleapis.com/{path}"
     
     # 获取并拼接查询参数 (例如 ?alt=sse)
     query_params = request.url.query
     if query_params:
         target_url += f"?{query_params}"
+        
+    # ... 后面的代码保持不变 ...
 
     # 2. 处理请求头和请求体
     body = await request.body()

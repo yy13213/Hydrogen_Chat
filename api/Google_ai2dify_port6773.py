@@ -6,7 +6,7 @@ import os
 
 # 默认 API Key 配置
 # ⚠️ 强烈建议：生产环境中请清空此处，仅使用环境变量 GEMINI_API_KEY 传入
-DEFAULT_API_KEY = ""
+DEFAULT_API_KEY = "AIzaSyA2W4LAnxzMh_iaxCED5V8DTgAD66vMWUU"
 
 # 初始化 FastAPI 应用
 app = FastAPI(title="Gemini API Proxy", description="A simple API wrapper for Gemini")

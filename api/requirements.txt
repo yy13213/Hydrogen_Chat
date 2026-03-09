@@ -4,3 +4,8 @@ httpx>=0.26.0
 google-genai>=0.2.0
 pydantic>=2.5.0
 python-dotenv>=1.0.0
+
+# 高并发性能优化依赖
+uvloop>=0.19.0  # 更快的事件循环
+httptools>=0.6.0  # 更快的 HTTP 解析器
+h2>=4.1.0  # HTTP/2 支持

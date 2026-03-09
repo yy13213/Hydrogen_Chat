@@ -99,8 +99,17 @@ python Google_ai2dify_port6773.py
 - **文件**: `Google_ai2dify_port6773.py`
 - **端口**: 6773
 - **功能**: Google Gemini API 代理服务
-- **环境变量**: 需要设置 `GEMINI_API_KEY`
-- **API 端点**: `POST /v1/chat/completions`
+- **环境变量**: 需要设置 `GEMINI_API_KEY` (可选，也可在代码中配置 `DEFAULT_API_KEY`)
+- **API 端点**: 
+  - `POST /v1/chat/completions` - 简化格式
+  - `POST /v1beta/models/{model}:generateContent` - Gemini 原生格式（非流式）
+  - `POST /v1beta/models/{model}:streamGenerateContent` - Gemini 原生格式（流式）
+- **特性支持**:
+  - ✓ 流式响应 (SSE)
+  - ✓ 思考模式配置 (thinkingConfig)
+  - ✓ 媒体分辨率设置
+  - ✓ 请求头 API Key 认证
+  - ✓ 工具调用 (tools)
 
 ## 🔧 配置说明
 
@@ -129,12 +138,56 @@ Reranker 服务需要本地运行的 vLLM 服务：
 
 ### 测试 Google AI 服务
 
+**简化格式：**
 ```bash
 curl -X POST http://localhost:6773/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "你好，请介绍一下自己",
-    "temperature": 0.7
+    "temperature": 0.7,
+    "model": "gemini-3-flash-preview"
+  }'
+```
+
+**Gemini 原生格式（非流式）：**
+```bash
+curl -X POST http://localhost:6773/v1beta/models/gemini-3-flash-preview:generateContent \
+  -H "Content-Type: application/json" \
+  -H "x-goog-api-key: YOUR_API_KEY" \
+  -d '{
+    "contents": [
+      {
+        "parts": [{"text": "你好"}],
+        "role": "user"
+      }
+    ],
+    "generationConfig": {
+      "temperature": 0.7,
+      "maxOutputTokens": 2048
+    }
+  }'
+```
+
+**Gemini 原生格式（流式 SSE）：**
+```bash
+curl -X POST "http://localhost:6773/v1beta/models/gemini-3-flash-preview:streamGenerateContent?alt=sse" \
+  -H "Content-Type: application/json" \
+  -H "x-goog-api-key: YOUR_API_KEY" \
+  -d '{
+    "contents": [
+      {
+        "parts": [{"text": "讲一个故事"}],
+        "role": "user"
+      }
+    ],
+    "generationConfig": {
+      "temperature": 0.7,
+      "maxOutputTokens": 2048,
+      "thinkingConfig": {
+        "include_thoughts": false,
+        "thinking_level": "HIGH"
+      }
+    }
   }'
 ```
 

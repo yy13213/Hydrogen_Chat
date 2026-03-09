@@ -1,9 +1,11 @@
 from fastapi import FastAPI, HTTPException, Header, Request
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 from google import genai
 import uvicorn
 import os
+import json
 from dotenv import load_dotenv
 
 # 加载 .env 文件中的环境变量
@@ -46,6 +48,7 @@ class GeminiNativeRequest(BaseModel):
     generationConfig: Optional[Dict[str, Any]] = None
     safetySettings: Optional[List[Dict[str, Any]]] = None
     systemInstruction: Optional[Dict[str, Any]] = None
+    tools: Optional[List[Dict[str, Any]]] = None
 
 @app.post("/v1/chat/completions")
 async def generate_text(request: GenerateRequest):
@@ -71,6 +74,48 @@ async def generate_text(request: GenerateRequest):
         raise HTTPException(status_code=500, detail=f"调用 Gemini API 失败: {str(e)}")
 
 
+def build_config_params(request: GeminiNativeRequest):
+    """构建 Gemini API 配置参数"""
+    config_params = {}
+    
+    if request.generationConfig:
+        gen_config = request.generationConfig
+        
+        # 基础配置
+        if "temperature" in gen_config:
+            config_params["temperature"] = gen_config["temperature"]
+        if "maxOutputTokens" in gen_config:
+            config_params["max_output_tokens"] = gen_config["maxOutputTokens"]
+        if "topP" in gen_config:
+            config_params["top_p"] = gen_config["topP"]
+        if "topK" in gen_config:
+            config_params["top_k"] = gen_config["topK"]
+        
+        # 高级配置 - 思考模式
+        if "thinkingConfig" in gen_config:
+            thinking_config = gen_config["thinkingConfig"]
+            # 注意：这些参数可能不被所有版本的 SDK 支持
+            # 如果不支持，将被忽略
+            if "include_thoughts" in thinking_config:
+                config_params["include_thoughts"] = thinking_config["include_thoughts"]
+            if "thinking_level" in thinking_config:
+                config_params["thinking_level"] = thinking_config["thinking_level"]
+        
+        # 媒体分辨率配置
+        if "mediaResolution" in gen_config:
+            config_params["media_resolution"] = gen_config["mediaResolution"]
+    
+    # 安全设置
+    if request.safetySettings:
+        config_params["safety_settings"] = request.safetySettings
+    
+    # 系统指令
+    if request.systemInstruction:
+        config_params["system_instruction"] = request.systemInstruction
+    
+    return config_params
+
+
 @app.post("/v1/v1beta/models/{model_name}:generateContent")
 @app.post("/v1beta/models/{model_name}:generateContent")
 async def gemini_native_generate(
@@ -79,11 +124,11 @@ async def gemini_native_generate(
     x_goog_api_key: Optional[str] = Header(None)
 ):
     """
-    支持 Gemini 原生 API 格式的端点
-    路径示例：/v1/v1beta/models/gemini-2.5-flash:generateContent
+    支持 Gemini 原生 API 格式的端点（非流式）
+    路径示例：/v1/v1beta/models/gemini-3-flash-preview:generateContent
     """
     try:
-        # 如果请求头中提供了 API key，使用该 key 创建新的客户端
+        # 选择客户端
         if x_goog_api_key:
             temp_client = genai.Client(api_key=x_goog_api_key)
             print(f"🔑 使用请求头中的 API Key")
@@ -92,25 +137,7 @@ async def gemini_native_generate(
             print(f"🔑 使用默认配置的 API Key")
         
         # 构建配置参数
-        config_params = {}
-        if request.generationConfig:
-            gen_config = request.generationConfig
-            if "temperature" in gen_config:
-                config_params["temperature"] = gen_config["temperature"]
-            if "maxOutputTokens" in gen_config:
-                config_params["max_output_tokens"] = gen_config["maxOutputTokens"]
-            if "topP" in gen_config:
-                config_params["top_p"] = gen_config["topP"]
-            if "topK" in gen_config:
-                config_params["top_k"] = gen_config["topK"]
-        
-        # 添加 safety_settings 到配置中
-        if request.safetySettings:
-            config_params["safety_settings"] = request.safetySettings
-        
-        # 添加 system_instruction 到配置中
-        if request.systemInstruction:
-            config_params["system_instruction"] = request.systemInstruction
+        config_params = build_config_params(request)
         
         # 调用 Gemini API
         response = temp_client.models.generate_content(
@@ -137,6 +164,123 @@ async def gemini_native_generate(
                 "totalTokenCount": getattr(response, "total_token_count", 0)
             }
         }
+        
+    except Exception as e:
+        print(f"❌ 调用失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"调用 Gemini API 失败: {str(e)}")
+
+
+@app.post("/v1/v1beta/models/{model_name}:streamGenerateContent")
+@app.post("/v1beta/models/{model_name}:streamGenerateContent")
+async def gemini_native_stream_generate(
+    model_name: str,
+    request: GeminiNativeRequest,
+    req: Request,
+    x_goog_api_key: Optional[str] = Header(None)
+):
+    """
+    支持 Gemini 原生 API 格式的端点（流式响应）
+    路径示例：/v1/v1beta/models/gemini-3-flash-preview:streamGenerateContent?alt=sse
+    """
+    try:
+        # 选择客户端
+        if x_goog_api_key:
+            temp_client = genai.Client(api_key=x_goog_api_key)
+            print(f"🔑 使用请求头中的 API Key (流式)")
+        else:
+            temp_client = client
+            print(f"🔑 使用默认配置的 API Key (流式)")
+        
+        # 检查是否请求 SSE 格式
+        query_params = dict(req.query_params)
+        is_sse = query_params.get("alt") == "sse"
+        
+        # 构建配置参数
+        config_params = build_config_params(request)
+        
+        async def generate_stream():
+            try:
+                # 调用流式 API
+                stream = temp_client.models.generate_content_stream(
+                    model=model_name,
+                    contents=request.contents,
+                    config=genai.types.GenerateContentConfig(**config_params) if config_params else None
+                )
+                
+                chunk_index = 0
+                for chunk in stream:
+                    if chunk.text:
+                        # 构建响应数据
+                        chunk_data = {
+                            "candidates": [
+                                {
+                                    "content": {
+                                        "parts": [{"text": chunk.text}],
+                                        "role": "model"
+                                    },
+                                    "finishReason": None,
+                                    "index": 0
+                                }
+                            ]
+                        }
+                        
+                        if is_sse:
+                            # SSE 格式
+                            yield f"data: {json.dumps(chunk_data)}\n\n"
+                        else:
+                            # JSON Lines 格式
+                            yield json.dumps(chunk_data) + "\n"
+                        
+                        chunk_index += 1
+                
+                # 发送最终的结束标记
+                final_data = {
+                    "candidates": [
+                        {
+                            "content": {
+                                "parts": [{"text": ""}],
+                                "role": "model"
+                            },
+                            "finishReason": "STOP",
+                            "index": 0
+                        }
+                    ],
+                    "usageMetadata": {
+                        "promptTokenCount": 0,
+                        "candidatesTokenCount": 0,
+                        "totalTokenCount": 0
+                    }
+                }
+                
+                if is_sse:
+                    yield f"data: {json.dumps(final_data)}\n\n"
+                else:
+                    yield json.dumps(final_data) + "\n"
+                    
+            except Exception as e:
+                print(f"❌ 流式生成失败: {str(e)}")
+                error_data = {"error": {"message": str(e), "code": 500}}
+                if is_sse:
+                    yield f"data: {json.dumps(error_data)}\n\n"
+                else:
+                    yield json.dumps(error_data) + "\n"
+        
+        # 返回流式响应
+        if is_sse:
+            return StreamingResponse(
+                generate_stream(),
+                media_type="text/event-stream",
+                headers={
+                    "Cache-Control": "no-cache",
+                    "Connection": "keep-alive",
+                    "X-Accel-Buffering": "no"
+                }
+            )
+        else:
+            return StreamingResponse(
+                generate_stream(),
+                media_type="application/json"
+            )
         
     except Exception as e:
         print(f"❌ 调用失败: {str(e)}")

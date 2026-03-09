@@ -4,7 +4,10 @@ from fastapi.responses import StreamingResponse
 import uvicorn
 import os
 import asyncio
+import time
 from contextlib import asynccontextmanager
+from collections import defaultdict
+from datetime import datetime
 from dotenv import load_dotenv
 
 # 加载 .env 文件中的环境变量
@@ -24,6 +27,73 @@ semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
 
 # 全局 HTTP 客户端（连接池复用）
 http_client = None
+
+# ==================== 实时统计功能 ====================
+class RequestStats:
+    """请求统计类"""
+    def __init__(self):
+        self.total_requests = 0  # 总请求数
+        self.success_count = 0  # 成功数
+        self.error_count = 0  # 失败数
+        self.current_concurrent = 0  # 当前并发数
+        self.max_concurrent = 0  # 峰值并发数
+        self.response_times = []  # 响应时间列表（最近100个）
+        self.start_time = time.time()  # 启动时间
+        
+    def request_start(self):
+        """请求开始"""
+        self.total_requests += 1
+        self.current_concurrent += 1
+        if self.current_concurrent > self.max_concurrent:
+            self.max_concurrent = self.current_concurrent
+    
+    def request_end(self, success: bool, response_time: float):
+        """请求结束"""
+        self.current_concurrent -= 1
+        if success:
+            self.success_count += 1
+        else:
+            self.error_count += 1
+        
+        # 保留最近100个响应时间
+        self.response_times.append(response_time)
+        if len(self.response_times) > 100:
+            self.response_times.pop(0)
+    
+    def get_stats(self):
+        """获取统计信息"""
+        uptime = time.time() - self.start_time
+        avg_response_time = sum(self.response_times) / len(self.response_times) if self.response_times else 0
+        qps = self.total_requests / uptime if uptime > 0 else 0
+        
+        return {
+            "total": self.total_requests,
+            "success": self.success_count,
+            "error": self.error_count,
+            "current_concurrent": self.current_concurrent,
+            "max_concurrent": self.max_concurrent,
+            "avg_response_time": round(avg_response_time, 3),
+            "qps": round(qps, 2),
+            "uptime": round(uptime, 1)
+        }
+
+# 全局统计实例
+stats = RequestStats()
+
+# 后台统计打印任务
+async def stats_printer():
+    """定期打印统计信息"""
+    while True:
+        await asyncio.sleep(10)  # 每10秒打印一次
+        s = stats.get_stats()
+        print("\n" + "="*70)
+        print(f"📊 实时统计 [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}]")
+        print("-"*70)
+        print(f"🔢 总请求数: {s['total']:,}  |  ✅ 成功: {s['success']:,}  |  ❌ 失败: {s['error']:,}")
+        print(f"⚡ 当前并发: {s['current_concurrent']}  |  📈 峰值并发: {s['max_concurrent']}")
+        print(f"⏱️  平均响应时间: {s['avg_response_time']:.3f}s  |  🚀 QPS: {s['qps']:.2f}")
+        print(f"⏰ 运行时间: {s['uptime']:.1f}s")
+        print("="*70 + "\n")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -62,11 +132,33 @@ async def lifespan(app: FastAPI):
     print(f"   - HTTP/2: 已启用")
     print("="*60)
     
+    # 启动统计打印后台任务
+    stats_task = asyncio.create_task(stats_printer())
+    
     yield  # 应用运行中
     
-    # 关闭时：释放连接池资源
+    # 关闭时：取消统计任务并释放连接池资源
+    stats_task.cancel()
+    try:
+        await stats_task
+    except asyncio.CancelledError:
+        pass
+    
     await http_client.aclose()
     print("\n✓ HTTP 客户端连接池已关闭")
+    
+    # 打印最终统计
+    final_stats = stats.get_stats()
+    print("\n" + "="*60)
+    print("📊 最终统计")
+    print("-"*60)
+    print(f"总请求: {final_stats['total']:,}")
+    print(f"成功: {final_stats['success']:,} ({final_stats['success']/final_stats['total']*100 if final_stats['total'] > 0 else 0:.1f}%)")
+    print(f"失败: {final_stats['error']:,} ({final_stats['error']/final_stats['total']*100 if final_stats['total'] > 0 else 0:.1f}%)")
+    print(f"峰值并发: {final_stats['max_concurrent']}")
+    print(f"平均响应时间: {final_stats['avg_response_time']:.3f}s")
+    print(f"平均 QPS: {final_stats['qps']:.2f}")
+    print("="*60)
 
 # 初始化 FastAPI 应用（使用生命周期管理）
 app = FastAPI(
@@ -89,66 +181,74 @@ async def reverse_proxy(path: str, request: Request):
     """
     将收到的所有请求原封不动地转发给 Google 官方 API，并将结果原路返回。
     """
-    # === 🌟 核心修复：路径清洗 ===
-    # 1. 修复 Dify/前端常见的路径拼接错误（消除多余的 v1/）
-    if path.startswith("v1/v1beta/"):
-        path = path.replace("v1/v1beta/", "v1beta/", 1)
-        
-    # 2. 隐藏福利：如果你在客户端选了 OpenAI 格式，自动映射到 Google 官方的 OpenAI 兼容端点
-    if path.endswith("chat/completions"):
-        path = "v1beta/openai/chat/completions"
-
-    # 3. 拼接真实的 Google API 地址
-    target_url = f"https://generativelanguage.googleapis.com/{path}"
+    # 记录请求开始时间和统计
+    start_time = time.time()
+    stats.request_start()
+    success = False
     
-    # 获取并拼接查询参数 (例如 ?alt=sse)
-    query_params = request.url.query
-    if query_params:
-        target_url += f"?{query_params}"
-        
-    # ... 后面的代码保持不变 ...
-
-    # 2. 处理请求头和请求体
-    body = await request.body()
-    headers = dict(request.headers)
-    
-    # ⚠️ 必须移除的请求头
-    # 移除 host，否则 Google 发现 host 是你本地服务器的 IP 会拒绝请求
-    headers.pop("host", None)
-    # 移除 content-length，交由 httpx 自动重新计算，防止因编码问题导致长度不匹配报错
-    headers.pop("content-length", None)
-    
-    # 自动注入 API Key：如果客户端没传，且服务器配置了，则帮忙补上
-    header_keys_lower = [k.lower() for k in headers.keys()]
-    if DEFAULT_API_KEY and "x-goog-api-key" not in header_keys_lower:
-        headers["x-goog-api-key"] = DEFAULT_API_KEY
-
-    # 3. 判断是否需要流式输出 (根据 URL 特征判断)
-    is_stream = "alt=sse" in query_params or "streamGenerateContent" in path
-
-    # 4. 发起请求并透传结果（使用并发控制）
     try:
+        # === 🌟 核心修复：路径清洗 ===
+        # 1. 修复 Dify/前端常见的路径拼接错误（消除多余的 v1/）
+        if path.startswith("v1/v1beta/"):
+            path = path.replace("v1/v1beta/", "v1beta/", 1)
+            
+        # 2. 隐藏福利：如果你在客户端选了 OpenAI 格式，自动映射到 Google 官方的 OpenAI 兼容端点
+        if path.endswith("chat/completions"):
+            path = "v1beta/openai/chat/completions"
+
+        # 3. 拼接真实的 Google API 地址
+        target_url = f"https://generativelanguage.googleapis.com/{path}"
+        
+        # 获取并拼接查询参数 (例如 ?alt=sse)
+        query_params = request.url.query
+        if query_params:
+            target_url += f"?{query_params}"
+
+        # 2. 处理请求头和请求体
+        body = await request.body()
+        headers = dict(request.headers)
+        
+        # ⚠️ 必须移除的请求头
+        # 移除 host，否则 Google 发现 host 是你本地服务器的 IP 会拒绝请求
+        headers.pop("host", None)
+        # 移除 content-length，交由 httpx 自动重新计算，防止因编码问题导致长度不匹配报错
+        headers.pop("content-length", None)
+        
+        # 自动注入 API Key：如果客户端没传，且服务器配置了，则帮忙补上
+        header_keys_lower = [k.lower() for k in headers.keys()]
+        if DEFAULT_API_KEY and "x-goog-api-key" not in header_keys_lower:
+            headers["x-goog-api-key"] = DEFAULT_API_KEY
+
+        # 3. 判断是否需要流式输出 (根据 URL 特征判断)
+        is_stream = "alt=sse" in query_params or "streamGenerateContent" in path
+
+        # 4. 发起请求并透传结果（使用并发控制）
         # 使用信号量限制并发，防止过载
         async with semaphore:
             if is_stream:
                 # 【流式转发】像管道一样，Google 发来一个字，就给前端吐一个字
                 async def stream_generator():
-                    # 使用全局连接池客户端（复用连接）
-                    async with http_client.stream(
-                        method=request.method,
-                        url=target_url,
-                        headers=headers,
-                        content=body,
-                        timeout=READ_TIMEOUT  # 使用配置的超时时间
-                    ) as response:
-                        # 检查上游是否报错（如 403 404）
-                        if response.status_code != 200:
-                            print(f"⚠️ 上游返回错误状态码: {response.status_code}")
-                            
-                        # 按字节流转发
-                        async for chunk in response.aiter_bytes():
-                            yield chunk
+                    try:
+                        # 使用全局连接池客户端（复用连接）
+                        async with http_client.stream(
+                            method=request.method,
+                            url=target_url,
+                            headers=headers,
+                            content=body,
+                            timeout=READ_TIMEOUT  # 使用配置的超时时间
+                        ) as response:
+                            # 检查上游是否报错（如 403 404）
+                            if response.status_code != 200:
+                                print(f"⚠️ 上游返回错误状态码: {response.status_code}")
+                                
+                            # 按字节流转发
+                            async for chunk in response.aiter_bytes():
+                                yield chunk
+                    except Exception as e:
+                        print(f"❌ 流式转发异常: {str(e)}")
+                        raise
 
+                success = True
                 return StreamingResponse(
                     stream_generator(),
                     media_type="text/event-stream"
@@ -164,11 +264,13 @@ async def reverse_proxy(path: str, request: Request):
                     content=body
                 )
                 
-                # 透传完整的状态码、响应头（清理掉一些可能导致浏览器解析问题的头）和响应体
+                # 🔧 修复 Content-Length bug：清理掉所有可能导致长度不匹配的响应头
                 resp_headers = dict(response.headers)
                 resp_headers.pop("content-encoding", None)
                 resp_headers.pop("transfer-encoding", None)
+                resp_headers.pop("content-length", None)  # 关键修复：让 FastAPI 自动计算
                 
+                success = True
                 return Response(
                     content=response.content,
                     status_code=response.status_code,
@@ -189,32 +291,64 @@ async def reverse_proxy(path: str, request: Request):
             status_code=500, 
             media_type="application/json"
         )
+    finally:
+        # 记录请求结束统计
+        response_time = time.time() - start_time
+        stats.request_end(success, response_time)
 
 
 if __name__ == "__main__":
     # 从环境变量读取配置
     port = int(os.getenv("GOOGLE_AI_PORT", 6773))
-    workers = int(os.getenv("WORKERS", 4))  # 工作进程数，建议设置为 CPU 核心数
+    workers = int(os.getenv("WORKERS", 1))  # 工作进程数，默认1（多进程会导致统计不准确）
+    
+    # 检查性能优化库是否可用
+    try:
+        import uvloop
+        use_uvloop = True
+    except ImportError:
+        use_uvloop = False
+        print("⚠️  未安装 uvloop，将使用默认事件循环（性能较低）")
+    
+    try:
+        import httptools
+        use_httptools = True
+    except ImportError:
+        use_httptools = False
+        print("⚠️  未安装 httptools，将使用默认 HTTP 解析器（性能较低）")
     
     print("\n" + "="*60)
     print(f"🚀 高并发代理服务器启动中...")
     print(f"📡 监听端口: {port}")
-    print(f"👷 工作进程数: {workers} (多进程模式)")
+    if workers > 1:
+        print(f"👷 工作进程数: {workers} (多进程模式)")
+        print(f"⚠️  注意：多进程模式下统计数据为单进程统计")
+    else:
+        print(f"👷 工作进程数: {workers} (单进程模式)")
     print(f"💡 提示: 按 Ctrl+C 可以停止服务")
     print("="*60 + "\n")
     
-    # 生产环境配置
-    uvicorn.run(
-        "Google_ai2dify_port6773:app",  # 使用字符串导入，支持多进程
-        host="0.0.0.0",
-        port=port,
-        workers=workers,  # 多进程
-        log_level="info",
-        access_log=True,
-        # 性能优化选项
-        loop="uvloop",  # 使用更快的事件循环（需安装 uvloop）
-        http="httptools",  # 使用更快的 HTTP 解析器
-        limit_concurrency=MAX_CONCURRENT_REQUESTS,  # 并发限制
-        backlog=2048,  # 挂起连接队列大小
-        timeout_keep_alive=75  # Keep-Alive 超时
-    )
+    # 构建 uvicorn 配置
+    uvicorn_config = {
+        "app": "Google_ai2dify_port6773:app" if workers > 1 else app,
+        "host": "0.0.0.0",
+        "port": port,
+        "log_level": "info",
+        "access_log": False,  # 禁用访问日志以提高性能
+        "limit_concurrency": MAX_CONCURRENT_REQUESTS,
+        "backlog": 2048,
+        "timeout_keep_alive": 75
+    }
+    
+    # 只在多进程模式下添加 workers 参数
+    if workers > 1:
+        uvicorn_config["workers"] = workers
+    
+    # 添加性能优化选项（如果可用）
+    if use_uvloop:
+        uvicorn_config["loop"] = "uvloop"
+    if use_httptools:
+        uvicorn_config["http"] = "httptools"
+    
+    # 启动服务器
+    uvicorn.run(**uvicorn_config)

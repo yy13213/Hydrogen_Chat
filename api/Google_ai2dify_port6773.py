@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header, Request
 from pydantic import BaseModel
+from typing import Optional, List, Dict, Any
 from google import genai
 import uvicorn
 import os
@@ -29,19 +30,25 @@ except Exception as e:
     print(f"❌ 初始化 Gemini 客户端失败，请检查 API Key 配置。错误信息: {e}")
     print(f"提示: 可以设置环境变量 GEMINI_API_KEY 或在代码中配置 DEFAULT_API_KEY")
 
-# 修改 1：在请求体的数据校验模型中增加 model 字段
+# 原有的简化请求格式
 class GenerateRequest(BaseModel):
-    model: str = "gemini-2.5-flash" # 设置一个默认模型，用户不传时默认使用此模型
+    model: str = "gemini-3-pro-preview"
     prompt: str
     temperature: float = 0.7
+
+# Gemini 原生 API 请求格式
+class GeminiNativeRequest(BaseModel):
+    contents: List[Dict[str, Any]]
+    generationConfig: Optional[Dict[str, Any]] = None
+    safetySettings: Optional[List[Dict[str, Any]]] = None
+    systemInstruction: Optional[Dict[str, Any]] = None
 
 @app.post("/v1/chat/completions")
 async def generate_text(request: GenerateRequest):
     """
-    接收用户的 prompt 和指定模型，调用对应的 Gemini 模型
+    接收用户的 prompt 和指定模型，调用对应的 Gemini 模型（简化格式）
     """
     try:
-        # 修改 2：使用 request.model 动态传入模型名称
         response = client.models.generate_content(
             model=request.model,
             contents=request.prompt,
@@ -50,15 +57,79 @@ async def generate_text(request: GenerateRequest):
             )
         )
         
-        # 返回标准化的 JSON 响应
         return {
             "status": "success",
-            "model": request.model, # 返回实际使用的模型名称
+            "model": request.model,
             "response": response.text
         }
         
     except Exception as e:
-        # 如果调用失败（例如网络问题、Quota 超限或模型名称错误），返回 500 错误
+        raise HTTPException(status_code=500, detail=f"调用 Gemini API 失败: {str(e)}")
+
+
+@app.post("/v1/v1beta/models/{model_name}:generateContent")
+@app.post("/v1beta/models/{model_name}:generateContent")
+async def gemini_native_generate(
+    model_name: str,
+    request: GeminiNativeRequest,
+    x_goog_api_key: Optional[str] = Header(None)
+):
+    """
+    支持 Gemini 原生 API 格式的端点
+    路径示例：/v1/v1beta/models/gemini-2.5-flash:generateContent
+    """
+    try:
+        # 如果请求头中提供了 API key，使用该 key 创建新的客户端
+        if x_goog_api_key:
+            temp_client = genai.Client(api_key=x_goog_api_key)
+            print(f"🔑 使用请求头中的 API Key")
+        else:
+            temp_client = client
+            print(f"🔑 使用默认配置的 API Key")
+        
+        # 构建配置参数
+        config_params = {}
+        if request.generationConfig:
+            gen_config = request.generationConfig
+            if "temperature" in gen_config:
+                config_params["temperature"] = gen_config["temperature"]
+            if "maxOutputTokens" in gen_config:
+                config_params["max_output_tokens"] = gen_config["maxOutputTokens"]
+            if "topP" in gen_config:
+                config_params["top_p"] = gen_config["topP"]
+            if "topK" in gen_config:
+                config_params["top_k"] = gen_config["topK"]
+        
+        # 调用 Gemini API
+        response = temp_client.models.generate_content(
+            model=model_name,
+            contents=request.contents,
+            config=genai.types.GenerateContentConfig(**config_params) if config_params else None,
+            safety_settings=request.safetySettings,
+            system_instruction=request.systemInstruction
+        )
+        
+        # 返回符合 Gemini 原生格式的响应
+        return {
+            "candidates": [
+                {
+                    "content": {
+                        "parts": [{"text": response.text}],
+                        "role": "model"
+                    },
+                    "finishReason": "STOP",
+                    "index": 0
+                }
+            ],
+            "usageMetadata": {
+                "promptTokenCount": getattr(response, "prompt_token_count", 0),
+                "candidatesTokenCount": getattr(response, "candidates_token_count", 0),
+                "totalTokenCount": getattr(response, "total_token_count", 0)
+            }
+        }
+        
+    except Exception as e:
+        print(f"❌ 调用失败: {str(e)}")
         raise HTTPException(status_code=500, detail=f"调用 Gemini API 失败: {str(e)}")
 
 if __name__ == "__main__":

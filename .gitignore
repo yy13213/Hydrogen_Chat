@@ -1,1 +1,22 @@
 venv/
+api/Google_ai2dify_port6773.py
+
+# 环境变量文件
+.env
+*.env
+!.env.example
+
+# Python 虚拟环境
+hydrogen_chat_api/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

@@ -4,6 +4,10 @@ from typing import Optional, List, Dict, Any
 from google import genai
 import uvicorn
 import os
+from dotenv import load_dotenv
+
+# 加载 .env 文件中的环境变量
+load_dotenv()
 
 # 默认 API Key 配置
 # ⚠️ 强烈建议：生产环境中请清空此处，仅使用环境变量 GEMINI_API_KEY 传入
@@ -139,6 +143,7 @@ async def gemini_native_generate(
         raise HTTPException(status_code=500, detail=f"调用 Gemini API 失败: {str(e)}")
 
 if __name__ == "__main__":
-    # 统一了 print 提示的端口和实际运行的端口
-    print("启动服务，监听端口: 6773...")
-    uvicorn.run(app, host="0.0.0.0", port=6773)
+    # 从环境变量读取端口配置，默认为 6773
+    port = int(os.getenv("GOOGLE_AI_PORT", 6773))
+    print(f"启动服务，监听端口: {port}...")
+    uvicorn.run(app, host="0.0.0.0", port=port)

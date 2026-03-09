@@ -5,10 +5,15 @@ import math
 import httpx
 import uvicorn
 import asyncio
+import os
 from fastapi import FastAPI, Request
+from dotenv import load_dotenv
+
+# 加载 .env 文件中的环境变量
+load_dotenv()
 
 app = FastAPI()
-VLLM_API_URL = "http://127.0.0.1:9582/v1/completions"
+VLLM_API_URL = os.getenv("VLLM_API_URL", "http://127.0.0.1:9582/v1/completions")
 
 # 封装单个请求为一个异步函数
 async def fetch_score(client, i, query, doc, model_name):
@@ -57,4 +62,8 @@ async def rerank_endpoint(request: Request):
     return {"id": "qwen3-reranker-proxy-async", "model": model_name, "results": results}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=9583)
+    # 从环境变量读取端口配置，默认为 9583
+    port = int(os.getenv("RERANKER_PORT", 9583))
+    print(f"启动 Reranker 服务，监听端口: {port}...")
+    print(f"vLLM API 地址: {VLLM_API_URL}")
+    uvicorn.run(app, host="0.0.0.0", port=port)

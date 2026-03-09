@@ -17,12 +17,21 @@
 cd api
 ```
 
-2. 赋予脚本执行权限：
+2. 配置环境变量（首次运行必须）：
+```bash
+# 复制环境变量模板
+cp .env.example .env
+
+# 编辑 .env 文件，填入你的 API Key
+nano .env  # 或使用 vim, vi 等编辑器
+```
+
+3. 赋予脚本执行权限：
 ```bash
 chmod +x setup.sh
 ```
 
-3. 运行设置脚本：
+4. 运行设置脚本：
 ```bash
 ./setup.sh
 ```
@@ -37,24 +46,28 @@ chmod +x setup.sh
 
 如果你希望手动控制每一步，请按照以下步骤操作：
 
-1. **创建虚拟环境**
+1. **配置环境变量**
+```bash
+# 复制环境变量模板
+cp .env.example .env
+
+# 编辑 .env 文件，填入你的 Gemini API Key
+nano .env
+```
+
+2. **创建虚拟环境**
 ```bash
 python3 -m venv hydrogen_chat_api
 ```
 
-2. **激活虚拟环境**
+3. **激活虚拟环境**
 ```bash
 source hydrogen_chat_api/bin/activate
 ```
 
-3. **安装依赖包**
+4. **安装依赖包**
 ```bash
 pip install -r requirements.txt
-```
-
-4. **设置环境变量（Google AI 服务需要）**
-```bash
-export GEMINI_API_KEY="your_gemini_api_key_here"
 ```
 
 5. **启动服务**

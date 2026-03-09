@@ -100,13 +100,19 @@ async def gemini_native_generate(
             if "topK" in gen_config:
                 config_params["top_k"] = gen_config["topK"]
         
+        # 添加 safety_settings 到配置中
+        if request.safetySettings:
+            config_params["safety_settings"] = request.safetySettings
+        
+        # 添加 system_instruction 到配置中
+        if request.systemInstruction:
+            config_params["system_instruction"] = request.systemInstruction
+        
         # 调用 Gemini API
         response = temp_client.models.generate_content(
             model=model_name,
             contents=request.contents,
-            config=genai.types.GenerateContentConfig(**config_params) if config_params else None,
-            safety_settings=request.safetySettings,
-            system_instruction=request.systemInstruction
+            config=genai.types.GenerateContentConfig(**config_params) if config_params else None
         )
         
         # 返回符合 Gemini 原生格式的响应

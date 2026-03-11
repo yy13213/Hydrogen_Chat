@@ -1,0 +1,36 @@
+@chart_agent 在这个文件夹下实现智能图表绘制，功能如下：
+数据库连接函数@chart_agent/database_query.py 
+数据库er图@chart_agent/ER_chart.jpg 
+大模型连接端口@api/Google_ai2dify_port6773.py （使用geminiSDK）
+
+注意：
+所有用户输入中都包括上下文，并可能有图片，括txt或csv文件，并需要将jsonl的执行记录一同传给AI，并按照jsonl的执行记录索引上下文中的图片、文件一同传给AI，请使用geminiSDK做好多模态支持
+开启代码执行的AI回复也可能包含图片，请阅读https://ai.google.dev/gemini-api/docs/code-execution?hl=zh-cn，理解如何使用代码执行
+项目目录下的jsonl，包括每次运行记录（json），每次执行一步（或者循环）都需要输出一条json。
+json包括状态字段，如正在思考，生成sql，执行sql，执行出错，再次生成sql，生成图表等等。
+jsonl还有上下文字段，用于存储用户多轮回答的上下文，及每次上下文上传的图片文件地址。
+jsonl还可能有数据库查询结果csv，也需要作为上下文传给AI。
+注意多轮对话的上传图片文件及Ai生成图片文件命名，不要出现重复或者错误，可以只有雪花算法生成url作为文件名，并重命名用户上传文件。
+
+需求如下：
+
+main.py
+1.启动图表绘制服务（端口9621），接受用户问题，
+2.生成项目文件夹，以时间戳命名，向前端返回项目名，方便前端轮询进度或请求继续提问。用于存放后续的图片，并在同目录下建立jsonl，并将每一步记录上传jsonl。
+3.将用户输入和数据库结构图@chart_agent/ER_chart.jpg 交由gemini-3.1-flash-lite-preview（视觉输入），让Ai结构化返回是否查询数据库（true/false）
+4.若返回true执行.sql_genration.py
+5.若返回false执行chart_genration.py
+6.接受用户再次提问，回到3，循环执行。
+
+sql_genration.py
+1.将用户输入和数据库结构图@chart_agent/ER_chart.jpg 交由gemini-3.1-pro-preview（视觉输入），让Ai生成sql代码，并结构化返回（使用geminiSDK的结构化输出）。
+2.执行sql，并返回结果，若成功将查询结果保存为csv文件（命名为data.csv），若失败则记录报错信息。上传jsonl（如果成功，记录csv地址；如果失败，就记录报错信息）。
+3.将用户输入，sql语句和查询结果（csv文件，使用文件上传，或者报错内容）交给gemini-3.1-pro-preview，让Ai结构化返回，查询结果是否成功完成，如果false则回到第一步。
+4.循环执行，直到查询结果完整（true），上限8次。如果true，执行chart_genration.py
+
+
+chart_genration.py
+将用户输入交给gemini-3.1-pro-preview，（配置代码执行工具），让Ai自己编写代码并执行生成 Matplotlib 图表，并返回图表图片和AI的回复（可能问题仅仅为问答，则没有图表）。
+
+chart_agent.py
+streamlit前端，用于方便测试。

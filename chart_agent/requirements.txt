@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+google-generativeai
+psycopg2-binary
+streamlit
+requests
+python-multipart
+python-dotenv
+matplotlib
+pandas

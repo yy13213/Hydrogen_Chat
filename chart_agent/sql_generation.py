@@ -263,7 +263,7 @@ def run_sql_generation(
                 f"用户问题：{user_input}\n\n"
                 f"执行的 SQL：\n{generated_sql}\n\n"
                 f"查询结果（CSV）：\n{csv_content}\n\n"
-                "请判断查询结果是否完整地回答了用户问题。"
+                "请判断查询结果所包含的数据是否能完整地回答了用户问题。（无需绘图，无需回答问题，只看现有的数据是否足够让下一步的智能体完成回答）"
                 "如果完整返回 true，否则返回 false 并说明原因。"
             )
         ))

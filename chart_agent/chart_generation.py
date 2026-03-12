@@ -50,41 +50,52 @@ def _build_contents(user_input: str, context: list, csv_path: str = None) -> lis
       {
         "role": "user" | "model",
         "text": "...",
-        "files": ["path1", "path2"],
+        "files": ["path1", "path2"],   # user_turn: 用户上传文件; model_turn: AI生成图片（跳过）
         "csv": "path/to/data.csv"
       }
+
+    注意：model_turn 中的 AI 生成图片不放入多轮上下文 inline_data，
+    因为代码执行模型不支持历史轮次中携带 inline_data，会导致 500 错误。
+    model_turn 的图片仅保留文本描述。
+    用户上传文件（user_turn）和数据库 CSV 正常传入。
     """
     contents = []
 
     for item in context:
+        role = item.get("role", "user")
         parts = []
+
         if item.get("text"):
             parts.append(types.Part.from_text(text=item["text"]))
 
-        for file_path in item.get("files", []):
-            p = Path(file_path)
-            if not p.exists():
-                continue
-            suffix = p.suffix.lower()
-            if suffix in (".jpg", ".jpeg"):
-                mime = "image/jpeg"
-            elif suffix == ".png":
-                mime = "image/png"
-            elif suffix == ".gif":
-                mime = "image/gif"
-            elif suffix == ".webp":
-                mime = "image/webp"
-            else:
-                mime = "text/plain"
+        # user_turn：传入用户上传的图片/文件
+        # model_turn：跳过 AI 生成图片（inline_data 会导致代码执行模型 500）
+        if role == "user":
+            for file_path in item.get("files", []):
+                p = Path(file_path)
+                if not p.exists():
+                    continue
+                suffix = p.suffix.lower()
+                if suffix in (".jpg", ".jpeg"):
+                    mime = "image/jpeg"
+                elif suffix == ".png":
+                    mime = "image/png"
+                elif suffix == ".gif":
+                    mime = "image/gif"
+                elif suffix == ".webp":
+                    mime = "image/webp"
+                else:
+                    mime = "text/plain"
 
-            with open(p, "rb") as f:
-                raw = f.read()
+                with open(p, "rb") as f:
+                    raw = f.read()
 
-            if mime.startswith("image"):
-                parts.append(types.Part.from_bytes(data=raw, mime_type=mime))
-            else:
-                parts.append(types.Part.from_text(text=raw.decode("utf-8", errors="replace")))
+                if mime.startswith("image"):
+                    parts.append(types.Part.from_bytes(data=raw, mime_type=mime))
+                else:
+                    parts.append(types.Part.from_text(text=raw.decode("utf-8", errors="replace")))
 
+        # 历史 CSV 数据（user_turn 和 model_turn 均可携带）
         if item.get("csv"):
             csv_p = Path(item["csv"])
             if csv_p.exists():
@@ -92,12 +103,9 @@ def _build_contents(user_input: str, context: list, csv_path: str = None) -> lis
                 parts.append(types.Part.from_text(text=f"[历史CSV数据]\n{csv_text}"))
 
         if parts:
-            contents.append(types.Content(
-                role=item.get("role", "user"),
-                parts=parts
-            ))
+            contents.append(types.Content(role=role, parts=parts))
 
-    # 当前轮用户输入
+    # 当前轮用户输入（附带本轮 CSV 查询结果）
     current_parts = []
     if csv_path:
         csv_p = Path(csv_path)
@@ -175,8 +183,9 @@ def run_chart_generation(
         "你是一个专业的数据分析和图表绘制助手。\n"
         "当用户提供数据时，请使用 Python Matplotlib 生成美观的图表。\n"
         "图表要求：\n"
+        "- 按照用户提问的语言来决定绘图的语言，如果用户提问是中文，则使用中文标题和标签，如果用户提问是英文，则使用英文标题和标签。\n"
         "- 使用中文标题和标签（设置 matplotlib 中文字体：plt.rcParams['font.sans-serif'] = ['SimHei', 'DejaVu Sans']）\n"
-        "- 配色美观，添加网格线\n"
+        "- 配色合理，绘制美观，添加网格线\n"
         "- 图表尺寸适中（figsize=(10, 6) 或根据内容调整）\n"
         "- 如果问题是纯问答，无需生成图表，直接回答即可。\n"
         "- 生成图表后使用 plt.show() 展示（代码执行环境会自动捕获图片）。"

@@ -3,12 +3,13 @@
 连接后端服务：http://localhost:9621
 """
 
-import time
+import json
 import requests
 import streamlit as st
 from pathlib import Path
 
 BACKEND_URL = "http://localhost:9621"
+PROJECTS_DIR = Path(__file__).parent / "projects"
 
 # ==================== 页面配置 ====================
 st.set_page_config(
@@ -26,10 +27,62 @@ if "project_name" not in st.session_state:
     st.session_state.project_name = None
 
 if "messages" not in st.session_state:
-    st.session_state.messages = []  # {"role": "user"/"assistant", "content": str, "images": [url]}
+    st.session_state.messages = []
 
 if "progress_records" not in st.session_state:
     st.session_state.progress_records = []
+
+
+# ==================== 工具函数 ====================
+def load_history_from_jsonl(project_name: str) -> list:
+    """从项目 jsonl 文件重建聊天消息列表"""
+    jsonl_path = PROJECTS_DIR / project_name / "session.jsonl"
+    if not jsonl_path.exists():
+        return []
+    messages = []
+    for line in jsonl_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            record = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        status = record.get("status")
+        if status == "user_turn":
+            messages.append({
+                "role": "user",
+                "content": record.get("text", ""),
+                "images": []
+            })
+        elif status == "model_turn":
+            # 将服务器绝对路径转为前端可访问的 /projects/... URL
+            raw_paths = record.get("files", [])
+            image_urls = []
+            for p in raw_paths:
+                try:
+                    rel = Path(p).relative_to(PROJECTS_DIR)
+                    image_urls.append(f"/projects/{rel.as_posix()}")
+                except ValueError:
+                    pass
+            messages.append({
+                "role": "assistant",
+                "content": record.get("text", ""),
+                "images": image_urls
+            })
+    return messages
+
+
+def list_history_projects() -> list:
+    """列出所有历史项目目录（按时间倒序）"""
+    if not PROJECTS_DIR.exists():
+        return []
+    dirs = sorted(
+        [d.name for d in PROJECTS_DIR.iterdir() if d.is_dir() and (d / "session.jsonl").exists()],
+        reverse=True
+    )
+    return dirs
+
 
 # ==================== 侧边栏 ====================
 with st.sidebar:
@@ -44,6 +97,32 @@ with st.sidebar:
             st.rerun()
     else:
         st.info("尚未开始会话，发送第一条消息后自动创建项目。")
+
+    # ---------- 历史会话恢复 ----------
+    st.divider()
+    st.header("📂 历史会话")
+    history_projects = list_history_projects()
+    if history_projects:
+        selected = st.selectbox(
+            "选择历史项目继续对话：",
+            options=["（不恢复）"] + history_projects,
+            key="history_selector"
+        )
+        if st.button("📥 加载历史会话", use_container_width=True):
+            if selected != "（不恢复）":
+                st.session_state.project_name = selected
+                st.session_state.messages = load_history_from_jsonl(selected)
+                # 同步进度记录
+                try:
+                    resp = requests.get(f"{BACKEND_URL}/progress/{selected}", timeout=10)
+                    if resp.status_code == 200:
+                        st.session_state.progress_records = resp.json().get("records", [])
+                except Exception:
+                    pass
+                st.success(f"已加载项目：{selected}（共 {len(st.session_state.messages)} 条消息）")
+                st.rerun()
+    else:
+        st.caption("暂无历史项目")
 
     st.divider()
     st.header("📋 执行进度")

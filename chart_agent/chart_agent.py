@@ -20,7 +20,7 @@ st.set_page_config(
 )
 
 st.title("📊 智能图表绘制助手")
-st.caption("基于 Gemini 的数据库查询与图表生成系统")
+st.caption("氢聊的数据库查询与图表生成系统")
 
 # ==================== Session State 初始化 ====================
 if "project_name" not in st.session_state:
@@ -235,7 +235,7 @@ if user_input:
                     files_payload.append(("files", (f.name, f.read(), f.type)))
 
             # 轮询进度的同时等待响应
-            with st.spinner("Gemini 正在分析..."):
+            with st.spinner("氢聊正在分析..."):
                 response = requests.post(
                     f"{BACKEND_URL}/chat",
                     data=form_data,

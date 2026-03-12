@@ -57,6 +57,7 @@ def load_history_from_jsonl(project_name: str) -> list:
             })
         elif status == "model_turn":
             # 将服务器绝对路径转为前端可访问的 /projects/... URL
+            # 只保留最后一张图（前几张是 AI 代码执行的中间产物）
             raw_paths = record.get("files", [])
             image_urls = []
             for p in raw_paths:
@@ -68,7 +69,7 @@ def load_history_from_jsonl(project_name: str) -> list:
             messages.append({
                 "role": "assistant",
                 "content": record.get("text", ""),
-                "images": image_urls
+                "images": image_urls[-1:] if image_urls else []
             })
     return messages
 
@@ -250,7 +251,9 @@ if user_input:
                 st.session_state.project_name = result["project_name"]
 
                 reply_text = result.get("reply_text", "")
-                image_urls = result.get("image_urls", [])
+                all_image_urls = result.get("image_urls", [])
+                # 只展示最后一张（前几张是 AI 代码执行的中间产物）
+                display_image_urls = all_image_urls[-1:] if all_image_urls else []
                 need_db = result.get("need_db", False)
                 error = result.get("error")
 
@@ -270,19 +273,19 @@ if user_input:
                 if reply_text:
                     st.markdown(reply_text)
 
-                # 展示生成图片
-                for img_url in image_urls:
+                # 展示最后一张图片
+                for img_url in display_image_urls:
                     full_url = f"{BACKEND_URL}{img_url}"
                     st.image(full_url, use_container_width=True)
 
                 if error and not reply_text:
                     st.error(f"处理出错：{error}")
 
-                # 保存到消息历史
+                # 保存到消息历史（同样只保留最后一张）
                 st.session_state.messages.append({
                     "role": "assistant",
                     "content": reply_text or ("处理出错：" + error if error else ""),
-                    "images": image_urls
+                    "images": display_image_urls
                 })
 
                 # 自动刷新进度记录

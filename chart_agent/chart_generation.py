@@ -14,16 +14,16 @@ import uuid
 from pathlib import Path
 from datetime import datetime
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
-# ==================== Gemini 配置 ====================
+# ==================== Gemini 客户端配置 ====================
 GEMINI_BASE_URL = "http://localhost:9583"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "placeholder")
 
-genai.configure(
+client = genai.Client(
     api_key=GEMINI_API_KEY,
-    transport="rest",
-    client_options={"api_endpoint": GEMINI_BASE_URL}
+    http_options=types.HttpOptions(base_url=GEMINI_BASE_URL)
 )
 
 
@@ -41,14 +41,14 @@ def _snowflake_id() -> str:
 
 def _build_contents(user_input: str, context: list, csv_path: str = None) -> list:
     """
-    构建 Gemini generate_content 所需的 contents 列表（多轮对话格式）。
+    构建新版 SDK 所需的 contents 列表（多轮对话格式）。
 
     context 每项格式：
       {
         "role": "user" | "model",
         "text": "...",
-        "files": ["path1", "path2"],   # 图片或文本文件路径
-        "csv": "path/to/data.csv"       # CSV 文件路径
+        "files": ["path1", "path2"],
+        "csv": "path/to/data.csv"
       }
     """
     contents = []
@@ -56,7 +56,7 @@ def _build_contents(user_input: str, context: list, csv_path: str = None) -> lis
     for item in context:
         parts = []
         if item.get("text"):
-            parts.append({"text": item["text"]})
+            parts.append(types.Part.from_text(text=item["text"]))
 
         for file_path in item.get("files", []):
             p = Path(file_path)
@@ -78,23 +78,21 @@ def _build_contents(user_input: str, context: list, csv_path: str = None) -> lis
                 raw = f.read()
 
             if mime.startswith("image"):
-                parts.append({
-                    "inline_data": {
-                        "mime_type": mime,
-                        "data": base64.b64encode(raw).decode("utf-8")
-                    }
-                })
+                parts.append(types.Part.from_bytes(data=raw, mime_type=mime))
             else:
-                parts.append({"text": raw.decode("utf-8", errors="replace")})
+                parts.append(types.Part.from_text(text=raw.decode("utf-8", errors="replace")))
 
         if item.get("csv"):
             csv_p = Path(item["csv"])
             if csv_p.exists():
                 csv_text = csv_p.read_text(encoding="utf-8-sig")
-                parts.append({"text": f"[历史CSV数据]\n{csv_text}"})
+                parts.append(types.Part.from_text(text=f"[历史CSV数据]\n{csv_text}"))
 
         if parts:
-            contents.append({"role": item.get("role", "user"), "parts": parts})
+            contents.append(types.Content(
+                role=item.get("role", "user"),
+                parts=parts
+            ))
 
     # 当前轮用户输入
     current_parts = []
@@ -102,30 +100,29 @@ def _build_contents(user_input: str, context: list, csv_path: str = None) -> lis
         csv_p = Path(csv_path)
         if csv_p.exists():
             csv_text = csv_p.read_text(encoding="utf-8-sig")
-            current_parts.append({"text": f"[数据库查询结果CSV]\n{csv_text}\n\n"})
+            current_parts.append(types.Part.from_text(text=f"[数据库查询结果CSV]\n{csv_text}\n\n"))
 
-    current_parts.append({"text": user_input})
-    contents.append({"role": "user", "parts": current_parts})
+    current_parts.append(types.Part.from_text(text=user_input))
+    contents.append(types.Content(role="user", parts=current_parts))
 
     return contents
 
 
-def _extract_images_from_response(response, project_dir: Path) -> list[str]:
+def _extract_images_from_response(response, project_dir: Path) -> list:
     """
-    从 Gemini 响应中提取内联图片，保存到项目目录，返回图片路径列表。
+    从 Gemini 响应中提取代码执行产生的内联图片，保存到项目目录。
     参考：https://ai.google.dev/gemini-api/docs/code-execution
     """
     saved_paths = []
     for candidate in response.candidates:
         for part in candidate.content.parts:
-            # 代码执行输出的内联图片
-            if hasattr(part, "inline_data") and part.inline_data:
-                mime = part.inline_data.mime_type
+            if part.inline_data and part.inline_data.data:
+                mime = part.inline_data.mime_type or "image/png"
                 ext = "png" if "png" in mime else "jpg" if "jpeg" in mime else "bin"
                 filename = f"{_snowflake_id()}.{ext}"
                 img_path = project_dir / filename
                 with open(img_path, "wb") as f:
-                    f.write(base64.b64decode(part.inline_data.data))
+                    f.write(part.inline_data.data)
                 saved_paths.append(str(img_path))
     return saved_paths
 
@@ -135,7 +132,7 @@ def _extract_text_from_response(response) -> str:
     texts = []
     for candidate in response.candidates:
         for part in candidate.content.parts:
-            if hasattr(part, "text") and part.text:
+            if part.text:
                 texts.append(part.text)
     return "\n".join(texts)
 
@@ -182,17 +179,17 @@ def run_chart_generation(
         "- 生成图表后使用 plt.show() 展示（代码执行环境会自动捕获图片）。"
     )
 
-    # 配置代码执行工具（Gemini SDK 写法）
-    model_with_si = genai.GenerativeModel(
-        model_name="gemini-2.5-pro-preview-03-25",
-        tools="code_execution",
-        system_instruction=system_instruction
-    )
-
     contents = _build_contents(user_input, context, csv_path)
 
     try:
-        response = model_with_si.generate_content(contents)
+        response = client.models.generate_content(
+            model="gemini-2.5-pro-preview-03-25",
+            contents=contents,
+            config=types.GenerateContentConfig(
+                system_instruction=system_instruction,
+                tools=[types.Tool(code_execution=types.ToolCodeExecution())],
+            )
+        )
     except Exception as e:
         _append_jsonl(jsonl_path, {
             "timestamp": datetime.now().isoformat(),

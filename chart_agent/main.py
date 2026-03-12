@@ -14,12 +14,12 @@
 import os
 import json
 import uuid
-import base64
 from pathlib import Path
 from datetime import datetime
 from typing import List, Optional
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -28,14 +28,13 @@ import uvicorn
 from sql_generation import run_sql_generation
 from chart_generation import run_chart_generation
 
-# ==================== Gemini 配置 ====================
+# ==================== Gemini 客户端配置 ====================
 GEMINI_BASE_URL = "http://localhost:9583"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "placeholder")
 
-genai.configure(
+client = genai.Client(
     api_key=GEMINI_API_KEY,
-    transport="rest",
-    client_options={"api_endpoint": GEMINI_BASE_URL}
+    http_options=types.HttpOptions(base_url=GEMINI_BASE_URL)
 )
 
 # ==================== 路径配置 ====================
@@ -45,7 +44,7 @@ ER_CHART_PATH = BASE_DIR / "ER_chart.jpg"
 PROJECTS_DIR.mkdir(exist_ok=True)
 
 # ==================== FastAPI 应用 ====================
-app = FastAPI(title="智能图表绘制服务", version="1.0.0")
+app = FastAPI(title="智能图表绘制服务", version="1.0.1")
 
 # 挂载静态文件目录，供前端访问生成的图片
 app.mount("/projects", StaticFiles(directory=str(PROJECTS_DIR)), name="projects")
@@ -74,10 +73,10 @@ def _read_jsonl(jsonl_path: Path) -> list:
     return records
 
 
-def _load_er_image_inline() -> dict:
+def _load_er_image_inline() -> types.Part:
     with open(ER_CHART_PATH, "rb") as f:
-        data = base64.b64encode(f.read()).decode("utf-8")
-    return {"mime_type": "image/jpeg", "data": data}
+        data = f.read()
+    return types.Part.from_bytes(data=data, mime_type="image/jpeg")
 
 
 def _save_uploaded_file(upload: UploadFile, project_dir: Path) -> str:
@@ -113,9 +112,7 @@ def _check_need_db(user_input: str, uploaded_file_paths: list, context: list) ->
     使用 gemini-2.0-flash-lite（视觉）判断是否需要查询数据库。
     结构化返回 {"need_db": true/false, "reason": "..."}
     """
-    model = genai.GenerativeModel("gemini-2.0-flash-lite")
     er_image = _load_er_image_inline()
-
     parts = []
 
     # 历史上下文文本摘要
@@ -124,48 +121,54 @@ def _check_need_db(user_input: str, uploaded_file_paths: list, context: list) ->
             f"[{'用户' if c['role'] == 'user' else 'AI'}]: {c['text']}"
             for c in context if c.get("text")
         )
-        parts.append(f"[历史对话]\n{history_text}\n\n")
+        parts.append(types.Part.from_text(text=f"[历史对话]\n{history_text}\n\n"))
 
-    # 用户上传的图片
+    # 用户上传的图片/文件
     for fp in uploaded_file_paths:
         p = Path(fp)
         if p.suffix.lower() in (".jpg", ".jpeg", ".png", ".gif", ".webp"):
             with open(p, "rb") as f:
                 raw = f.read()
             mime = "image/jpeg" if p.suffix.lower() in (".jpg", ".jpeg") else "image/png"
-            parts.append({"inline_data": {"mime_type": mime, "data": base64.b64encode(raw).decode()}})
+            parts.append(types.Part.from_bytes(data=raw, mime_type=mime))
         elif p.suffix.lower() in (".txt", ".csv"):
-            parts.append(p.read_text(encoding="utf-8", errors="replace"))
+            parts.append(types.Part.from_text(
+                text=p.read_text(encoding="utf-8", errors="replace")
+            ))
 
     # ER 图
-    parts.append({"inline_data": er_image})
+    parts.append(er_image)
 
-    parts.append(
-        f"用户问题：{user_input}\n\n"
-        "根据上方数据库 ER 图和用户问题，判断是否需要查询数据库才能回答。\n"
-        "如果用户问题需要具体数据（如统计、列表、趋势等），返回 need_db=true；\n"
-        "如果是纯问答、解释或不需要数据库数据，返回 need_db=false。"
+    parts.append(types.Part.from_text(
+        text=(
+            f"用户问题：{user_input}\n\n"
+            "根据上方数据库 ER 图和用户问题，判断是否需要查询数据库才能回答。\n"
+            "如果用户问题需要具体数据（如统计、列表、趋势等），返回 need_db=true；\n"
+            "如果是纯问答、解释或不需要数据库数据，返回 need_db=false。"
+        )
+    ))
+
+    need_db_schema = types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "need_db": types.Schema(type=types.Type.BOOLEAN),
+            "reason": types.Schema(type=types.Type.STRING),
+        },
+        required=["need_db", "reason"]
     )
 
     try:
-        response = model.generate_content(
-            parts,
-            generation_config=genai.GenerationConfig(
+        response = client.models.generate_content(
+            model="gemini-2.0-flash-lite",
+            contents=parts,
+            config=types.GenerateContentConfig(
                 response_mime_type="application/json",
-                response_schema={
-                    "type": "object",
-                    "properties": {
-                        "need_db": {"type": "boolean"},
-                        "reason": {"type": "string"}
-                    },
-                    "required": ["need_db", "reason"]
-                }
+                response_schema=need_db_schema,
             )
         )
         result = json.loads(response.text)
         return result.get("need_db", False)
     except Exception:
-        # 解析失败时默认不查询数据库
         return False
 
 

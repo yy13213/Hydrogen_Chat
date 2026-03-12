@@ -4,8 +4,8 @@ from psycopg2 import Error
 # 数据库连接配置
 # ⚠️ 安全提示：在生产环境中，强烈建议将这些敏感信息移至 .env 文件中，通过 os.getenv() 获取，避免密码硬编码在代码库里。
 DB_CONFIG = {
-    "host": "47.121.180.232",
-    "port": "18012",
+    "host": "127.0.0.1",
+    "port": "5433",
     "dbname": "digital-hydrogen",
     "user": "hydrogen_chat",
     "password": "TJhc123,."

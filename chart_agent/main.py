@@ -29,7 +29,7 @@ from sql_generation import run_sql_generation
 from chart_generation import run_chart_generation
 
 # ==================== Gemini 客户端配置 ====================
-GEMINI_BASE_URL = "http://localhost:9583"
+GEMINI_BASE_URL = "http://localhost:6773"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "placeholder")
 
 client = genai.Client(
@@ -44,7 +44,7 @@ ER_CHART_PATH = BASE_DIR / "ER_chart.jpg"
 PROJECTS_DIR.mkdir(exist_ok=True)
 
 # ==================== FastAPI 应用 ====================
-app = FastAPI(title="智能图表绘制服务", version="1.0.1")
+app = FastAPI(title="智能图表绘制服务", version="1.0.2")
 
 # 挂载静态文件目录，供前端访问生成的图片
 app.mount("/projects", StaticFiles(directory=str(PROJECTS_DIR)), name="projects")
@@ -109,7 +109,7 @@ def _build_context_from_jsonl(jsonl_path: Path) -> list:
 
 def _check_need_db(user_input: str, uploaded_file_paths: list, context: list) -> bool:
     """
-    使用 gemini-2.0-flash-lite（视觉）判断是否需要查询数据库。
+    使用 gemini-3.1-pro-preview（视觉）判断是否需要查询数据库。
     结构化返回 {"need_db": true/false, "reason": "..."}
     """
     er_image = _load_er_image_inline()
@@ -159,7 +159,7 @@ def _check_need_db(user_input: str, uploaded_file_paths: list, context: list) ->
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.0-flash-lite",
+            model="gemini-3.1-pro-preview",
             contents=parts,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",

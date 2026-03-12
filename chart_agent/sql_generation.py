@@ -26,7 +26,7 @@ _spec.loader.exec_module(_db_module)
 DB_CONFIG = _db_module.DB_CONFIG
 
 # ==================== Gemini 客户端配置 ====================
-GEMINI_BASE_URL = "http://localhost:9583"
+GEMINI_BASE_URL = "http://localhost:6773"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "placeholder")
 
 client = genai.Client(
@@ -186,7 +186,7 @@ def run_sql_generation(
 
         try:
             sql_response = client.models.generate_content(
-                model="gemini-2.5-pro-preview-03-25",
+                model="gemini-3.1-pro-preview",
                 contents=prompt_parts,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
@@ -267,7 +267,7 @@ def run_sql_generation(
 
         try:
             val_response = client.models.generate_content(
-                model="gemini-2.5-pro-preview-03-25",
+                model="gemini-3.1-pro-preview",
                 contents=validation_parts,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",

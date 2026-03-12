@@ -18,7 +18,7 @@ from google import genai
 from google.genai import types
 
 # ==================== Gemini 客户端配置 ====================
-GEMINI_BASE_URL = "http://localhost:9583"
+GEMINI_BASE_URL = "http://localhost:6773"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "placeholder")
 
 client = genai.Client(
@@ -183,7 +183,7 @@ def run_chart_generation(
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-pro-preview-03-25",
+            model="gemini-3.1-pro-preview",
             contents=contents,
             config=types.GenerateContentConfig(
                 system_instruction=system_instruction,

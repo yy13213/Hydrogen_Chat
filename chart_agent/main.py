@@ -24,9 +24,12 @@ from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 import uvicorn
-
+from dotenv import load_dotenv
 from sql_generation import run_sql_generation
 from chart_generation import run_chart_generation
+
+# 加载 .env 文件中的环境变量
+load_dotenv()
 
 # ==================== Gemini 客户端配置 ====================
 GEMINI_BASE_URL = "http://localhost:6773"

@@ -2,7 +2,7 @@ import http.server
 import socketserver
 
 # 这里设置你需要监听的端口
-PORT = 6773
+PORT = 9621
 
 class RequestHandler(http.server.BaseHTTPRequestHandler):
     # 覆盖默认的日志记录方法，使我们的自定义打印更清晰

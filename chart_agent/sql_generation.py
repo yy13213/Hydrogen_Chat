@@ -13,10 +13,13 @@ import base64
 import importlib.util
 from pathlib import Path
 from datetime import datetime
-
+from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 import psycopg2
+
+# 加载 .env 文件中的环境变量
+load_dotenv()
 
 # 用 importlib 加载数据库模块
 _db_module_path = Path(__file__).parent / "database_query.py"

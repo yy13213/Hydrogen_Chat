@@ -13,9 +13,12 @@ import base64
 import uuid
 from pathlib import Path
 from datetime import datetime
-
+from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+
+# 加载 .env 文件中的环境变量
+load_dotenv()
 
 # ==================== Gemini 客户端配置 ====================
 GEMINI_BASE_URL = "http://localhost:6773"

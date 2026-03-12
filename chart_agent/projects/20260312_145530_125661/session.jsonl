@@ -1,0 +1,6 @@
+{"timestamp": "2026-03-12T14:55:30.126068", "status": "user_turn", "text": "查询进10年数据库发文数量，并绘制柱状图", "files": [], "csv": ""}
+{"timestamp": "2026-03-12T14:55:30.126936", "status": "正在思考", "message": "判断是否需要查询数据库"}
+{"timestamp": "2026-03-12T14:55:30.152319", "status": "思考完成", "need_db": false}
+{"timestamp": "2026-03-12T14:55:30.152618", "status": "生成图表", "csv_path": null}
+{"timestamp": "2026-03-12T14:55:30.166940", "status": "图表生成失败", "error": "404 None. {'detail': 'Not Found'}"}
+{"timestamp": "2026-03-12T14:55:30.167625", "status": "model_turn", "text": "图表生成失败：404 None. {'detail': 'Not Found'}", "files": [], "csv": ""}

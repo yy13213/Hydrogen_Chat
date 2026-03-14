@@ -23,7 +23,7 @@ from utils.file_lock import write_jsonl_all
 
 PROJECTS_DIR = os.getenv("PROJECTS_DIR", "projects")
 MAX_RESEARCHERS = 5
-MAX_SERIAL_ROUNDS = 6
+MAX_SERIAL_ROUNDS = 8
 RESEARCHER_TIMEOUT = 300
 
 

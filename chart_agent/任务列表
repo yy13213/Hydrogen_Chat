@@ -32,5 +32,5 @@ sql_genration.py
 chart_genration.py
 将用户输入交给gemini-3.1-pro-preview，（配置代码执行工具），让Ai自己编写代码并执行生成 Matplotlib 图表，并返回图表图片和AI的回复（可能问题仅仅为问答，则没有图表）。
 
-chart_agent.py
+_chart_agent.py
 streamlit前端，用于方便测试。

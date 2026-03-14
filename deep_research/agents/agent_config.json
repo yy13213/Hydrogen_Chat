@@ -1,0 +1,22 @@
+{
+  "agents": {
+    "Builder": {
+      "enabled": true,
+      "description": "编程智能体，擅长编写和执行代码，适合数据计算、统计分析、数据处理等需要编程解决的任务。",
+      "model": "gemini-3.1-pro-preview",
+      "tools": ["code_execution"]
+    },
+    "Rover": {
+      "enabled": true,
+      "description": "网络搜索智能体，擅长在公共互联网上搜索最新信息，适合查找新闻、最新研究、公开数据等。",
+      "model": "gemini-3.1-pro-preview",
+      "tools": ["google_search"]
+    },
+    "Insight": {
+      "enabled": true,
+      "description": "深度思考智能体，擅长深度分析和推理，适合处理复杂逻辑、综合分析、推断结论等需要深度思考的任务。",
+      "model": "gemini-3.1-pro-preview",
+      "thinking_level": "high"
+    }
+  }
+}

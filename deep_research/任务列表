@@ -1,0 +1,128 @@
+请帮我构建一个deep_research框架。
+
+已有工作：
+大模型连接端口@api/Google_ai2dify_port6773.py （使用geminiSDK，直接转发，带有并发）
+
+注意：
+若为特殊提及，所有的ai模型均为gemini-3.1-pro-preview，请使用geminiSDK调用，并注意对一些新特性的支持，所有的AI调用均使用结构化返回。
+建立带并行能力的框架，Researchesr及Agent都具有并行能力。
+上下文为每次调用该角色时随问题一同传入给AI的上下文。
+如果某个AI结构化返回了错误的信息，比如不存在的ID，无法解析的json，请重新调用AI，最多3次重试机会。
+注意对文件锁（File Lock）的设置，可以使用第三方库filelock，管理对json和jsonl的写入。
+
+记忆框架：
+每个研究开始时，使用采用时间戳生成项目文件夹
+结构如下：
+projects
+    20260312_145530_125661
+        -shared_memory.jsonl
+        -article.json
+        -doubt.jsonl
+        -Researcher_list.jsonl
+        -research_report.md
+        -Researcher1
+            --task_list.jsonl
+            --memory.jsonl
+        -Researcher2
+            --task_list.jsonl
+            --memory.jsonl
+        -Researcher3
+            --task_list.jsonl
+            --memory.jsonl
+        ...
+
+时间戳目录中shared_memory.jsonl为所有Researcher和Agent共享的记忆。
+Researcher目录下的为某个Researcher及其所调用的Agent的独有记忆。
+memory.json：每次调用Agent，都将生成一个记忆单元，采用STAR+可信度（S，情景，这个任务的背景，由Researcher提供；T，目标，这个任务目标；A，行动，为完成任务做出的行动，Agent输出；R，结论，这次任务的结论；C，可信度，由Supervisor对任务评价得出），记忆单元为json格式，存入对应Researcher的memory.jsonl。
+Researcher_list.jsonl为Planner对子研究的安排列表，每条数据包括子研究id（雪花算法生成），Researcher，任务背景，研究目标，完成情况，开始时间，结束时间。
+Memory_control控制shared_memory.jsonl，存储结构以子研究主题为一个json（来自Planner为Researcher的子研究分配），研究刚开始时的用户问题和问题重写单独放在一个json中，每个子研究json包括：子研究id，任务背景，研究目标，任务数据（每条数据包括任务id（雪花算法生成）、研究行动、结论、可信度 ）。
+task_list.jsonl为Researcher对Agent任务的分配列表，每条数据包括任务id（雪花算法生成），Agent类，任务背景，研究目标，完成情况，开始时间，结束时间。
+doubt.jsonl结构为质疑者（某个Researcher）、被质疑者（某个Researcher）、任务id、质疑内容、回答内容、是否接受、理由。
+
+Planner.py
+角色：规划者
+上下文：shared_memory.jsonl，Researcher_list.jsonl
+需求：
+研究开始时，建立研究目录（时间戳为目录名），返回目录名，便于前端轮询。对研究进行重写，同时将研究拆分为多个并行的子研究（无需强求一次性完成任务，ai会多次调用，可串行完成研究），调用一个或多个Researcher（上限5个，Researcher1-Researcher5），为每个Researcher赋予子研究（子研究背景，子研究目标），注意采用结构化返回，雪花算法生成子研究id，子研究内容和Researcher调用写入Researcher_list.jsonl，并在shared_memory.jsonl建立相应子研究json。
+每当接收到某个Researchers完成工作时，Planner激活，继续规划新的子研究（任务背景，研究目标），可调用Researcher（Researcher1-Researcher5）可以为没有工作的Researcher安排工作，也可以为刚刚工作完的Researcher安排新的工作，注意每个Researcher有自己的记忆，建议为一个Researcher分配相关的工作，新的工作尽可能给未参见过工作的Researcher，避免记忆的影响。注意可直接返回无需下一步研究，以便及时停止研究。Planner无需规划撰写报告，只需把研究所需要的所有结论得出即可。所有内容要求结构化返回。
+当某一个Researchers运行超过300s，Planner激活，分析该Researcher的memory.jsonl，拆分Researcher的工作，结构化返回，将task_list.jsonl中剩余没完成的任务拆分一部分给空闲的Researcher，并将超时的Researcher的memory.jsonl复制给空闲的Researcher。
+最多串行进行6次研究，到达4次时，开始在提示词中出现倒计时，请在3次研究内完成剩余研究。
+所有子研究完成后调用Doubter。
+
+Researcher.py
+上下文：shared_memory.jsonl，自己的memory.jsonl，自己的task_list.jsonl
+角色：执行研究的的研究员，接受来自Planner的子研究，并安排手中的智能体协助研究。
+Researcher有5个，每个都有独立记忆（memory.jsonl）
+接受到Planner安排的子研究，对子子研究进行分析，同时将子研究拆分为多个并行的任务（无需强求一次性完成任务，ai会多次调用，可串行完成任务），调用一个或多个Agent（可并行调用，每个Agent也可以同时多次调用），为每个Agent赋予任务（任务背景，任务目标），注意采用结构化返回，雪花算法生成任务id，任务内容和Agent调用写入task_list.jsonl，并在shared_memory.jsonl建立相应子研究json。
+每当接收到某个Agent完成工作时，Researcher激活，继续规划新的任务（任务背景，任务目标），调用Agentr完成任务。注意可直接返回无需下一步研究，以便及时停止研究。Researcher仅负责对子研究主题内进行研究，要有限的拓展研究内容，及时结束子研究，只需把研究所需要的所有结论得出即可。所有内容要求结构化返回。
+最多串行进行4次研究，到达3次时，开始在提示词中出现倒计时，请在2次研究内完成剩余研究。
+所有子研究完成后调用Planner。
+
+Agent
+角色：研究员所调用的智能体，每个可独立完成工作。
+上下文：shared_memory.jsonl，所属Researcher的memory.jsonl。
+分类：
+Archivist：知识库检索智能体，擅长检索知识库。（留空，待完成）
+Tracker：pg数据库检索智能体。（留空，待完成）
+Probe：mysql数据库检索智能体。（留空，待完成）
+Builder：编程智能体，擅长编写代码计算统计数据信息。（使用gemini-3.1-pro-preview，（配置代码执行工具，详见https://ai.google.dev/gemini-api/docs/code-execution?hl=zh-cn））
+Rover：网络搜索智能体，擅长在公共互联网寻找有效信息。（使用gemini-3.1-pro-preview，（配置内置的谷歌搜索工具））
+Insight：深度思考智能体，擅长思考处理常规信息，通用型选手。（使用gemini-3.1-pro-preview，（thinking_level="high"））
+需求：
+目录下建立智能体配置列表，可选择启用那些智能体，以及每个智能体的介绍（为Researcher的提示词），智能体列表可拓展。
+所有智能体可并行重复调用。
+智能体收到Researcher的任务后（背景，目标），结构化返回行动和结果，行动中必须有详细的执行过程和搜集的信息及其信源，最后得到详细的结论。
+智能体完成后将行动与所得结论同Researcher提供的（背景，目标）链接，组成STAR记忆体，并组成调用Supervisor对其评分。
+
+Supervisor.py
+角色：主管，监督Researcher和Agent的工作完成情况，并给予可信度评分。
+上下文：shared_memory.jsonl，Agent所属Researcher的memory.jsonl。
+接受Agent完成任务得到的STAR记忆体，参考其信源与其结论，对其进行可信度评分（百分制），并精炼其研究内容、结论到500字，结构化返回。
+将原始STAR记忆体与可信度存入Agent所属Researcher的memory.jsonl，精炼后的研究行动、结论，可信度评分存入shared_memory.jsonl的对应位置。
+
+Memory_control.py
+角色：记忆管理者。
+当shared_memory.jsonl超过50000字，触发Memory_control，结构化返回指令（例如delete，alter），操作任务id（无法操作子研究id），修改后的内容（请定义好AI输出的格式）。以此批量合并shared_memory.jsonl。
+通过delete无效信息，或者delete一些同类的有效信息，只保留一条信息，使用alter将其他信息合并到这一条，最终实现缩减Memory_control。
+每次尽可以的结构化返回大量指令，来高效删减记忆。
+alter合并后可信度为合并前几条数据的平均值（AI计算）。
+当某一memory.jsonl超过100000字，触发Memory_control，删减原理与对shared_memory.jsonl一致，只是结构化返回的格式不同。
+
+Doubter.py
+任务的质疑者，验证结论的真实性。
+上下文：shared_memory.jsonl，质疑或者被质疑Researcher的memory.jsonl（动态切换）。
+收到Planner完成所有子研究的指令后，并行调用所有参与过研究的Researcher的记忆（只需切换memory.jsonl和task_list.jsonl即可，后面不在赘述），分析shared_memory.jsonl中子研究中某条数据的内容进行质疑，结构化返回内容为是否质疑，质疑任务id、质疑内容（仅仅提出必要的质疑，可提出多条，也可不提出质疑），统计每个Researcher质疑到doubt.jsonl。
+进行回答阶段。将doubt.jsonl中的质疑任务id按照完成该任务的Researcher进行分类，并行调用所有出现被质疑的Researcher的记忆批量回答自己被质疑的任务，结构化返回，将回答内容加入doubt.jsonl。
+进行接受阶段，并行调用质疑者Researcher的记忆，阅读其质疑任务的回答内容，并结构化返回是否接受、理由。
+如果此时还有任务未被接受，调用Researcher，以该条质疑记录为任务，进行研究，结束后正常调用Supervisor后结束任务，不再调用Planner，即对质疑的研究只进行一次，所有质疑研究完成后直接交由Publisher。
+所有没有不接受的质疑或者质疑均研究完成时，调用Publisher.
+
+Publisher.py
+稿件发布者，最后发布稿件的主编。
+以shared_memory.jsonl，Researcher_list.jsonl为上下文，对整篇文章进行分配任务，安排完成最后撰写工作，尽量安排研究某章节的Researcher撰写该章节，可重复安排Researcher。结构化返回：章节，负责撰写的Researcher（结构化返回章节的内容和顺序即为文章的最终呈现），存放在article.json。
+以shared_memory.jsonl，自己的memory.jsonl，自己的task_list.jsonl为上下文，并行调用所有Researcher的记忆，逐个完成对所有章节的撰写。存放在article.json。
+以article.json为上下文，由deepseek-chat完成整篇文章的整理工作，输出markdown格式最终结果，并以research_report进行命名。
+（deepseek-chat调用方式：OpenAI SDK ，base_url ：https://api.deepseek.com，api_key：sk-87d7368283d2467888f2c94dddba0857，所有的AI只有此处调用的是deepseek-chat）
+调用research_report.md为上下文，调用Ai，结构化返回report_name，对research_report.md进行重命名，输出到用户前端。
+
+main.py
+启动深度研究服务（端口3031），接受用户问题，从Planner开始依次深度研究的完整过程。
+接受用户以轮询某个项目（时间戳）的研究进展
+
+_deep_research.py
+streamlit前端，用于方便测试。
+可查看历史研究记录：
+以Researcher_list.jsonl，task_list.jsonl来绘制思维导图（随着研究进展更新，可手动展开详情）
+以doubt.jsonl建立质询对话框。
+以research_report.md（最后会重命名）渲染markdown，来阅读最后的调研报告。
+
+utils
+工具包，存放例如雪花算法等工具函数。
+
+.env.example
+环境变量配置模板，复制后修改为.env。
+
+
+
+
+

@@ -46,8 +46,14 @@ class PlannerContinueResponse(BaseModel):
     reason: str = Field(description="决策理由")
 
 
+class SplitTask(BaseModel):
+    researcher_id: str = Field(description="目标Researcher编号，如 Researcher2")
+    background: str = Field(description="任务背景")
+    goal: str = Field(description="任务目标")
+
+
 class PlannerTimeoutResponse(BaseModel):
-    split_tasks: list[dict] = Field(description="拆分给空闲Researcher的任务列表，每项包含researcher_id, background, goal")
+    split_tasks: list[SplitTask] = Field(description="拆分给空闲Researcher的任务列表")
     reason: str = Field(description="拆分理由")
 
 
@@ -346,7 +352,7 @@ Researcher任务列表：
 
         sub_research_tasks = []
         for task in result.split_tasks:
-            target_r = task.get("researcher_id")
+            target_r = task.researcher_id
             if not target_r:
                 continue
 
@@ -356,8 +362,8 @@ Researcher任务列表：
             write_jsonl_append(paths["researcher_list"], {
                 "sub_research_id": sub_id,
                 "researcher_id": target_r,
-                "background": task.get("background", ""),
-                "goal": task.get("goal", ""),
+                "background": task.background,
+                "goal": task.goal,
                 "status": "pending",
                 "start_time": now,
                 "end_time": None,
@@ -367,8 +373,8 @@ Researcher任务列表：
                 "type": "sub_research",
                 "sub_research_id": sub_id,
                 "researcher_id": target_r,
-                "background": task.get("background", ""),
-                "goal": task.get("goal", ""),
+                "background": task.background,
+                "goal": task.goal,
                 "tasks": [],
             })
 
@@ -377,7 +383,7 @@ Researcher任务列表：
             if os.path.exists(r_paths["memory"]):
                 shutil.copy2(r_paths["memory"], target_r_paths["memory"])
 
-            sub_research_tasks.append((sub_id, target_r, task.get("background", ""), task.get("goal", "")))
+            sub_research_tasks.append((sub_id, target_r, task.background, task.goal))
             self.log.info(f"超时拆分：[{sub_id}] → {target_r}")
 
         await self._launch_researchers(sub_research_tasks)

@@ -82,6 +82,38 @@ def update_jsonl_record(
     return found
 
 
+def update_all_jsonl_records(
+    file_path: str,
+    match_fn: Callable[[dict], bool],
+    update_fn: Callable[[dict], dict],
+) -> int:
+    """
+    查找所有满足 match_fn 的记录，用 update_fn 更新后写回。
+    返回更新的记录数量。
+    """
+    with FileLock(_lock_path(file_path)):
+        records = []
+        if Path(file_path).exists():
+            with open(file_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line:
+                        try:
+                            records.append(json.loads(line))
+                        except json.JSONDecodeError:
+                            pass
+        count = 0
+        for i, rec in enumerate(records):
+            if match_fn(rec):
+                records[i] = update_fn(rec)
+                count += 1
+        if count > 0:
+            with open(file_path, "w", encoding="utf-8") as f:
+                for rec in records:
+                    f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    return count
+
+
 def read_json(file_path: str) -> Any:
     """读取 json 文件"""
     path = Path(file_path)

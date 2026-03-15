@@ -23,8 +23,14 @@ SHARED_MEMORY_THRESHOLD = 50000
 RESEARCHER_MEMORY_THRESHOLD = 100000
 
 
+class MemoryInstruction(BaseModel):
+    op: str = Field(description="操作类型：delete 或 alter")
+    id: str = Field(description="要操作的记录ID")
+    new_content: str = Field(default="", description="alter 操作时的新内容，delete 时为空")
+
+
 class MemoryControlInstructions(BaseModel):
-    instructions: list[dict] = Field(description="操作指令列表，每条为 delete 或 alter 操作")
+    instructions: list[MemoryInstruction] = Field(description="操作指令列表，每条为 delete 或 alter 操作")
     summary: str = Field(description="本次压缩操作的总结")
 
 
@@ -51,6 +57,7 @@ async def _call_gemini_with_retry(prompt: str, response_schema, log, max_retries
 
 
 def _apply_instructions_to_shared_memory(records: list, instructions: list) -> list:
+    """instructions 为 MemoryInstruction 对象列表"""
     task_index = {}
     for si, rec in enumerate(records):
         if rec.get("type") == "sub_research":
@@ -59,21 +66,17 @@ def _apply_instructions_to_shared_memory(records: list, instructions: list) -> l
 
     ids_to_delete = set()
     for instr in instructions:
-        op = instr.get("op")
+        op = instr.op if hasattr(instr, "op") else instr.get("op", "")
+        rec_id = instr.id if hasattr(instr, "id") else instr.get("id", "")
+        new_content = instr.new_content if hasattr(instr, "new_content") else instr.get("new_content", "")
+
         if op == "delete":
-            task_id = instr.get("task_id")
-            if task_id in task_index:
-                ids_to_delete.add(task_id)
+            if rec_id in task_index:
+                ids_to_delete.add(rec_id)
         elif op == "alter":
-            target_id = instr.get("target_task_id")
-            source_ids = instr.get("source_task_ids", [])
-            if target_id in task_index:
-                si, ti = task_index[target_id]
-                records[si]["tasks"][ti]["action"] = instr.get("merged_action", "")
-                records[si]["tasks"][ti]["conclusion"] = instr.get("merged_conclusion", "")
-                records[si]["tasks"][ti]["credibility"] = instr.get("merged_credibility", 0)
-            for sid in source_ids:
-                ids_to_delete.add(sid)
+            if rec_id in task_index:
+                si, ti = task_index[rec_id]
+                records[si]["tasks"][ti]["conclusion"] = new_content
 
     for rec in records:
         if rec.get("type") == "sub_research":
@@ -82,24 +85,21 @@ def _apply_instructions_to_shared_memory(records: list, instructions: list) -> l
 
 
 def _apply_instructions_to_memory(records: list, instructions: list) -> list:
+    """instructions 为 MemoryInstruction 对象列表"""
     task_index = {rec.get("task_id"): i for i, rec in enumerate(records)}
     ids_to_delete = set()
     for instr in instructions:
-        op = instr.get("op")
+        op = instr.op if hasattr(instr, "op") else instr.get("op", "")
+        rec_id = instr.id if hasattr(instr, "id") else instr.get("id", "")
+        new_content = instr.new_content if hasattr(instr, "new_content") else instr.get("new_content", "")
+
         if op == "delete":
-            task_id = instr.get("task_id")
-            if task_id in task_index:
-                ids_to_delete.add(task_id)
+            if rec_id in task_index:
+                ids_to_delete.add(rec_id)
         elif op == "alter":
-            target_id = instr.get("target_task_id")
-            source_ids = instr.get("source_task_ids", [])
-            if target_id in task_index:
-                idx = task_index[target_id]
-                records[idx]["A"] = instr.get("merged_action", "")
-                records[idx]["R"] = instr.get("merged_conclusion", "")
-                records[idx]["C"] = instr.get("merged_credibility", 0)
-            for sid in source_ids:
-                ids_to_delete.add(sid)
+            if rec_id in task_index:
+                idx = task_index[rec_id]
+                records[idx]["R"] = new_content
     return [r for r in records if r.get("task_id") not in ids_to_delete]
 
 
@@ -135,11 +135,11 @@ async def compress_shared_memory(project_dir: str) -> bool:
 {json.dumps(all_tasks, ensure_ascii=False, indent=2)}
 
 请批量生成压缩指令（尽可能多地生成指令以高效压缩）：
-- delete：删除无效信息、重复信息、价值低的信息（op: "delete", task_id: "xxx"）
-- alter：将多条同类信息合并为一条（op: "alter", target_task_id: "xxx", source_task_ids: ["yyy","zzz"], merged_action: "...", merged_conclusion: "...", merged_credibility: 数值）
+- delete：删除无效/重复/低价值信息，字段：op="delete", id=task_id, new_content=""
+- alter：将多条同类信息合并，保留一条并更新其 conclusion，字段：op="alter", id=保留的task_id, new_content="合并后的结论"
 
 注意：
-- alter 操作中 source_task_ids 不能包含 target_task_id
+- 每条指令仅操作一个 id
 - 尽量保留高可信度的信息
 """
     result: MemoryControlInstructions = await _call_gemini_with_retry(prompt, MemoryControlInstructions, log)
@@ -169,8 +169,10 @@ async def compress_researcher_memory(project_dir: str, researcher_id: str) -> bo
 {json.dumps(records, ensure_ascii=False, indent=2)}
 
 请批量生成压缩指令：
-- delete：删除无效信息、重复信息（op: "delete", task_id: "xxx"）
-- alter：将多条同类记忆合并（op: "alter", target_task_id: "xxx", source_task_ids: ["yyy"], merged_action: "...", merged_conclusion: "...", merged_credibility: 数值）
+- delete：删除无效/重复信息，字段：op="delete", id=task_id, new_content=""
+- alter：将多条同类记忆合并，保留一条并更新其结论（R字段），字段：op="alter", id=保留的task_id, new_content="合并后的结论"
+
+注意：每条指令仅操作一个 id。
 """
     result: MemoryControlInstructions = await _call_gemini_with_retry(prompt, MemoryControlInstructions, log)
     updated_records = _apply_instructions_to_memory(records, result.instructions)

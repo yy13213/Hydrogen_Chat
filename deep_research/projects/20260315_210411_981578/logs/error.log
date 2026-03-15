@@ -1,0 +1,1266 @@
+2026-03-15 21:07:29 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:07:29 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:07:29 [ERROR] [dr.20260315_210411_981578.Planner] Researcher3 执行失败 [308616395241820160]: Doubter 调用失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 208, in launch_one
+    await researcher.start(sub_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 154, in start
+    await self._dispatch_tasks(result.tasks, sub_research_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 216, in _dispatch_tasks
+    await self.on_tasks_complete(sub_research_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 262, in on_tasks_complete
+    await self._notify_planner_complete(sub_research_id)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 282, in _notify_planner_complete
+    await planner.on_researcher_complete(self.researcher_id)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 273, in on_researcher_complete
+    return await self._finalize_research()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 390, in _finalize_research
+    await doubter.run()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 121, in run
+    await self._phase_answer()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 228, in _phase_answer
+    await asyncio.gather(*[
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 217, in answer_as_researcher
+    result: DoubtAnswerResponse = await _call_gemini_with_retry(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 68, in _call_gemini_with_retry
+    raise RuntimeError(f"Doubter 调用失败: {e}") from e
+RuntimeError: Doubter 调用失败: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:08:41 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:08:41 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:08:41 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:08:41 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:08:41 [ERROR] [dr.20260315_210411_981578.Planner] Researcher2 执行失败 [308616395229237248]: Doubter 调用失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 208, in launch_one
+    await researcher.start(sub_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 154, in start
+    await self._dispatch_tasks(result.tasks, sub_research_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 216, in _dispatch_tasks
+    await self.on_tasks_complete(sub_research_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 262, in on_tasks_complete
+    await self._notify_planner_complete(sub_research_id)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 282, in _notify_planner_complete
+    await planner.on_researcher_complete(self.researcher_id)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 231, in on_researcher_complete
+    return await self._finalize_research()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 390, in _finalize_research
+    await doubter.run()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 121, in run
+    await self._phase_answer()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 228, in _phase_answer
+    await asyncio.gather(*[
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 217, in answer_as_researcher
+    result: DoubtAnswerResponse = await _call_gemini_with_retry(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 68, in _call_gemini_with_retry
+    raise RuntimeError(f"Doubter 调用失败: {e}") from e
+RuntimeError: Doubter 调用失败: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:08:53 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:08:53 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:08:53 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:08:53 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:08:53 [ERROR] [dr.20260315_210411_981578.Planner] Researcher5 执行失败 [308616395258597376]: Doubter 调用失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 208, in launch_one
+    await researcher.start(sub_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 154, in start
+    await self._dispatch_tasks(result.tasks, sub_research_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 216, in _dispatch_tasks
+    await self.on_tasks_complete(sub_research_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 262, in on_tasks_complete
+    await self._notify_planner_complete(sub_research_id)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 282, in _notify_planner_complete
+    await planner.on_researcher_complete(self.researcher_id)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 273, in on_researcher_complete
+    return await self._finalize_research()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 390, in _finalize_research
+    await doubter.run()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 121, in run
+    await self._phase_answer()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 228, in _phase_answer
+    await asyncio.gather(*[
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 217, in answer_as_researcher
+    result: DoubtAnswerResponse = await _call_gemini_with_retry(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 68, in _call_gemini_with_retry
+    raise RuntimeError(f"Doubter 调用失败: {e}") from e
+RuntimeError: Doubter 调用失败: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:10:11 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:10:11 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:10:11 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:10:11 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:10:11 [ERROR] [dr.20260315_210411_981578.Planner] Researcher4 执行失败 [308616917067763712]: Doubter 调用失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 208, in launch_one
+    await researcher.start(sub_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 154, in start
+    await self._dispatch_tasks(result.tasks, sub_research_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 216, in _dispatch_tasks
+    await self.on_tasks_complete(sub_research_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 262, in on_tasks_complete
+    await self._notify_planner_complete(sub_research_id)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 282, in _notify_planner_complete
+    await planner.on_researcher_complete(self.researcher_id)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 231, in on_researcher_complete
+    return await self._finalize_research()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 390, in _finalize_research
+    await doubter.run()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 121, in run
+    await self._phase_answer()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 228, in _phase_answer
+    await asyncio.gather(*[
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 217, in answer_as_researcher
+    result: DoubtAnswerResponse = await _call_gemini_with_retry(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 68, in _call_gemini_with_retry
+    raise RuntimeError(f"Doubter 调用失败: {e}") from e
+RuntimeError: Doubter 调用失败: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:10:59 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:10:59 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:10:59 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:10:59 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:10:59 [ERROR] [dr.20260315_210411_981578.Planner] Researcher3 执行失败 [308617177160749056]: Doubter 调用失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 208, in launch_one
+    await researcher.start(sub_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 154, in start
+    await self._dispatch_tasks(result.tasks, sub_research_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 216, in _dispatch_tasks
+    await self.on_tasks_complete(sub_research_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 262, in on_tasks_complete
+    await self._notify_planner_complete(sub_research_id)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 282, in _notify_planner_complete
+    await planner.on_researcher_complete(self.researcher_id)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 231, in on_researcher_complete
+    return await self._finalize_research()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 390, in _finalize_research
+    await doubter.run()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 121, in run
+    await self._phase_answer()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 228, in _phase_answer
+    await asyncio.gather(*[
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 217, in answer_as_researcher
+    result: DoubtAnswerResponse = await _call_gemini_with_retry(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 68, in _call_gemini_with_retry
+    raise RuntimeError(f"Doubter 调用失败: {e}") from e
+RuntimeError: Doubter 调用失败: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:13:49 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:13:49 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:13:49 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:13:49 [ERROR] [dr.20260315_210411_981578.Doubter] Gemini 调用最终失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+2026-03-15 21:13:49 [ERROR] [dr.20260315_210411_981578.Planner] Researcher1 执行失败 [308617177148166144]: Doubter 调用失败: additionalProperties is not supported in the Gemini API.
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 53, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4347, in _generate_content
+    request_dict = _GenerateContentParameters_to_mldev(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1482, in _GenerateContentParameters_to_mldev
+    _GenerateContentConfig_to_mldev(
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 1172, in _GenerateContentConfig_to_mldev
+    t.t_schema(api_client, getv(from_object, ['response_schema'])),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 879, in t_schema
+    process_schema(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 794, in process_schema
+    properties[name] = _recurse(sub_schema)
+                       ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 808, in process_schema
+    schema['items'] = _recurse(items)
+                      ^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 768, in _recurse
+    process_schema(sub_schema, client, defs, order_properties=order_properties)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 732, in process_schema
+    _raise_for_unsupported_mldev_properties(schema, client)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_transformers.py", line 659, in _raise_for_unsupported_mldev_properties
+    raise ValueError('additionalProperties is not supported in the Gemini API.')
+ValueError: additionalProperties is not supported in the Gemini API.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 208, in launch_one
+    await researcher.start(sub_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 154, in start
+    await self._dispatch_tasks(result.tasks, sub_research_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 216, in _dispatch_tasks
+    await self.on_tasks_complete(sub_research_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 262, in on_tasks_complete
+    await self._notify_planner_complete(sub_research_id)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 282, in _notify_planner_complete
+    await planner.on_researcher_complete(self.researcher_id)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 231, in on_researcher_complete
+    return await self._finalize_research()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 390, in _finalize_research
+    await doubter.run()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 121, in run
+    await self._phase_answer()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 228, in _phase_answer
+    await asyncio.gather(*[
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 217, in answer_as_researcher
+    result: DoubtAnswerResponse = await _call_gemini_with_retry(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 68, in _call_gemini_with_retry
+    raise RuntimeError(f"Doubter 调用失败: {e}") from e
+RuntimeError: Doubter 调用失败: additionalProperties is not supported in the Gemini API.

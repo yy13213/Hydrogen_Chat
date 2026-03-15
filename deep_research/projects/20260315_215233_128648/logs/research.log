@@ -1,0 +1,890 @@
+2026-03-15 21:52:33 [INFO] [dr.20260315_215233_128648.main] 研究任务启动，问题：收集整理目前中国9阶层实际收入和财务状况，特别研究得出中国的中产有哪些特点，实际中产人数，财力等等...
+2026-03-15 21:52:33 [INFO] [dr.20260315_215233_128648.Planner] 开始研究初始化，问题：收集整理目前中国9阶层实际收入和财务状况，特别研究得出中国的中产有哪些特点，实际中产人数，财力等等...
+2026-03-15 21:52:53 [INFO] [dr.20260315_215233_128648.Planner] 问题重写完成：当前中国社会九大阶层的收入与财务状况全景评估，及中产阶级规模、财富特征与社会经济画像的深度研究。...
+2026-03-15 21:52:53 [INFO] [dr.20260315_215233_128648.Planner] 规划 5 个子研究
+2026-03-15 21:52:53 [INFO] [dr.20260315_215233_128648.Planner] 子研究 [308628521347977216] → Researcher1：梳理并界定目前中国社会'九大阶层'的标准划分模型，明确各阶层的定义、核心准入标准及社会学特征。...
+2026-03-15 21:52:53 [INFO] [dr.20260315_215233_128648.Planner] 子研究 [308628521360560128] → Researcher2：广泛收集并整理中国九大阶层当前的实际收入区间、资产状况及负债水平，形成全社会的阶层财富分布全景数据图表。...
+2026-03-15 21:52:53 [INFO] [dr.20260315_215233_128648.Planner] 子研究 [308628521368948736] → Researcher3：通过权威宏观数据多维度测算当前中国中产阶级的实际总人数、占总人口比例，并描绘其地域分布、年龄结构及职业构成等人口学特征。...
+2026-03-15 21:52:53 [INFO] [dr.20260315_215233_128648.Planner] 子研究 [308628521381531648] → Researcher4：深度剖析中国中产阶级的财富结构（如房产占比、金融资产流动性）、负债压力（如房贷、消费贷）及实际可自由支配财力。...
+2026-03-15 21:52:53 [INFO] [dr.20260315_215233_128648.Planner] 子研究 [308628521389920256] → Researcher5：研究中国中产阶级的消费行为特征（如消费升降级趋势）、生活方式，以及面临的阶层滑落风险、财务安全感和焦虑现状。...
+2026-03-15 21:52:53 [INFO] [dr.20260315_215233_128648.Planner] 并行启动 5 个 Researcher...
+2026-03-15 21:52:53 [INFO] [dr.20260315_215233_128648.Planner] 启动 Researcher1，子研究 [308628521347977216]
+2026-03-15 21:52:53 [INFO] [dr.20260315_215233_128648.Researcher1] 开始子研究 [308628521347977216]：梳理并界定目前中国社会'九大阶层'的标准划分模型，明确各阶层的定义、核心准入标准及社会学特征。...
+2026-03-15 21:52:53 [INFO] [dr.20260315_215233_128648.Planner] 启动 Researcher2，子研究 [308628521360560128]
+2026-03-15 21:52:53 [INFO] [dr.20260315_215233_128648.Researcher2] 开始子研究 [308628521360560128]：广泛收集并整理中国九大阶层当前的实际收入区间、资产状况及负债水平，形成全社会的阶层财富分布全景数据图表。...
+2026-03-15 21:52:53 [INFO] [dr.20260315_215233_128648.Planner] 启动 Researcher3，子研究 [308628521368948736]
+2026-03-15 21:52:53 [INFO] [dr.20260315_215233_128648.Researcher3] 开始子研究 [308628521368948736]：通过权威宏观数据多维度测算当前中国中产阶级的实际总人数、占总人口比例，并描绘其地域分布、年龄结构及职业构成等人口学特征。...
+2026-03-15 21:52:53 [INFO] [dr.20260315_215233_128648.Planner] 启动 Researcher4，子研究 [308628521381531648]
+2026-03-15 21:52:53 [INFO] [dr.20260315_215233_128648.Researcher4] 开始子研究 [308628521381531648]：深度剖析中国中产阶级的财富结构（如房产占比、金融资产流动性）、负债压力（如房贷、消费贷）及实际可自由支配财力。...
+2026-03-15 21:52:53 [INFO] [dr.20260315_215233_128648.Planner] 启动 Researcher5，子研究 [308628521389920256]
+2026-03-15 21:52:53 [INFO] [dr.20260315_215233_128648.Researcher5] 开始子研究 [308628521389920256]：研究中国中产阶级的消费行为特征（如消费升降级趋势）、生活方式，以及面临的阶层滑落风险、财务安全感和焦虑现状。...
+2026-03-15 21:53:12 [INFO] [dr.20260315_215233_128648.Researcher1] 分析完成，规划 3 个Agent任务
+2026-03-15 21:53:12 [INFO] [dr.20260315_215233_128648.Researcher1] 启动 Agent [Rover] 任务 [308628599680798720]：在公共互联网和公开文献库中搜索“中国九大阶层”的理论渊源（例如梁晓声的社会阶层分析模型，或类似有影响...
+2026-03-15 21:53:12 [INFO] [dr.20260315_215233_128648.Researcher1] 启动 Agent [Rover] 任务 [308628599689187328]：搜索并汇总近年来智库、学术界或主流权威媒体对中国各社会阶层（尤其是九大阶层模型）在收入水平、职业类型...
+2026-03-15 21:53:12 [INFO] [dr.20260315_215233_128648.Researcher1] 启动 Agent [Insight] 任务 [308628599697575936]：基于经济、政治、文化三大资本的经典社会学分层理论（如韦伯分层理论及中国社科院陆学艺的社会阶层研究），...
+2026-03-15 21:53:12 [INFO] [dr.20260315_215233_128648.Rover.Researcher1] [Rover] 开始执行任务 [308628599680798720]：在公共互联网和公开文献库中搜索“中国九大阶层”的理论渊源（例如梁晓声的社会阶层分析模型，或类似有影响力的划分标准），梳理...
+2026-03-15 21:53:12 [INFO] [dr.20260315_215233_128648.Rover.Researcher1] [Rover] 开始执行任务 [308628599689187328]：搜索并汇总近年来智库、学术界或主流权威媒体对中国各社会阶层（尤其是九大阶层模型）在收入水平、职业类型、教育背景及社会声望...
+2026-03-15 21:53:12 [INFO] [dr.20260315_215233_128648.Insight.Researcher1] [Insight] 开始执行任务 [308628599697575936]：基于经济、政治、文化三大资本的经典社会学分层理论（如韦伯分层理论及中国社科院陆学艺的社会阶层研究），推演并构建一套符合当...
+2026-03-15 21:53:14 [INFO] [dr.20260315_215233_128648.Researcher2] 分析完成，规划 4 个Agent任务
+2026-03-15 21:53:14 [INFO] [dr.20260315_215233_128648.Researcher2] 启动 Agent [Rover] 任务 [308628610560823296]：搜索并收集中国'九大阶层'划分标准中上层（第1至第3层，如顶级权贵、大富豪、中大型企业主、高级管理人...
+2026-03-15 21:53:14 [INFO] [dr.20260315_215233_128648.Researcher2] 启动 Agent [Rover] 任务 [308628610569211904]：搜索并收集中国'九大阶层'划分标准中中间阶层（第4至第6层，如普通白领、小微企业主、专业技术人员、体...
+2026-03-15 21:53:14 [INFO] [dr.20260315_215233_128648.Researcher2] 启动 Agent [Rover] 任务 [308628610577600512]：搜索并收集中国'九大阶层'划分标准中底层（第7至第9层，如普通蓝领工人、服务业基层人员、普通农民、低...
+2026-03-15 21:53:14 [INFO] [dr.20260315_215233_128648.Researcher2] 启动 Agent [Insight] 任务 [308628610581794816]：对收集到的中国九大阶层各阶段的收入、资产与负债数据进行交叉验证、逻辑清洗和结构化整理，提取核心数据指...
+2026-03-15 21:53:14 [INFO] [dr.20260315_215233_128648.Rover.Researcher2] [Rover] 开始执行任务 [308628610560823296]：搜索并收集中国'九大阶层'划分标准中上层（第1至第3层，如顶级权贵、大富豪、中大型企业主、高级管理人员等）的实际年收入区...
+2026-03-15 21:53:14 [INFO] [dr.20260315_215233_128648.Rover.Researcher2] [Rover] 开始执行任务 [308628610569211904]：搜索并收集中国'九大阶层'划分标准中中间阶层（第4至第6层，如普通白领、小微企业主、专业技术人员、体制内基层等）当前的实...
+2026-03-15 21:53:14 [INFO] [dr.20260315_215233_128648.Rover.Researcher2] [Rover] 开始执行任务 [308628610577600512]：搜索并收集中国'九大阶层'划分标准中底层（第7至第9层，如普通蓝领工人、服务业基层人员、普通农民、低保及失业人群）的实际...
+2026-03-15 21:53:14 [INFO] [dr.20260315_215233_128648.Insight.Researcher2] [Insight] 开始执行任务 [308628610581794816]：对收集到的中国九大阶层各阶段的收入、资产与负债数据进行交叉验证、逻辑清洗和结构化整理，提取核心数据指标，构建全社会阶层财...
+2026-03-15 21:53:17 [INFO] [dr.20260315_215233_128648.Researcher3] 分析完成，规划 3 个Agent任务
+2026-03-15 21:53:17 [INFO] [dr.20260315_215233_128648.Researcher3] 启动 Agent [Rover] 任务 [308628620929142784]：搜索并梳理国家统计局、社科院、麦肯锡、瑞信、胡润等国内外权威机构对中国中产阶级的定义标准、最新总人数...
+2026-03-15 21:53:17 [INFO] [dr.20260315_215233_128648.Researcher3] 启动 Agent [Rover] 任务 [308628620937531392]：搜索收集当前中国中产阶级在地域分布（如一二线城市与下沉市场的分布占比）、年龄结构（如80后、90后的...
+2026-03-15 21:53:17 [INFO] [dr.20260315_215233_128648.Researcher3] 启动 Agent [Insight] 任务 [308628620945920000]：基于收集到的多方规模与特征数据，进行多维度比对与交叉分析，剔除极端或不适用的口径，推导得出当前中国中...
+2026-03-15 21:53:17 [INFO] [dr.20260315_215233_128648.Rover.Researcher3] [Rover] 开始执行任务 [308628620929142784]：搜索并梳理国家统计局、社科院、麦肯锡、瑞信、胡润等国内外权威机构对中国中产阶级的定义标准、最新总人数测算结果及占总人口比...
+2026-03-15 21:53:17 [INFO] [dr.20260315_215233_128648.Rover.Researcher3] [Rover] 开始执行任务 [308628620937531392]：搜索收集当前中国中产阶级在地域分布（如一二线城市与下沉市场的分布占比）、年龄结构（如80后、90后的代际分布特征）及职业...
+2026-03-15 21:53:17 [INFO] [dr.20260315_215233_128648.Insight.Researcher3] [Insight] 开始执行任务 [308628620945920000]：基于收集到的多方规模与特征数据，进行多维度比对与交叉分析，剔除极端或不适用的口径，推导得出当前中国中产阶级最合理的实际规...
+2026-03-15 21:53:19 [INFO] [dr.20260315_215233_128648.Researcher4] 分析完成，规划 3 个Agent任务
+2026-03-15 21:53:19 [INFO] [dr.20260315_215233_128648.Researcher4] 启动 Agent [Rover] 任务 [308628631419097088]：在公共互联网上搜索并收集有关中国中产阶级最新财富结构和资产配置的权威数据与研究报告，重点提炼房产在总...
+2026-03-15 21:53:19 [INFO] [dr.20260315_215233_128648.Researcher4] 启动 Agent [Rover] 任务 [308628631427485696]：搜索并提取中国中产阶级的负债状况及实际可支配收入相关的数据信息，重点聚焦房贷、车贷及各类消费贷等核心...
+2026-03-15 21:53:19 [INFO] [dr.20260315_215233_128648.Researcher4] 启动 Agent [Insight] 任务 [308628631431680000]：结合当前中国宏观经济周期与中产阶级资产负债的一般性特征，深度剖析其资产负债表的脆弱性与韧性，逻辑推演...
+2026-03-15 21:53:19 [INFO] [dr.20260315_215233_128648.Rover.Researcher4] [Rover] 开始执行任务 [308628631419097088]：在公共互联网上搜索并收集有关中国中产阶级最新财富结构和资产配置的权威数据与研究报告，重点提炼房产在总资产中的占比、金融资...
+2026-03-15 21:53:19 [INFO] [dr.20260315_215233_128648.Rover.Researcher4] [Rover] 开始执行任务 [308628631427485696]：搜索并提取中国中产阶级的负债状况及实际可支配收入相关的数据信息，重点聚焦房贷、车贷及各类消费贷等核心负债的占比、收入负债...
+2026-03-15 21:53:19 [INFO] [dr.20260315_215233_128648.Insight.Researcher4] [Insight] 开始执行任务 [308628631431680000]：结合当前中国宏观经济周期与中产阶级资产负债的一般性特征，深度剖析其资产负债表的脆弱性与韧性，逻辑推演其真实的自由支配财力...
+2026-03-15 21:53:22 [INFO] [dr.20260315_215233_128648.Researcher5] 分析完成，规划 3 个Agent任务
+2026-03-15 21:53:22 [INFO] [dr.20260315_215233_128648.Researcher5] 启动 Agent [Rover] 任务 [308628644278833152]：搜索并整理近年来中国中产阶级消费行为变化的数据、报告与新闻，重点分析平替消费、体验式消费等趋势，以及...
+2026-03-15 21:53:22 [INFO] [dr.20260315_215233_128648.Researcher5] 启动 Agent [Rover] 任务 [308628644287221760]：搜索并整理近年来中国中产阶级消费行为变化的数据、报告与新闻，重点分析平替消费、体验式消费等趋势，以及...
+2026-03-15 21:53:22 [INFO] [dr.20260315_215233_128648.Researcher5] 启动 Agent [Rover] 任务 [308628644291416064]：广泛搜索关于中国中产阶级阶层滑落风险、财务安全感缺失与阶层焦虑的最新社会调研数据、分析文章，归纳其焦...
+2026-03-15 21:53:22 [INFO] [dr.20260315_215233_128648.Researcher5] 启动 Agent [Rover] 任务 [308628644299804672]：广泛搜索关于中国中产阶级阶层滑落风险、财务安全感缺失与阶层焦虑的最新社会调研数据、分析文章，归纳其焦...
+2026-03-15 21:53:22 [INFO] [dr.20260315_215233_128648.Researcher5] 启动 Agent [Insight] 任务 [308628644303998976]：结合行为经济学与社会学视角，深度剖析中国中产阶级财务状况、消费保守化及阶层焦虑三者之间的深层因果逻辑...
+2026-03-15 21:53:22 [INFO] [dr.20260315_215233_128648.Rover.Researcher5] [Rover] 开始执行任务 [308628644278833152]：搜索并整理近年来中国中产阶级消费行为变化的数据、报告与新闻，重点分析平替消费、体验式消费等趋势，以及在教育、医疗等领域的...
+2026-03-15 21:53:22 [INFO] [dr.20260315_215233_128648.Rover.Researcher5] [Rover] 开始执行任务 [308628644287221760]：搜索并整理近年来中国中产阶级消费行为变化的数据、报告与新闻，重点分析平替消费、体验式消费等趋势，以及在教育、医疗等领域的...
+2026-03-15 21:53:22 [INFO] [dr.20260315_215233_128648.Rover.Researcher5] [Rover] 开始执行任务 [308628644291416064]：广泛搜索关于中国中产阶级阶层滑落风险、财务安全感缺失与阶层焦虑的最新社会调研数据、分析文章，归纳其焦虑的主要来源（如职场...
+2026-03-15 21:53:22 [INFO] [dr.20260315_215233_128648.Rover.Researcher5] [Rover] 开始执行任务 [308628644299804672]：广泛搜索关于中国中产阶级阶层滑落风险、财务安全感缺失与阶层焦虑的最新社会调研数据、分析文章，归纳其焦虑的主要来源（如职场...
+2026-03-15 21:53:22 [INFO] [dr.20260315_215233_128648.Insight.Researcher5] [Insight] 开始执行任务 [308628644303998976]：结合行为经济学与社会学视角，深度剖析中国中产阶级财务状况、消费保守化及阶层焦虑三者之间的深层因果逻辑，并评估这种社会心态...
+2026-03-15 21:53:55 [INFO] [dr.20260315_215233_128648.Supervisor.Researcher3] 任务 [308628620945920000] 评分：95分
+2026-03-15 21:53:55 [INFO] [dr.20260315_215233_128648.Insight.Researcher3] [Insight] 任务 [308628620945920000] 完成，可信度：95
+2026-03-15 21:54:15 [INFO] [dr.20260315_215233_128648.Supervisor.Researcher1] 任务 [308628599697575936] 评分：85分
+2026-03-15 21:54:15 [INFO] [dr.20260315_215233_128648.Insight.Researcher1] [Insight] 任务 [308628599697575936] 完成，可信度：85
+2026-03-15 21:54:17 [INFO] [dr.20260315_215233_128648.Supervisor.Researcher2] 任务 [308628610581794816] 评分：88分
+2026-03-15 21:54:17 [INFO] [dr.20260315_215233_128648.Insight.Researcher2] [Insight] 任务 [308628610581794816] 完成，可信度：88
+2026-03-15 21:54:21 [INFO] [dr.20260315_215233_128648.Supervisor.Researcher5] 任务 [308628644291416064] 评分：85分
+2026-03-15 21:54:21 [INFO] [dr.20260315_215233_128648.Rover.Researcher5] [Rover] 任务 [308628644291416064] 完成，可信度：85
+2026-03-15 21:54:21 [INFO] [dr.20260315_215233_128648.Supervisor.Researcher4] 任务 [308628631427485696] 评分：85分
+2026-03-15 21:54:21 [INFO] [dr.20260315_215233_128648.Rover.Researcher4] [Rover] 任务 [308628631427485696] 完成，可信度：85
+2026-03-15 21:54:25 [INFO] [dr.20260315_215233_128648.Supervisor.Researcher4] 任务 [308628631431680000] 评分：75分
+2026-03-15 21:54:25 [INFO] [dr.20260315_215233_128648.Insight.Researcher4] [Insight] 任务 [308628631431680000] 完成，可信度：75
+2026-03-15 21:54:26 [INFO] [dr.20260315_215233_128648.Supervisor.Researcher2] 任务 [308628610560823296] 评分：95分
+2026-03-15 21:54:26 [INFO] [dr.20260315_215233_128648.Rover.Researcher2] [Rover] 任务 [308628610560823296] 完成，可信度：95
+2026-03-15 21:54:26 [INFO] [dr.20260315_215233_128648.Supervisor.Researcher5] 任务 [308628644303998976] 评分：85分
+2026-03-15 21:54:26 [INFO] [dr.20260315_215233_128648.Insight.Researcher5] [Insight] 任务 [308628644303998976] 完成，可信度：85
+2026-03-15 21:54:26 [INFO] [dr.20260315_215233_128648.Supervisor.Researcher3] 任务 [308628620937531392] 评分：95分
+2026-03-15 21:54:26 [INFO] [dr.20260315_215233_128648.Rover.Researcher3] [Rover] 任务 [308628620937531392] 完成，可信度：95
+2026-03-15 21:54:31 [INFO] [dr.20260315_215233_128648.Supervisor.Researcher2] 任务 [308628610569211904] 评分：95分
+2026-03-15 21:54:31 [INFO] [dr.20260315_215233_128648.Rover.Researcher2] [Rover] 任务 [308628610569211904] 完成，可信度：95
+2026-03-15 21:54:35 [INFO] [dr.20260315_215233_128648.Supervisor.Researcher4] 任务 [308628631419097088] 评分：92分
+2026-03-15 21:54:35 [INFO] [dr.20260315_215233_128648.Rover.Researcher4] [Rover] 任务 [308628631419097088] 完成，可信度：92
+2026-03-15 21:54:35 [INFO] [dr.20260315_215233_128648.Researcher4] Agent 任务 [308628631419097088] 完成
+2026-03-15 21:54:35 [INFO] [dr.20260315_215233_128648.Researcher4] Agent 任务 [308628631427485696] 完成
+2026-03-15 21:54:35 [INFO] [dr.20260315_215233_128648.Researcher4] Agent 任务 [308628631431680000] 完成
+2026-03-15 21:54:35 [INFO] [dr.20260315_215233_128648.Researcher4] 第 2 轮任务完成，评估是否继续
+2026-03-15 21:54:35 [INFO] [dr.20260315_215233_128648.Supervisor.Researcher5] 任务 [308628644299804672] 评分：92分
+2026-03-15 21:54:35 [INFO] [dr.20260315_215233_128648.Rover.Researcher5] [Rover] 任务 [308628644299804672] 完成，可信度：92
+2026-03-15 21:54:41 [INFO] [dr.20260315_215233_128648.Supervisor.Researcher5] 任务 [308628644278833152] 评分：95分
+2026-03-15 21:54:41 [INFO] [dr.20260315_215233_128648.Rover.Researcher5] [Rover] 任务 [308628644278833152] 完成，可信度：95
+2026-03-15 21:54:45 [INFO] [dr.20260315_215233_128648.Researcher4] 继续决策：continue=False，理由：当前已通过多项任务全面收集并分析了中国中产阶级的财富结构（房产占净资产比重超76%、金融资产低流动性且偏好储蓄）、负债压
+2026-03-15 21:54:45 [INFO] [dr.20260315_215233_128648.Researcher4] 子研究 [308628521381531648] 完成，通知 Planner
+2026-03-15 21:54:45 [INFO] [dr.20260315_215233_128648.Planner] Researcher4 完成，当前第 2 轮
+2026-03-15 21:54:45 [INFO] [dr.20260315_215233_128648.Supervisor.Researcher1] 任务 [308628599680798720] 评分：80分
+2026-03-15 21:54:45 [INFO] [dr.20260315_215233_128648.Rover.Researcher1] [Rover] 任务 [308628599680798720] 完成，可信度：80
+2026-03-15 21:55:01 [INFO] [dr.20260315_215233_128648.Planner] Planner 决策：continue=True，理由：当前研究已经非常详尽地界定了九大阶层的框架，并深度剖析了1-6层（精英与中产）的实际收入、财富结构以及中产阶级的消费心态和人数规模。但为了完全达成初始目标（收集
+2026-03-15 21:55:01 [INFO] [dr.20260315_215233_128648.Planner] 新子研究 [308629059980496896] → Researcher4：收集整理中国社会第7至第9层（如普通工薪阶层、蓝领、农民及边缘劳动者等）的实际收入区间、资产分布特征（如农村土地、少量存...
+2026-03-15 21:55:01 [INFO] [dr.20260315_215233_128648.Planner] 启动 Researcher4，子研究 [308629059980496896]
+2026-03-15 21:55:01 [INFO] [dr.20260315_215233_128648.Researcher4] 开始子研究 [308629059980496896]：收集整理中国社会第7至第9层（如普通工薪阶层、蓝领、农民及边缘劳动者等）的实际收入区间、资产分布特征（如农村土地、少量存...
+2026-03-15 21:55:06 [INFO] [dr.20260315_215233_128648.Supervisor.Researcher1] 任务 [308628599689187328] 评分：92分
+2026-03-15 21:55:06 [INFO] [dr.20260315_215233_128648.Rover.Researcher1] [Rover] 任务 [308628599689187328] 完成，可信度：92
+2026-03-15 21:55:06 [INFO] [dr.20260315_215233_128648.Researcher1] Agent 任务 [308628599680798720] 完成
+2026-03-15 21:55:06 [INFO] [dr.20260315_215233_128648.Researcher1] Agent 任务 [308628599689187328] 完成
+2026-03-15 21:55:06 [INFO] [dr.20260315_215233_128648.Researcher1] Agent 任务 [308628599697575936] 完成
+2026-03-15 21:55:06 [INFO] [dr.20260315_215233_128648.Researcher1] 第 2 轮任务完成，评估是否继续
+2026-03-15 21:55:16 [INFO] [dr.20260315_215233_128648.Researcher1] 继续决策：continue=False，理由：当前子研究的所有任务均已顺利完成。通过理论溯源与数据检索，已成功梳理并界定了‘中国九大阶层’的主流量化划分模型（1-9级
+2026-03-15 21:55:16 [INFO] [dr.20260315_215233_128648.Researcher1] 子研究 [308628521347977216] 完成，通知 Planner
+2026-03-15 21:55:16 [INFO] [dr.20260315_215233_128648.Planner] Researcher1 完成，当前第 3 轮
+2026-03-15 21:55:16 [INFO] [dr.20260315_215233_128648.Researcher4] 分析完成，规划 3 个Agent任务
+2026-03-15 21:55:16 [INFO] [dr.20260315_215233_128648.Researcher4] 启动 Agent [Rover] 任务 [308629121368330240]：在公共互联网上搜索并收集中国第7至第9层群体的最新实际收入区间（如月均/年均可支配收入）和资产分布特...
+2026-03-15 21:55:16 [INFO] [dr.20260315_215233_128648.Researcher4] 启动 Agent [Rover] 任务 [308629121376718848]：定向搜索并提取中国第7至第9层群体的负债现状（如生存型网贷、大病负债、农村彩礼负债等）及其日常消费结...
+2026-03-15 21:55:16 [INFO] [dr.20260315_215233_128648.Researcher4] 启动 Agent [Insight] 任务 [308629121385107456]：结合第7至第9层群体的财务特征，深度剖析其财务脆弱性与抗风险能力底线，推演其阶层固化的深层原因，并评...
+2026-03-15 21:55:16 [INFO] [dr.20260315_215233_128648.Rover.Researcher4] [Rover] 开始执行任务 [308629121368330240]：在公共互联网上搜索并收集中国第7至第9层群体的最新实际收入区间（如月均/年均可支配收入）和资产分布特征（如存款规模、农村...
+2026-03-15 21:55:16 [INFO] [dr.20260315_215233_128648.Rover.Researcher4] [Rover] 开始执行任务 [308629121376718848]：定向搜索并提取中国第7至第9层群体的负债现状（如生存型网贷、大病负债、农村彩礼负债等）及其日常消费结构特征（如恩格尔系数...
+2026-03-15 21:55:16 [INFO] [dr.20260315_215233_128648.Insight.Researcher4] [Insight] 开始执行任务 [308629121385107456]：结合第7至第9层群体的财务特征，深度剖析其财务脆弱性与抗风险能力底线，推演其阶层固化的深层原因，并评估该庞大群体在当前宏...
+2026-03-15 21:55:19 [INFO] [dr.20260315_215233_128648.Supervisor.Researcher5] 任务 [308628644287221760] 评分：92分
+2026-03-15 21:55:19 [INFO] [dr.20260315_215233_128648.Rover.Researcher5] [Rover] 任务 [308628644287221760] 完成，可信度：92
+2026-03-15 21:55:19 [INFO] [dr.20260315_215233_128648.Researcher5] Agent 任务 [308628644278833152] 完成
+2026-03-15 21:55:19 [INFO] [dr.20260315_215233_128648.Researcher5] Agent 任务 [308628644287221760] 完成
+2026-03-15 21:55:19 [INFO] [dr.20260315_215233_128648.Researcher5] Agent 任务 [308628644291416064] 完成
+2026-03-15 21:55:19 [INFO] [dr.20260315_215233_128648.Researcher5] Agent 任务 [308628644299804672] 完成
+2026-03-15 21:55:19 [INFO] [dr.20260315_215233_128648.Researcher5] Agent 任务 [308628644303998976] 完成
+2026-03-15 21:55:19 [INFO] [dr.20260315_215233_128648.Researcher5] 第 2 轮任务完成，评估是否继续
+2026-03-15 21:55:24 [INFO] [dr.20260315_215233_128648.Supervisor.Researcher2] 任务 [308628610577600512] 评分：95分
+2026-03-15 21:55:24 [INFO] [dr.20260315_215233_128648.Rover.Researcher2] [Rover] 任务 [308628610577600512] 完成，可信度：95
+2026-03-15 21:55:24 [INFO] [dr.20260315_215233_128648.Researcher2] Agent 任务 [308628610560823296] 完成
+2026-03-15 21:55:24 [INFO] [dr.20260315_215233_128648.Researcher2] Agent 任务 [308628610569211904] 完成
+2026-03-15 21:55:24 [INFO] [dr.20260315_215233_128648.Researcher2] Agent 任务 [308628610577600512] 完成
+2026-03-15 21:55:24 [INFO] [dr.20260315_215233_128648.Researcher2] Agent 任务 [308628610581794816] 完成
+2026-03-15 21:55:24 [INFO] [dr.20260315_215233_128648.Researcher2] 第 2 轮任务完成，评估是否继续
+2026-03-15 21:55:27 [INFO] [dr.20260315_215233_128648.Researcher5] 继续决策：continue=False，理由：当前子研究已圆满完成。通过多轮网络搜索与深度分析，已经全面梳理了中国中产阶级的消费行为演变（如防御性消费、平替经济与体验
+2026-03-15 21:55:27 [INFO] [dr.20260315_215233_128648.Researcher5] 子研究 [308628521389920256] 完成，通知 Planner
+2026-03-15 21:55:27 [INFO] [dr.20260315_215233_128648.Planner] Researcher5 完成，当前第 4 轮
+2026-03-15 21:55:30 [INFO] [dr.20260315_215233_128648.Researcher2] 继续决策：continue=False，理由：当前子研究已成功收集并整理了中国九大阶层（1-3层顶层精英、4-6层中产阶级、7-9层底层草根）的实际收入区间、核心资产
+2026-03-15 21:55:30 [INFO] [dr.20260315_215233_128648.Researcher2] 子研究 [308628521360560128] 完成，通知 Planner
+2026-03-15 21:55:30 [INFO] [dr.20260315_215233_128648.Planner] Researcher2 完成，当前第 5 轮
+2026-03-15 21:55:38 [INFO] [dr.20260315_215233_128648.Planner] Planner 决策：continue=False，理由：当前已完成和正在进行的研究任务已经全面覆盖了用户的需求。Researcher1确立了九大阶层的划分标准；Researcher2和Researcher4正全面梳理
+2026-03-15 21:55:38 [INFO] [dr.20260315_215233_128648.Planner] 所有子研究完成，调用 Doubter 进行质疑验证
+2026-03-15 21:55:38 [INFO] [dr.20260315_215233_128648.Doubter] 开始质疑流程，参与研究的 Researcher：['Researcher4', 'Researcher2', 'Researcher1', 'Researcher5']
+2026-03-15 21:55:38 [INFO] [dr.20260315_215233_128648.Doubter] 阶段1：并行质疑分析
+2026-03-15 21:55:40 [INFO] [dr.20260315_215233_128648.Planner] Planner 决策：continue=False，理由：当前已规划的研究任务（涵盖九大阶层的理论划分、全社会各阶层财富与收入分布图谱、第1至第9各阶层的详细财务数据收集、中产阶级的实际规模测算、财力与负债结构深度剖析
+2026-03-15 21:55:40 [INFO] [dr.20260315_215233_128648.Planner] 所有子研究完成，调用 Doubter 进行质疑验证
+2026-03-15 21:55:40 [INFO] [dr.20260315_215233_128648.Doubter] 开始质疑流程，参与研究的 Researcher：['Researcher4', 'Researcher2', 'Researcher1', 'Researcher5']
+2026-03-15 21:55:40 [INFO] [dr.20260315_215233_128648.Doubter] 阶段1：并行质疑分析
+2026-03-15 21:55:43 [INFO] [dr.20260315_215233_128648.Planner] Planner 决策：continue=False，理由：当前已经涵盖了用户提问的所有核心维度：中国九大阶层的标准划分、1-9层全景财务与收入状况（Researcher2已完成，Researcher4正在补充底层细节）
+2026-03-15 21:55:43 [INFO] [dr.20260315_215233_128648.Planner] 所有子研究完成，调用 Doubter 进行质疑验证
+2026-03-15 21:55:43 [INFO] [dr.20260315_215233_128648.Doubter] 开始质疑流程，参与研究的 Researcher：['Researcher4', 'Researcher2', 'Researcher1', 'Researcher5']
+2026-03-15 21:55:43 [INFO] [dr.20260315_215233_128648.Doubter] 阶段1：并行质疑分析
+2026-03-15 21:55:58 [INFO] [dr.20260315_215233_128648.Supervisor.Researcher3] 任务 [308628620929142784] 评分：95分
+2026-03-15 21:55:58 [INFO] [dr.20260315_215233_128648.Rover.Researcher3] [Rover] 任务 [308628620929142784] 完成，可信度：95
+2026-03-15 21:55:58 [INFO] [dr.20260315_215233_128648.Researcher3] Agent 任务 [308628620929142784] 完成
+2026-03-15 21:55:58 [INFO] [dr.20260315_215233_128648.Researcher3] Agent 任务 [308628620937531392] 完成
+2026-03-15 21:55:58 [INFO] [dr.20260315_215233_128648.Researcher3] Agent 任务 [308628620945920000] 完成
+2026-03-15 21:55:58 [INFO] [dr.20260315_215233_128648.Researcher3] 第 2 轮任务完成，评估是否继续
+2026-03-15 21:56:03 [INFO] [dr.20260315_215233_128648.Doubter] Researcher2 提出 2 条质疑
+2026-03-15 21:56:04 [INFO] [dr.20260315_215233_128648.Doubter] Researcher4 提出 2 条质疑
+2026-03-15 21:56:04 [INFO] [dr.20260315_215233_128648.Doubter] Researcher1 提出 3 条质疑
+2026-03-15 21:56:06 [INFO] [dr.20260315_215233_128648.Researcher3] 继续决策：continue=False，理由：当前子研究已圆满完成目标。通过Rover和Insight的协作，已经成功梳理了国家统计局、麦肯锡、瑞信、胡润等权威机构对
+2026-03-15 21:56:06 [INFO] [dr.20260315_215233_128648.Researcher3] 子研究 [308628521368948736] 完成，通知 Planner
+2026-03-15 21:56:06 [INFO] [dr.20260315_215233_128648.Planner] Researcher3 完成，当前第 6 轮
+2026-03-15 21:56:06 [INFO] [dr.20260315_215233_128648.Planner] 已达最大串行轮次 6，进入收尾阶段
+2026-03-15 21:56:06 [INFO] [dr.20260315_215233_128648.Planner] 所有子研究完成，调用 Doubter 进行质疑验证
+2026-03-15 21:56:06 [INFO] [dr.20260315_215233_128648.Doubter] 开始质疑流程，参与研究的 Researcher：['Researcher3', 'Researcher4', 'Researcher1', 'Researcher5', 'Researcher2']
+2026-03-15 21:56:06 [INFO] [dr.20260315_215233_128648.Doubter] 阶段1：并行质疑分析
+2026-03-15 21:56:08 [INFO] [dr.20260315_215233_128648.Doubter] Researcher1 提出 2 条质疑
+2026-03-15 21:56:08 [INFO] [dr.20260315_215233_128648.Doubter] Researcher5 提出 3 条质疑
+2026-03-15 21:56:08 [INFO] [dr.20260315_215233_128648.Supervisor.Researcher4] 任务 [308629121385107456] 评分：88分
+2026-03-15 21:56:08 [INFO] [dr.20260315_215233_128648.Insight.Researcher4] [Insight] 任务 [308629121385107456] 完成，可信度：88
+2026-03-15 21:56:09 [INFO] [dr.20260315_215233_128648.Doubter] Researcher1 提出 2 条质疑
+2026-03-15 21:56:09 [INFO] [dr.20260315_215233_128648.Doubter] Researcher4 提出 2 条质疑
+2026-03-15 21:56:10 [INFO] [dr.20260315_215233_128648.Doubter] Researcher4 提出 2 条质疑
+2026-03-15 21:56:10 [INFO] [dr.20260315_215233_128648.Doubter] Researcher5 提出 2 条质疑
+2026-03-15 21:56:10 [INFO] [dr.20260315_215233_128648.Doubter] 共产生 20 条质疑，进入回答阶段
+2026-03-15 21:56:10 [INFO] [dr.20260315_215233_128648.Doubter] 阶段2：并行批量回答质疑
+2026-03-15 21:56:10 [INFO] [dr.20260315_215233_128648.Doubter] Researcher2 提出 2 条质疑
+2026-03-15 21:56:19 [INFO] [dr.20260315_215233_128648.Doubter] Researcher2 提出 3 条质疑
+2026-03-15 21:56:19 [INFO] [dr.20260315_215233_128648.Doubter] 共产生 25 条质疑，进入回答阶段
+2026-03-15 21:56:19 [INFO] [dr.20260315_215233_128648.Doubter] 阶段2：并行批量回答质疑
+2026-03-15 21:56:19 [WARNING] [dr.20260315_215233_128648.Doubter] Gemini 调用失败（第 1 次）: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model, limit: 25, model: gemini-3.1-pro\nPlease retry in 40.292319258s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '25'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '40s'}]}}
+2026-03-15 21:56:19 [WARNING] [dr.20260315_215233_128648.Doubter] Gemini 调用失败（第 1 次）: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model, limit: 25, model: gemini-3.1-pro\nPlease retry in 40.268551714s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '25'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '40s'}]}}
+2026-03-15 21:56:21 [WARNING] [dr.20260315_215233_128648.Doubter] Gemini 调用失败（第 2 次）: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model, limit: 25, model: gemini-3.1-pro\nPlease retry in 38.803739127s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '25'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '38s'}]}}
+2026-03-15 21:56:21 [WARNING] [dr.20260315_215233_128648.Doubter] Gemini 调用失败（第 2 次）: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model, limit: 25, model: gemini-3.1-pro\nPlease retry in 38.797854086s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel', 'quotaDimensions': {'model': 'gemini-3.1-pro', 'location': 'global'}, 'quotaValue': '25'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '38s'}]}}
+2026-03-15 21:56:31 [INFO] [dr.20260315_215233_128648.Doubter] Researcher1 一次性回答了 2 条质疑（doubt_ids: {'308629339170148352', '308629318186045440'}）
+2026-03-15 21:56:33 [WARNING] [dr.20260315_215233_128648.Doubter] Gemini 调用失败（第 3 次）: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model, limit: 25, model: gemini-3.1-pro\nPlease retry in 36.337269514s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '25'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '36s'}]}}
+2026-03-15 21:56:33 [ERROR] [dr.20260315_215233_128648.Doubter] Gemini 调用最终失败: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model, limit: 25, model: gemini-3.1-pro\nPlease retry in 36.337269514s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '25'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '36s'}]}}
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 64, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4371, in _generate_content
+    response = self._api_client.request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1401, in request
+    response = self._request(http_request, http_options, stream=False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1237, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 470, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 371, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 413, in exc_check
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 184, in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 473, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1214, in _request_once
+    errors.APIError.raise_for_response(response)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/errors.py", line 134, in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/errors.py", line 159, in raise_error
+    raise ClientError(status_code, response_json, response)
+google.genai.errors.ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model, limit: 25, model: gemini-3.1-pro\nPlease retry in 36.337269514s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '25'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '36s'}]}}
+2026-03-15 21:56:33 [WARNING] [dr.20260315_215233_128648.Doubter] Gemini 调用失败（第 3 次）: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model, limit: 25, model: gemini-3.1-pro\nPlease retry in 36.336022838s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '25'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '36s'}]}}
+2026-03-15 21:56:33 [ERROR] [dr.20260315_215233_128648.Doubter] Gemini 调用最终失败: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model, limit: 25, model: gemini-3.1-pro\nPlease retry in 36.336022838s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '25'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '36s'}]}}
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 64, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4371, in _generate_content
+    response = self._api_client.request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1401, in request
+    response = self._request(http_request, http_options, stream=False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1237, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 470, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 371, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 413, in exc_check
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 184, in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 473, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1214, in _request_once
+    errors.APIError.raise_for_response(response)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/errors.py", line 134, in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/errors.py", line 159, in raise_error
+    raise ClientError(status_code, response_json, response)
+google.genai.errors.ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model, limit: 25, model: gemini-3.1-pro\nPlease retry in 36.336022838s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '25'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '36s'}]}}
+2026-03-15 21:56:33 [ERROR] [dr.20260315_215233_128648.Planner] Researcher1 执行失败 [308628521347977216]: Doubter 调用失败: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model, limit: 25, model: gemini-3.1-pro\nPlease retry in 36.337269514s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '25'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '36s'}]}}
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 64, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4371, in _generate_content
+    response = self._api_client.request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1401, in request
+    response = self._request(http_request, http_options, stream=False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1237, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 470, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 371, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 413, in exc_check
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 184, in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 473, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1214, in _request_once
+    errors.APIError.raise_for_response(response)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/errors.py", line 134, in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/errors.py", line 159, in raise_error
+    raise ClientError(status_code, response_json, response)
+google.genai.errors.ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model, limit: 25, model: gemini-3.1-pro\nPlease retry in 36.337269514s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '25'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '36s'}]}}
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 214, in launch_one
+    await researcher.start(sub_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 154, in start
+    await self._dispatch_tasks(result.tasks, sub_research_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 216, in _dispatch_tasks
+    await self.on_tasks_complete(sub_research_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 262, in on_tasks_complete
+    await self._notify_planner_complete(sub_research_id)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 282, in _notify_planner_complete
+    await planner.on_researcher_complete(self.researcher_id)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 279, in on_researcher_complete
+    return await self._finalize_research()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 396, in _finalize_research
+    await doubter.run()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 139, in run
+    await self._phase_answer()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 259, in _phase_answer
+    await asyncio.gather(*[
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 245, in answer_as_researcher
+    result: DoubtAnswerResponse = await _call_gemini_with_retry(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 79, in _call_gemini_with_retry
+    raise RuntimeError(f"Doubter 调用失败: {e}") from e
+RuntimeError: Doubter 调用失败: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model, limit: 25, model: gemini-3.1-pro\nPlease retry in 36.337269514s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '25'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '36s'}]}}
+2026-03-15 21:56:35 [INFO] [dr.20260315_215233_128648.Doubter] Researcher1 提出 2 条质疑
+2026-03-15 21:56:35 [INFO] [dr.20260315_215233_128648.Doubter] Researcher5 提出 3 条质疑
+2026-03-15 21:56:35 [INFO] [dr.20260315_215233_128648.Doubter] 共产生 30 条质疑，进入回答阶段
+2026-03-15 21:56:35 [INFO] [dr.20260315_215233_128648.Doubter] 阶段2：并行批量回答质疑
+2026-03-15 21:56:35 [INFO] [dr.20260315_215233_128648.Doubter] Researcher4 一次性回答了 4 条质疑（doubt_ids: {'308629318194434048', '308629339178536960', '308629322917220352', '308629346833141760'}）
+2026-03-15 21:56:36 [INFO] [dr.20260315_215233_128648.Doubter] Researcher5 提出 3 条质疑
+2026-03-15 21:56:37 [INFO] [dr.20260315_215233_128648.Doubter] Researcher4 提出 2 条质疑
+2026-03-15 21:56:38 [INFO] [dr.20260315_215233_128648.Doubter] Researcher3 提出 2 条质疑
+2026-03-15 21:56:42 [INFO] [dr.20260315_215233_128648.Doubter] Researcher3 一次性回答了 5 条质疑（doubt_ids: {'308629322816557056', '308629322908831744', '308629346707312640', '308629343242817537', '308629339115622400'}）
+2026-03-15 21:56:46 [INFO] [dr.20260315_215233_128648.Doubter] Researcher1 一次性回答了 3 条质疑（doubt_ids: {'308629339170148352', '308629384665763840', '308629318186045440'}）
+2026-03-15 21:56:46 [INFO] [dr.20260315_215233_128648.Doubter] Researcher2 提出 2 条质疑
+2026-03-15 21:56:46 [INFO] [dr.20260315_215233_128648.Doubter] 共产生 39 条质疑，进入回答阶段
+2026-03-15 21:56:46 [INFO] [dr.20260315_215233_128648.Doubter] 阶段2：并行批量回答质疑
+2026-03-15 21:56:47 [INFO] [dr.20260315_215233_128648.Supervisor.Researcher4] 任务 [308629121376718848] 评分：95分
+2026-03-15 21:56:47 [INFO] [dr.20260315_215233_128648.Rover.Researcher4] [Rover] 任务 [308629121376718848] 完成，可信度：95
+2026-03-15 21:56:52 [INFO] [dr.20260315_215233_128648.Doubter] Researcher2 一次性回答了 9 条质疑（doubt_ids: {'308629346703118336', '308629339174342656', '308629341338603520', '308629339111428096', '308629322904637440', '308629346828947456', '308629341334409216', '308629343242817536', '308629322808168448'}）
+2026-03-15 21:56:52 [INFO] [dr.20260315_215233_128648.Doubter] 阶段3：并行接受/拒绝判断
+2026-03-15 21:56:55 [INFO] [dr.20260315_215233_128648.Supervisor.Researcher4] 任务 [308629121368330240] 评分：95分
+2026-03-15 21:56:55 [INFO] [dr.20260315_215233_128648.Rover.Researcher4] [Rover] 任务 [308629121368330240] 完成，可信度：95
+2026-03-15 21:56:55 [INFO] [dr.20260315_215233_128648.Researcher4] Agent 任务 [308629121368330240] 完成
+2026-03-15 21:56:55 [INFO] [dr.20260315_215233_128648.Researcher4] Agent 任务 [308629121376718848] 完成
+2026-03-15 21:56:55 [INFO] [dr.20260315_215233_128648.Researcher4] Agent 任务 [308629121385107456] 完成
+2026-03-15 21:56:55 [INFO] [dr.20260315_215233_128648.Researcher4] 第 2 轮任务完成，评估是否继续
+2026-03-15 21:56:57 [INFO] [dr.20260315_215233_128648.Doubter] Researcher3 一次性回答了 7 条质疑（doubt_ids: {'308629322816557056', '308629322908831744', '308629347088994304', '308629346707312640', '308629343242817537', '308629384669958144', '308629339115622400'}）
+2026-03-15 21:57:02 [INFO] [dr.20260315_215233_128648.Doubter] Researcher4 一次性回答了 7 条质疑（doubt_ids: {'308629346833141760', '308629339178536960', '308629322917220352', '308629384674152448', '308629451418112000', '308629318194434048', '308629347055439872'}）
+2026-03-15 21:57:02 [INFO] [dr.20260315_215233_128648.Doubter] Researcher1 一次性回答了 2 条质疑（doubt_ids: {'308629384665763840', '308629451405529088'}）
+2026-03-15 21:57:03 [INFO] [dr.20260315_215233_128648.Researcher4] 继续决策：continue=False，理由：当前子研究已圆满完成。通过前序任务，我们已经全面收集并整理了中国社会第7至第9阶层（平民及底层群体）的实际收入区间、资产
+2026-03-15 21:57:03 [INFO] [dr.20260315_215233_128648.Researcher4] 子研究 [308629059980496896] 完成，通知 Planner
+2026-03-15 21:57:03 [INFO] [dr.20260315_215233_128648.Planner] Researcher4 完成，当前第 7 轮
+2026-03-15 21:57:03 [INFO] [dr.20260315_215233_128648.Planner] 已达最大串行轮次 6，进入收尾阶段
+2026-03-15 21:57:03 [INFO] [dr.20260315_215233_128648.Planner] 所有子研究完成，调用 Doubter 进行质疑验证
+2026-03-15 21:57:03 [INFO] [dr.20260315_215233_128648.Doubter] 开始质疑流程，参与研究的 Researcher：['Researcher3', 'Researcher4', 'Researcher1', 'Researcher5', 'Researcher2']
+2026-03-15 21:57:03 [INFO] [dr.20260315_215233_128648.Doubter] 阶段1：并行质疑分析
+2026-03-15 21:57:09 [INFO] [dr.20260315_215233_128648.Doubter] Researcher4 审核完成：6/6 条接受
+2026-03-15 21:57:12 [INFO] [dr.20260315_215233_128648.Doubter] Researcher5 审核完成：5/5 条接受
+2026-03-15 21:57:14 [INFO] [dr.20260315_215233_128648.Doubter] Researcher3 一次性回答了 2 条质疑（doubt_ids: {'308629347088994304', '308629384669958144'}）
+2026-03-15 21:57:14 [INFO] [dr.20260315_215233_128648.Doubter] Researcher1 审核完成：7/7 条接受
+2026-03-15 21:57:16 [INFO] [dr.20260315_215233_128648.Doubter] Researcher2 审核完成：3/3 条接受
+2026-03-15 21:57:16 [INFO] [dr.20260315_215233_128648.Doubter] Researcher1 一次性回答了 4 条质疑（doubt_ids: {'308629499208011776', '308629466261753856', '308629460549111808', '308629451405529088'}）
+2026-03-15 21:57:16 [INFO] [dr.20260315_215233_128648.Doubter] 阶段4：对未接受质疑进行补充研究
+2026-03-15 21:57:16 [INFO] [dr.20260315_215233_128648.Doubter] 无被拒绝的质疑，无需补充研究
+2026-03-15 21:57:16 [INFO] [dr.20260315_215233_128648.Doubter] 质疑流程完成，调用 Publisher
+2026-03-15 21:57:16 [INFO] [dr.20260315_215233_128648.Publisher] 开始发布流程
+2026-03-15 21:57:16 [INFO] [dr.20260315_215233_128648.Doubter] Researcher4 一次性回答了 5 条质疑（doubt_ids: {'308629384674152448', '308629451418112000', '308629458506485760', '308629347055439872', '308629499216400384'}）
+2026-03-15 21:57:24 [INFO] [dr.20260315_215233_128648.Doubter] Researcher3 一次性回答了 7 条质疑（doubt_ids: {'308629322816557056', '308629322908831744', '308629347088994304', '308629346707312640', '308629343242817537', '308629384669958144', '308629339115622400'}）
+2026-03-15 21:57:31 [INFO] [dr.20260315_215233_128648.Doubter] Researcher2 一次性回答了 12 条质疑（doubt_ids: {'308629451413917696', '308629346703118336', '308629339174342656', '308629341338603520', '308629450591834112', '308629339111428096', '308629322904637440', '308629346828947456', '308629341334409216', '308629343242817536', '308629450587639808', '308629322808168448'}）
+2026-03-15 21:57:31 [INFO] [dr.20260315_215233_128648.Doubter] 阶段3：并行接受/拒绝判断
+2026-03-15 21:57:31 [INFO] [dr.20260315_215233_128648.Doubter] Researcher2 提出 2 条质疑
+2026-03-15 21:57:35 [INFO] [dr.20260315_215233_128648.Doubter] Researcher1 提出 1 条质疑
+2026-03-15 21:57:38 [INFO] [dr.20260315_215233_128648.Doubter] Researcher4 审核完成：1/1 条接受
+2026-03-15 21:57:40 [INFO] [dr.20260315_215233_128648.Doubter] Researcher3 审核完成：1/1 条接受
+2026-03-15 21:57:40 [INFO] [dr.20260315_215233_128648.Doubter] Researcher5 提出 4 条质疑
+2026-03-15 21:57:41 [INFO] [dr.20260315_215233_128648.Publisher] 文章规划完成：《中国社会九大阶层财富全景评估与中产阶级生存现状深度研究》，共 6 章
+2026-03-15 21:57:44 [INFO] [dr.20260315_215233_128648.Doubter] Researcher5 审核完成：4/4 条接受
+2026-03-15 21:57:46 [INFO] [dr.20260315_215233_128648.Doubter] Researcher1 审核完成：2/2 条接受
+2026-03-15 21:57:46 [INFO] [dr.20260315_215233_128648.Doubter] Researcher4 提出 3 条质疑
+2026-03-15 21:57:49 [INFO] [dr.20260315_215233_128648.Doubter] Researcher2 一次性回答了 16 条质疑（doubt_ids: {'308629451413917696', '308629346703118336', '308629339174342656', '308629341338603520', '308629450591834112', '308629339111428096', '308629322904637440', '308629346828947456', '308629341334409216', '308629460540723200', '308629466265948160', '308629343242817536', '308629458493902848', '308629458498097152', '308629450587639808', '308629322808168448'}）
+2026-03-15 21:57:49 [INFO] [dr.20260315_215233_128648.Doubter] 阶段3：并行接受/拒绝判断
+2026-03-15 21:57:53 [INFO] [dr.20260315_215233_128648.Doubter] Researcher3 提出 3 条质疑
+2026-03-15 21:57:53 [INFO] [dr.20260315_215233_128648.Doubter] 共产生 52 条质疑，进入回答阶段
+2026-03-15 21:57:53 [INFO] [dr.20260315_215233_128648.Doubter] 阶段2：并行批量回答质疑
+2026-03-15 21:57:56 [INFO] [dr.20260315_215233_128648.Doubter] Researcher2 审核完成：6/6 条接受
+2026-03-15 21:57:56 [INFO] [dr.20260315_215233_128648.Doubter] 阶段4：对未接受质疑进行补充研究
+2026-03-15 21:57:56 [INFO] [dr.20260315_215233_128648.Doubter] 无被拒绝的质疑，无需补充研究
+2026-03-15 21:57:56 [INFO] [dr.20260315_215233_128648.Doubter] 质疑流程完成，调用 Publisher
+2026-03-15 21:57:56 [INFO] [dr.20260315_215233_128648.Publisher] 开始发布流程
+2026-03-15 21:57:57 [INFO] [dr.20260315_215233_128648.Doubter] Researcher3 审核完成：1/1 条接受
+2026-03-15 21:57:58 [INFO] [dr.20260315_215233_128648.Doubter] Researcher5 审核完成：2/2 条接受
+2026-03-15 21:57:58 [INFO] [dr.20260315_215233_128648.Doubter] Researcher4 审核完成：1/1 条接受
+2026-03-15 21:58:13 [INFO] [dr.20260315_215233_128648.Doubter] Researcher2 审核完成：6/6 条接受
+2026-03-15 21:58:13 [INFO] [dr.20260315_215233_128648.Doubter] Researcher5 一次性回答了 1 条质疑（doubt_ids: {'308629751268904960'}）
+2026-03-15 21:58:13 [INFO] [dr.20260315_215233_128648.Doubter] 阶段4：对未接受质疑进行补充研究
+2026-03-15 21:58:13 [INFO] [dr.20260315_215233_128648.Doubter] 无被拒绝的质疑，无需补充研究
+2026-03-15 21:58:13 [INFO] [dr.20260315_215233_128648.Doubter] 质疑流程完成，调用 Publisher
+2026-03-15 21:58:13 [INFO] [dr.20260315_215233_128648.Publisher] 开始发布流程
+2026-03-15 21:58:14 [INFO] [dr.20260315_215233_128648.Publisher] 章节 2《中国九大阶层财富全景与顶层精英财务透视》撰写完成
+2026-03-15 21:58:18 [INFO] [dr.20260315_215233_128648.Publisher] 章节 5《中产阶级资产负债表解构：高杠杆下的财务脆弱性》撰写完成
+2026-03-15 21:58:20 [INFO] [dr.20260315_215233_128648.Doubter] Researcher1 一次性回答了 2 条质疑（doubt_ids: {'308629688232710144', '308629777969844224'}）
+2026-03-15 21:58:21 [INFO] [dr.20260315_215233_128648.Doubter] Researcher2 一次性回答了 5 条质疑（doubt_ids: {'308629704431112192', '308629751264710656', '308629777978232832', '308629726618980352', '308629751260516352'}）
+2026-03-15 21:58:22 [INFO] [dr.20260315_215233_128648.Publisher] 章节 6《中产阶级消费重塑与地位恐慌：阶层焦虑下的防御性收缩》撰写完成
+2026-03-15 21:58:24 [INFO] [dr.20260315_215233_128648.Publisher] 章节 3《7-9层平民与底层群体：生存型财务状况与防守型消费》撰写完成
+2026-03-15 21:58:25 [INFO] [dr.20260315_215233_128648.Publisher] 章节 1《重构中国社会九大阶层：划分标准与社会学画像》撰写完成
+2026-03-15 21:58:29 [INFO] [dr.20260315_215233_128648.Publisher] 章节 4《中产阶级规模测算与人群画像：谁是真正的社会中坚？》撰写完成
+2026-03-15 21:58:29 [INFO] [dr.20260315_215233_128648.Publisher] 所有章节撰写完成
+2026-03-15 21:58:29 [INFO] [dr.20260315_215233_128648.Publisher] 文章规划完成：《当前中国社会九大阶层财富全景与中产阶级深度画像评估报告》，共 7 章
+2026-03-15 21:58:39 [INFO] [dr.20260315_215233_128648.Publisher] 文章规划完成：《中国社会九大阶层财富全景与中产阶级生存现状深度报告》，共 8 章
+2026-03-15 21:58:43 [INFO] [dr.20260315_215233_128648.Doubter] Researcher4 一次性回答了 5 条质疑（doubt_ids: {'308629726623174657', '308629726623174656', '308629726627368960', '308629777982427136', '308629688241098752'}）
+2026-03-15 21:58:43 [INFO] [dr.20260315_215233_128648.Doubter] 阶段3：并行接受/拒绝判断
+2026-03-15 21:58:56 [INFO] [dr.20260315_215233_128648.Doubter] Researcher4 审核完成：3/3 条接受
+2026-03-15 21:58:59 [INFO] [dr.20260315_215233_128648.Doubter] Researcher5 审核完成：4/4 条接受
+2026-03-15 21:59:05 [INFO] [dr.20260315_215233_128648.Doubter] Researcher1 审核完成：1/1 条接受
+2026-03-15 21:59:15 [INFO] [dr.20260315_215233_128648.Publisher] 章节 4《聚焦中坚：中国中产阶级（4-6层）的真实规模与人群画像》撰写完成
+2026-03-15 21:59:18 [INFO] [dr.20260315_215233_128648.Publisher] 章节 1《理论基准：中国社会“九大阶层”划分框架与准入模型》撰写完成
+2026-03-15 21:59:18 [INFO] [dr.20260315_215233_128648.Publisher] 章节 3《庞大底盘：平民及底层群体（7-9层）的财务脆弱性与生存账本》撰写完成
+2026-03-15 21:59:22 [INFO] [dr.20260315_215233_128648.Publisher] 章节 6《中产阶级的社会心态重塑：阶层焦虑、防御性储蓄与消费转移》撰写完成
+2026-03-15 21:59:25 [INFO] [dr.20260315_215233_128648.Doubter] Researcher3 审核完成：3/3 条接受
+2026-03-15 21:59:25 [INFO] [dr.20260315_215233_128648.Publisher] 章节 2《财富全景与顶层透视：阶层分配格局与精英（1-3层）防守策略》撰写完成
+2026-03-15 21:59:25 [INFO] [dr.20260315_215233_128648.Publisher] 章节 3《底层生存（7-9级）：平民群体的财务脆弱性与生存型闭环》撰写完成
+2026-03-15 21:59:25 [INFO] [dr.20260315_215233_128648.Publisher] 章节 7《结语：阶层固化风险与社会流动性的宏观交织》撰写完成
+2026-03-15 21:59:28 [INFO] [dr.20260315_215233_128648.Publisher] 章节 2《顶层财富（1-3级）：精英阶层的资产配置与风险隔离策略》撰写完成
+2026-03-15 21:59:30 [INFO] [dr.20260315_215233_128648.Publisher] 章节 5《中产阶级的真实资产负债表：高杠杆、重资产与流动性困局》撰写完成
+2026-03-15 21:59:30 [INFO] [dr.20260315_215233_128648.Publisher] 所有章节撰写完成
+2026-03-15 21:59:32 [INFO] [dr.20260315_215233_128648.Publisher] 章节 6《中产社会心态：地位恐慌、滑落焦虑与职场危机》撰写完成
+2026-03-15 21:59:33 [INFO] [dr.20260315_215233_128648.Publisher] 章节 1《理论框架：当前中国社会九大阶层的划分标准与演变特征》撰写完成
+2026-03-15 21:59:34 [INFO] [dr.20260315_215233_128648.Doubter] Researcher2 审核完成：2/2 条接受
+2026-03-15 21:59:34 [INFO] [dr.20260315_215233_128648.Doubter] 阶段4：对未接受质疑进行补充研究
+2026-03-15 21:59:34 [INFO] [dr.20260315_215233_128648.Doubter] 无被拒绝的质疑，无需补充研究
+2026-03-15 21:59:34 [INFO] [dr.20260315_215233_128648.Doubter] 质疑流程完成，调用 Publisher
+2026-03-15 21:59:34 [INFO] [dr.20260315_215233_128648.Publisher] 开始发布流程
+2026-03-15 21:59:35 [WARNING] [dr.20260315_215233_128648.Publisher] Gemini 调用失败（第 1 次）: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 10h24.816118103s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '36024s'}]}}
+2026-03-15 21:59:36 [WARNING] [dr.20260315_215233_128648.Publisher] Gemini 调用失败（第 2 次）: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 10h23.444901831s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '36023s'}]}}
+2026-03-15 21:59:36 [INFO] [dr.20260315_215233_128648.Publisher] 章节 7《中产消费重塑：防御性收缩、平替崛起与体验式突围》撰写完成
+2026-03-15 21:59:37 [INFO] [dr.20260315_215233_128648.Publisher] 章节 4《中坚力量：中国中产阶级（4-6级）的规模测算与人口学画像》撰写完成
+2026-03-15 21:59:39 [WARNING] [dr.20260315_215233_128648.Publisher] Gemini 调用失败（第 3 次）: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 10h21.083006059s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '36021s'}]}}
+2026-03-15 21:59:39 [ERROR] [dr.20260315_215233_128648.Publisher] Gemini 调用最终失败: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 10h21.083006059s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '36021s'}]}}
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Publisher.py", line 60, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4371, in _generate_content
+    response = self._api_client.request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1401, in request
+    response = self._request(http_request, http_options, stream=False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1237, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 470, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 371, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 413, in exc_check
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 184, in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 473, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1214, in _request_once
+    errors.APIError.raise_for_response(response)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/errors.py", line 134, in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/errors.py", line 159, in raise_error
+    raise ClientError(status_code, response_json, response)
+google.genai.errors.ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 10h21.083006059s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '36021s'}]}}
+2026-03-15 21:59:39 [ERROR] [dr.20260315_215233_128648.Planner] Researcher4 执行失败 [308629059980496896]: Publisher Gemini 调用失败: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 10h21.083006059s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '36021s'}]}}
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Publisher.py", line 60, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4371, in _generate_content
+    response = self._api_client.request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1401, in request
+    response = self._request(http_request, http_options, stream=False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1237, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 470, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 371, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 413, in exc_check
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 184, in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 473, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1214, in _request_once
+    errors.APIError.raise_for_response(response)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/errors.py", line 134, in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/errors.py", line 159, in raise_error
+    raise ClientError(status_code, response_json, response)
+google.genai.errors.ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 10h21.083006059s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '36021s'}]}}
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 214, in launch_one
+    await researcher.start(sub_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 154, in start
+    await self._dispatch_tasks(result.tasks, sub_research_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 216, in _dispatch_tasks
+    await self.on_tasks_complete(sub_research_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 262, in on_tasks_complete
+    await self._notify_planner_complete(sub_research_id)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 282, in _notify_planner_complete
+    await planner.on_researcher_complete(self.researcher_id)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 237, in on_researcher_complete
+    return await self._finalize_research()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 396, in _finalize_research
+    await doubter.run()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 148, in run
+    await self._call_publisher()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 371, in _call_publisher
+    await publisher.run()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Publisher.py", line 112, in run
+    plan = await self._plan_chapters()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Publisher.py", line 150, in _plan_chapters
+    return await _call_gemini_with_retry(prompt, PublisherPlanResponse, self.log)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Publisher.py", line 75, in _call_gemini_with_retry
+    raise RuntimeError(f"Publisher Gemini 调用失败: {e}") from e
+RuntimeError: Publisher Gemini 调用失败: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 10h21.083006059s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '36021s'}]}}
+2026-03-15 21:59:39 [INFO] [dr.20260315_215233_128648.Publisher] 章节 8《宏观启示：阶层固化挑战与财富分配结构的未来展望》撰写完成
+2026-03-15 21:59:40 [INFO] [dr.20260315_215233_128648.Publisher] 章节 5《中产财富真相：资产负债表失衡与流动性错配之困》撰写完成
+2026-03-15 21:59:40 [INFO] [dr.20260315_215233_128648.Publisher] 所有章节撰写完成
+2026-03-15 22:01:30 [INFO] [dr.20260315_215233_128648.Publisher] deepseek-chat 整理完成
+2026-03-15 22:01:40 [INFO] [dr.20260315_215233_128648.Publisher] 报告重命名为：中国社会九大阶层财富全景评估报告.md
+2026-03-15 22:01:40 [INFO] [dr.20260315_215233_128648.Publisher] 报告发布完成：/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/projects/20260315_215233_128648/中国社会九大阶层财富全景评估报告.md
+2026-03-15 22:02:29 [INFO] [dr.20260315_215233_128648.Publisher] deepseek-chat 整理完成
+2026-03-15 22:02:30 [WARNING] [dr.20260315_215233_128648.Publisher] Gemini 调用失败（第 1 次）: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 9h57m29.544398003s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'model': 'gemini-3.1-pro', 'location': 'global'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '35849s'}]}}
+2026-03-15 22:02:32 [WARNING] [dr.20260315_215233_128648.Publisher] Gemini 调用失败（第 2 次）: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 9h57m28.169868335s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'model': 'gemini-3.1-pro', 'location': 'global'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '35848s'}]}}
+2026-03-15 22:02:34 [WARNING] [dr.20260315_215233_128648.Publisher] Gemini 调用失败（第 3 次）: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 9h57m25.596331276s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '35845s'}]}}
+2026-03-15 22:02:34 [ERROR] [dr.20260315_215233_128648.Publisher] Gemini 调用最终失败: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 9h57m25.596331276s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '35845s'}]}}
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Publisher.py", line 60, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4371, in _generate_content
+    response = self._api_client.request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1401, in request
+    response = self._request(http_request, http_options, stream=False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1237, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 470, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 371, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 413, in exc_check
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 184, in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 473, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1214, in _request_once
+    errors.APIError.raise_for_response(response)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/errors.py", line 134, in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/errors.py", line 159, in raise_error
+    raise ClientError(status_code, response_json, response)
+google.genai.errors.ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 9h57m25.596331276s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '35845s'}]}}
+2026-03-15 22:02:34 [ERROR] [dr.20260315_215233_128648.Planner] Researcher2 执行失败 [308628521360560128]: Publisher Gemini 调用失败: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 9h57m25.596331276s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '35845s'}]}}
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Publisher.py", line 60, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4371, in _generate_content
+    response = self._api_client.request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1401, in request
+    response = self._request(http_request, http_options, stream=False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1237, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 470, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 371, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 413, in exc_check
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 184, in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 473, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1214, in _request_once
+    errors.APIError.raise_for_response(response)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/errors.py", line 134, in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/errors.py", line 159, in raise_error
+    raise ClientError(status_code, response_json, response)
+google.genai.errors.ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 9h57m25.596331276s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '35845s'}]}}
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 214, in launch_one
+    await researcher.start(sub_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 154, in start
+    await self._dispatch_tasks(result.tasks, sub_research_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 216, in _dispatch_tasks
+    await self.on_tasks_complete(sub_research_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 262, in on_tasks_complete
+    await self._notify_planner_complete(sub_research_id)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 282, in _notify_planner_complete
+    await planner.on_researcher_complete(self.researcher_id)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 279, in on_researcher_complete
+    return await self._finalize_research()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 396, in _finalize_research
+    await doubter.run()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 148, in run
+    await self._call_publisher()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 371, in _call_publisher
+    await publisher.run()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Publisher.py", line 126, in run
+    final_path = await self._rename_report(report_path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Publisher.py", line 255, in _rename_report
+    result: ReportNameResponse = await _call_gemini_with_retry(prompt, ReportNameResponse, self.log)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Publisher.py", line 75, in _call_gemini_with_retry
+    raise RuntimeError(f"Publisher Gemini 调用失败: {e}") from e
+RuntimeError: Publisher Gemini 调用失败: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 9h57m25.596331276s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '35845s'}]}}
+2026-03-15 22:02:40 [INFO] [dr.20260315_215233_128648.Publisher] deepseek-chat 整理完成
+2026-03-15 22:02:41 [WARNING] [dr.20260315_215233_128648.Publisher] Gemini 调用失败（第 1 次）: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 9h57m18.765120095s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '35838s'}]}}
+2026-03-15 22:02:42 [WARNING] [dr.20260315_215233_128648.Publisher] Gemini 调用失败（第 2 次）: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 9h57m17.393397987s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '35837s'}]}}
+2026-03-15 22:02:45 [WARNING] [dr.20260315_215233_128648.Publisher] Gemini 调用失败（第 3 次）: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 9h57m15.019582048s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '35835s'}]}}
+2026-03-15 22:02:45 [ERROR] [dr.20260315_215233_128648.Publisher] Gemini 调用最终失败: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 9h57m15.019582048s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '35835s'}]}}
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Publisher.py", line 60, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4371, in _generate_content
+    response = self._api_client.request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1401, in request
+    response = self._request(http_request, http_options, stream=False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1237, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 470, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 371, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 413, in exc_check
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 184, in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 473, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1214, in _request_once
+    errors.APIError.raise_for_response(response)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/errors.py", line 134, in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/errors.py", line 159, in raise_error
+    raise ClientError(status_code, response_json, response)
+google.genai.errors.ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 9h57m15.019582048s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '35835s'}]}}
+2026-03-15 22:02:45 [ERROR] [dr.20260315_215233_128648.Planner] Researcher3 执行失败 [308628521368948736]: Publisher Gemini 调用失败: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 9h57m15.019582048s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '35835s'}]}}
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Publisher.py", line 60, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4371, in _generate_content
+    response = self._api_client.request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1401, in request
+    response = self._request(http_request, http_options, stream=False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1237, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 470, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 371, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 413, in exc_check
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 184, in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 473, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1214, in _request_once
+    errors.APIError.raise_for_response(response)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/errors.py", line 134, in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/errors.py", line 159, in raise_error
+    raise ClientError(status_code, response_json, response)
+google.genai.errors.ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 9h57m15.019582048s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '35835s'}]}}
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 214, in launch_one
+    await researcher.start(sub_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 154, in start
+    await self._dispatch_tasks(result.tasks, sub_research_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 216, in _dispatch_tasks
+    await self.on_tasks_complete(sub_research_id, background, goal)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 262, in on_tasks_complete
+    await self._notify_planner_complete(sub_research_id)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Researcher.py", line 282, in _notify_planner_complete
+    await planner.on_researcher_complete(self.researcher_id)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 237, in on_researcher_complete
+    return await self._finalize_research()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 396, in _finalize_research
+    await doubter.run()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 148, in run
+    await self._call_publisher()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Doubter.py", line 371, in _call_publisher
+    await publisher.run()
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Publisher.py", line 126, in run
+    final_path = await self._rename_report(report_path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Publisher.py", line 255, in _rename_report
+    result: ReportNameResponse = await _call_gemini_with_retry(prompt, ReportNameResponse, self.log)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Publisher.py", line 75, in _call_gemini_with_retry
+    raise RuntimeError(f"Publisher Gemini 调用失败: {e}") from e
+RuntimeError: Publisher Gemini 调用失败: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_requests_per_model_per_day, limit: 250, model: gemini-3.1-pro\nPlease retry in 9h57m15.019582048s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_requests_per_model_per_day', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}, 'quotaValue': '250'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '35835s'}]}}
+2026-03-15 22:02:45 [INFO] [dr.20260315_215233_128648.main] 研究任务全部完成

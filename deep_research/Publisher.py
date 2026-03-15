@@ -24,7 +24,7 @@ from utils.file_lock import write_json
 PROJECTS_DIR = os.getenv("PROJECTS_DIR", "projects")
 MAX_RETRIES = 3
 
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "sk-87d7368283d2467888f2c94dddba0857")
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "your_deepseek_api_key_here")
 DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
 
 

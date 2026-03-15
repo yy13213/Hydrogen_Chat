@@ -102,7 +102,7 @@ Publisher.py
 以shared_memory.jsonl，Researcher_list.jsonl为上下文，对整篇文章进行分配任务，安排完成最后撰写工作，尽量安排研究某章节的Researcher撰写该章节，可重复安排Researcher。结构化返回：章节，负责撰写的Researcher（结构化返回章节的内容和顺序即为文章的最终呈现），存放在article.json。
 以shared_memory.jsonl，自己的memory.jsonl，自己的task_list.jsonl为上下文，并行调用所有Researcher的记忆，逐个完成对所有章节的撰写。存放在article.json。
 以article.json为上下文，由deepseek-chat完成整篇文章的整理工作，输出markdown格式最终结果，并以research_report进行命名。
-（deepseek-chat调用方式：OpenAI SDK ，base_url ：https://api.deepseek.com，api_key：sk-87d7368283d2467888f2c94dddba0857，所有的AI只有此处调用的是deepseek-chat）
+（deepseek-chat调用方式：OpenAI SDK ，base_url ：https://api.deepseek.com，api_key：，所有的AI只有此处调用的是deepseek-chat）
 调用research_report.md为上下文，调用Ai，结构化返回report_name，对research_report.md进行重命名，输出到用户前端。
 
 main.py

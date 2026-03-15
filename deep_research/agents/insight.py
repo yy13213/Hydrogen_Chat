@@ -58,6 +58,8 @@ class Insight(BaseAgent):
                 data = json.loads(response.text)
                 return AgentResult(**data)
             except Exception as e:
+                self.log.warning(f"Insight 调用失败（第 {attempt+1} 次）: {e}")
                 if attempt == MAX_RETRIES - 1:
+                    self.log.error(f"Insight 最终失败: {e}", exc_info=True)
                     raise RuntimeError(f"Insight 调用失败: {e}") from e
-                await asyncio.sleep(1)
+                await asyncio.sleep(2 ** attempt)

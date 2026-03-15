@@ -18,10 +18,10 @@ from typing import List
 from google.genai import types
 from pydantic import BaseModel, Field
 
-from gemini_client import client, MODEL
+from gemini_client import client, MODEL, PROJECTS_DIR
+from logger import get_project_logger
 from utils import generate_id, read_jsonl, write_jsonl_append, update_jsonl_record
 
-PROJECTS_DIR = os.getenv("PROJECTS_DIR", "projects")
 MAX_RETRIES = 3
 
 
@@ -38,20 +38,16 @@ class DoubterAnalysisResponse(BaseModel):
 
 
 class DoubtAnswerResponse(BaseModel):
-    answers: list[dict] = Field(
-        description="回答列表，每项包含 task_id 和 answer 字段"
-    )
+    answers: list[dict] = Field(description="回答列表，每项包含 task_id 和 answer 字段")
 
 
 class DoubtAcceptResponse(BaseModel):
-    reviews: list[dict] = Field(
-        description="审核列表，每项包含 task_id、accepted（bool）、reason 字段"
-    )
+    reviews: list[dict] = Field(description="审核列表，每项包含 task_id、accepted（bool）、reason 字段")
 
 
 # ==================== 辅助函数 ====================
 
-async def _call_gemini_with_retry(prompt: str, response_schema, max_retries: int = MAX_RETRIES):
+async def _call_gemini_with_retry(prompt: str, response_schema, log, max_retries: int = MAX_RETRIES):
     for attempt in range(max_retries):
         try:
             response = await asyncio.to_thread(
@@ -66,9 +62,11 @@ async def _call_gemini_with_retry(prompt: str, response_schema, max_retries: int
             data = json.loads(response.text)
             return response_schema(**data)
         except Exception as e:
+            log.warning(f"Gemini 调用失败（第 {attempt+1} 次）: {e}")
             if attempt == max_retries - 1:
+                log.error(f"Gemini 调用最终失败: {e}", exc_info=True)
                 raise RuntimeError(f"Doubter 调用失败: {e}") from e
-            await asyncio.sleep(1)
+            await asyncio.sleep(2 ** attempt)
 
 
 def _get_paths(project_dir: str) -> dict:
@@ -105,17 +103,30 @@ class Doubter:
     def __init__(self, project_dir: str):
         self.project_dir = project_dir
         self.paths = _get_paths(project_dir)
+        self.log = get_project_logger(project_dir, "Doubter")
 
     async def run(self) -> None:
         participated = _get_participated_researchers(self.project_dir)
+        self.log.info(f"开始质疑流程，参与研究的 Researcher：{participated}")
+
         if not participated:
+            self.log.warning("无参与研究的 Researcher，跳过质疑直接发布")
             await self._call_publisher()
             return
 
+        self.log.info("阶段1：并行质疑分析")
         await self._phase_doubt(participated)
+
+        self.log.info("阶段2：并行回答质疑")
         await self._phase_answer()
+
+        self.log.info("阶段3：并行接受/拒绝判断")
         await self._phase_accept()
+
+        self.log.info("阶段4：对未接受质疑进行补充研究")
         await self._phase_research_rejected()
+
+        self.log.info("质疑流程完成，调用 Publisher")
         await self._call_publisher()
 
     async def _phase_doubt(self, researchers: List[str]) -> None:
@@ -144,9 +155,8 @@ class Doubter:
 - 每条质疑需指定具体的 task_id
 """
             result: DoubterAnalysisResponse = await _call_gemini_with_retry(
-                prompt, DoubterAnalysisResponse
+                prompt, DoubterAnalysisResponse, self.log
             )
-
             if result.has_doubts:
                 task_to_researcher = self._build_task_to_researcher_map(shared_memory)
                 for doubt in result.doubts:
@@ -163,6 +173,9 @@ class Doubter:
                         "reason": "",
                         "timestamp": datetime.now().isoformat(),
                     })
+                self.log.info(f"{researcher_id} 提出 {len(result.doubts)} 条质疑")
+            else:
+                self.log.info(f"{researcher_id} 无质疑")
 
         await asyncio.gather(*[analyze_as_researcher(r) for r in researchers])
 
@@ -179,12 +192,12 @@ class Doubter:
         doubt_records = read_jsonl(self.paths["doubt"])
         unanswered = [d for d in doubt_records if not d.get("answer_content")]
         if not unanswered:
+            self.log.info("无待回答的质疑")
             return
 
         grouped: dict[str, list] = {}
         for d in unanswered:
-            doubted = d.get("doubted", "Unknown")
-            grouped.setdefault(doubted, []).append(d)
+            grouped.setdefault(d.get("doubted", "Unknown"), []).append(d)
 
         async def answer_as_researcher(researcher_id: str, doubts: list):
             context = _build_researcher_context(self.project_dir, researcher_id)
@@ -202,7 +215,7 @@ class Doubter:
 - answer：详细的回答内容
 """
             result: DoubtAnswerResponse = await _call_gemini_with_retry(
-                prompt, DoubtAnswerResponse
+                prompt, DoubtAnswerResponse, self.log
             )
             for ans in result.answers:
                 update_jsonl_record(
@@ -210,6 +223,7 @@ class Doubter:
                     lambda r, tid=ans.get("task_id"): r.get("task_id") == tid and r.get("doubted") == researcher_id,
                     lambda r, a=ans.get("answer", ""): {**r, "answer_content": a},
                 )
+            self.log.info(f"{researcher_id} 回答了 {len(result.answers)} 条质疑")
 
         await asyncio.gather(*[
             answer_as_researcher(r_id, doubts)
@@ -220,12 +234,12 @@ class Doubter:
         doubt_records = read_jsonl(self.paths["doubt"])
         answered = [d for d in doubt_records if d.get("answer_content") and d.get("accepted") is None]
         if not answered:
+            self.log.info("无待审核的质疑回答")
             return
 
         grouped: dict[str, list] = {}
         for d in answered:
-            doubter = d.get("doubter", "Unknown")
-            grouped.setdefault(doubter, []).append(d)
+            grouped.setdefault(d.get("doubter", "Unknown"), []).append(d)
 
         async def review_as_doubter(researcher_id: str, doubts: list):
             context = _build_researcher_context(self.project_dir, researcher_id)
@@ -243,18 +257,16 @@ class Doubter:
 - reason：判断理由
 """
             result: DoubtAcceptResponse = await _call_gemini_with_retry(
-                prompt, DoubtAcceptResponse
+                prompt, DoubtAcceptResponse, self.log
             )
             for review in result.reviews:
                 update_jsonl_record(
                     self.paths["doubt"],
                     lambda r, tid=review.get("task_id"): r.get("task_id") == tid and r.get("doubter") == researcher_id,
-                    lambda r, rv=review: {
-                        **r,
-                        "accepted": rv.get("accepted", True),
-                        "reason": rv.get("reason", ""),
-                    },
+                    lambda r, rv=review: {**r, "accepted": rv.get("accepted", True), "reason": rv.get("reason", "")},
                 )
+            accepted_count = sum(1 for rv in result.reviews if rv.get("accepted"))
+            self.log.info(f"{researcher_id} 审核完成：{accepted_count}/{len(result.reviews)} 条接受")
 
         await asyncio.gather(*[
             review_as_doubter(r_id, doubts)
@@ -265,8 +277,10 @@ class Doubter:
         doubt_records = read_jsonl(self.paths["doubt"])
         rejected = [d for d in doubt_records if d.get("accepted") is False]
         if not rejected:
+            self.log.info("无被拒绝的质疑，无需补充研究")
             return
 
+        self.log.info(f"有 {len(rejected)} 条质疑未被接受，启动补充研究")
         from Researcher import Researcher
 
         tasks = []
@@ -292,13 +306,14 @@ class Doubter:
                 "is_doubt_research": True,
             })
 
+            self.log.info(f"补充研究 [{sub_id}] → {target_r}：{goal[:60]}...")
             researcher = Researcher(self.project_dir, target_r)
             tasks.append(researcher.start(sub_id, background, goal))
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
-        for res in results:
+        for i, res in enumerate(results):
             if isinstance(res, Exception):
-                print(f"[Doubter] 补充研究失败: {res}")
+                self.log.error(f"补充研究 #{i} 失败: {res}", exc_info=False)
 
     async def _call_publisher(self) -> None:
         from Publisher import Publisher

@@ -15,11 +15,10 @@ from datetime import datetime
 from google.genai import types
 from pydantic import BaseModel, Field
 
-from gemini_client import client, MODEL
+from gemini_client import client, MODEL, PROJECTS_DIR
+from logger import get_project_logger
 from utils import generate_id, read_jsonl, write_jsonl_append, update_jsonl_record
-from utils.file_lock import write_jsonl_all
 
-PROJECTS_DIR = os.getenv("PROJECTS_DIR", "projects")
 MAX_SERIAL_ROUNDS = 4
 
 
@@ -59,7 +58,7 @@ def _get_paths(project_dir: str, researcher_id: str) -> dict:
     }
 
 
-async def _call_gemini_with_retry(prompt: str, response_schema, max_retries: int = 3):
+async def _call_gemini_with_retry(prompt: str, response_schema, log, max_retries: int = 3):
     for attempt in range(max_retries):
         try:
             response = await asyncio.to_thread(
@@ -74,9 +73,11 @@ async def _call_gemini_with_retry(prompt: str, response_schema, max_retries: int
             data = json.loads(response.text)
             return response_schema(**data)
         except Exception as e:
+            log.warning(f"Gemini 调用失败（第 {attempt+1} 次）: {e}")
             if attempt == max_retries - 1:
+                log.error(f"Gemini 调用最终失败: {e}", exc_info=True)
                 raise RuntimeError(f"Gemini 调用失败（已重试 {max_retries} 次）: {e}") from e
-            await asyncio.sleep(1)
+            await asyncio.sleep(2 ** attempt)
 
 
 def _load_agent_config() -> dict:
@@ -107,10 +108,12 @@ class Researcher:
         self.paths = _get_paths(project_dir, researcher_id)
         self.serial_round = 0
         self.agent_config = _load_agent_config()
+        self.log = get_project_logger(project_dir, researcher_id)
         os.makedirs(self.paths["r_dir"], exist_ok=True)
 
     async def start(self, sub_research_id: str, background: str, goal: str) -> None:
         self.serial_round = 1
+        self.log.info(f"开始子研究 [{sub_research_id}]：{goal[:60]}...")
 
         update_jsonl_record(
             self.paths["researcher_list"],
@@ -144,7 +147,10 @@ class Researcher:
 - 尽量让任务相互独立，可以并行进行
 - 只选择已启用的Agent类型
 """
-        result: ResearcherInitResponse = await _call_gemini_with_retry(prompt, ResearcherInitResponse)
+        result: ResearcherInitResponse = await _call_gemini_with_retry(
+            prompt, ResearcherInitResponse, self.log
+        )
+        self.log.info(f"分析完成，规划 {len(result.tasks)} 个Agent任务")
         await self._dispatch_tasks(result.tasks, sub_research_id, background, goal)
 
     async def _dispatch_tasks(
@@ -177,6 +183,7 @@ class Researcher:
                     "end_time": None,
                 })
 
+                self.log.info(f"启动 Agent [{task.agent_class}] 任务 [{task_id}]：{task.goal[:50]}...")
                 coroutines.append(
                     run_agent(
                         agent_class=task.agent_class,
@@ -192,12 +199,14 @@ class Researcher:
 
         for task_id, result in zip(task_ids, results):
             if isinstance(result, Exception):
+                self.log.error(f"Agent 任务 [{task_id}] 失败: {result}", exc_info=False)
                 update_jsonl_record(
                     self.paths["task_list"],
                     lambda r, tid=task_id: r.get("task_id") == tid,
                     lambda r: {**r, "status": "failed", "end_time": datetime.now().isoformat()},
                 )
             else:
+                self.log.info(f"Agent 任务 [{task_id}] 完成")
                 update_jsonl_record(
                     self.paths["task_list"],
                     lambda r, tid=task_id: r.get("task_id") == tid,
@@ -208,8 +217,10 @@ class Researcher:
 
     async def on_tasks_complete(self, sub_research_id: str, background: str, goal: str) -> None:
         self.serial_round += 1
+        self.log.info(f"第 {self.serial_round} 轮任务完成，评估是否继续")
 
         if self.serial_round > MAX_SERIAL_ROUNDS:
+            self.log.info("达到最大轮次，结束子研究")
             await self._notify_planner_complete(sub_research_id)
             return
 
@@ -242,7 +253,10 @@ class Researcher:
 - 只在子研究主题内进行研究，有限拓展，及时结束
 - 所有必要结论得出后即可结束
 """
-        result: ResearcherContinueResponse = await _call_gemini_with_retry(prompt, ResearcherContinueResponse)
+        result: ResearcherContinueResponse = await _call_gemini_with_retry(
+            prompt, ResearcherContinueResponse, self.log
+        )
+        self.log.info(f"继续决策：continue={result.continue_research}，理由：{result.reason[:60]}")
 
         if not result.continue_research:
             await self._notify_planner_complete(sub_research_id)
@@ -251,6 +265,7 @@ class Researcher:
         await self._dispatch_tasks(result.tasks, sub_research_id, background, goal)
 
     async def _notify_planner_complete(self, sub_research_id: str) -> None:
+        self.log.info(f"子研究 [{sub_research_id}] 完成，通知 Planner")
         update_jsonl_record(
             self.paths["researcher_list"],
             lambda r: r.get("sub_research_id") == sub_research_id,

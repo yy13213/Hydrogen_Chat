@@ -17,14 +17,14 @@ from google.genai import types
 from openai import AsyncOpenAI
 from pydantic import BaseModel, Field
 
-from gemini_client import client, MODEL
+from gemini_client import client, MODEL, PROJECTS_DIR
+from logger import get_project_logger
 from utils import read_jsonl
 from utils.file_lock import write_json
 
-PROJECTS_DIR = os.getenv("PROJECTS_DIR", "projects")
 MAX_RETRIES = 3
 
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "your_deepseek_api_key_here")
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "sk-87d7368283d2467888f2c94dddba0857")
 DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
 
 
@@ -54,7 +54,7 @@ class ReportNameResponse(BaseModel):
 
 # ==================== 辅助函数 ====================
 
-async def _call_gemini_with_retry(prompt: str, response_schema, max_retries: int = MAX_RETRIES):
+async def _call_gemini_with_retry(prompt: str, response_schema, log, max_retries: int = MAX_RETRIES):
     for attempt in range(max_retries):
         try:
             response = await asyncio.to_thread(
@@ -69,9 +69,11 @@ async def _call_gemini_with_retry(prompt: str, response_schema, max_retries: int
             data = json.loads(response.text)
             return response_schema(**data)
         except Exception as e:
+            log.warning(f"Gemini 调用失败（第 {attempt+1} 次）: {e}")
             if attempt == max_retries - 1:
+                log.error(f"Gemini 调用最终失败: {e}", exc_info=True)
                 raise RuntimeError(f"Publisher Gemini 调用失败: {e}") from e
-            await asyncio.sleep(1)
+            await asyncio.sleep(2 ** attempt)
 
 
 def _get_paths(project_dir: str) -> dict:
@@ -103,10 +105,15 @@ class Publisher:
     def __init__(self, project_dir: str):
         self.project_dir = project_dir
         self.paths = _get_paths(project_dir)
+        self.log = get_project_logger(project_dir, "Publisher")
 
     async def run(self) -> str:
+        self.log.info("开始发布流程")
         plan = await self._plan_chapters()
+        self.log.info(f"文章规划完成：《{plan.article_title}》，共 {len(plan.chapters)} 章")
+
         chapters = await self._write_chapters(plan)
+        self.log.info("所有章节撰写完成")
 
         article_data = {
             "title": plan.article_title,
@@ -117,6 +124,7 @@ class Publisher:
 
         report_path = await self._compile_report(article_data)
         final_path = await self._rename_report(report_path)
+        self.log.info(f"报告发布完成：{final_path}")
         return final_path
 
     async def _plan_chapters(self) -> PublisherPlanResponse:
@@ -139,7 +147,7 @@ Researcher任务列表：
 
 注意：章节应覆盖所有重要研究结论，逻辑清晰，层次分明。
 """
-        return await _call_gemini_with_retry(prompt, PublisherPlanResponse)
+        return await _call_gemini_with_retry(prompt, PublisherPlanResponse, self.log)
 
     async def _write_chapters(self, plan: PublisherPlanResponse) -> List[ChapterContent]:
         async def write_one_chapter(chapter: ChapterPlan) -> ChapterContent:
@@ -165,9 +173,10 @@ Researcher任务列表：
 3. 充分利用你的研究记忆中的数据和结论
 4. 章节内容要与章节说明高度契合
 """
-            result: ChapterContent = await _call_gemini_with_retry(prompt, ChapterContent)
+            result: ChapterContent = await _call_gemini_with_retry(prompt, ChapterContent, self.log)
             result.chapter_index = chapter.chapter_index
             result.title = chapter.title
+            self.log.info(f"章节 {chapter.chapter_index}《{chapter.title}》撰写完成")
             return result
 
         chapters = await asyncio.gather(*[write_one_chapter(c) for c in plan.chapters])
@@ -214,11 +223,13 @@ Researcher任务列表：
                     stream=False,
                 )
                 markdown_content = response.choices[0].message.content
+                self.log.info("deepseek-chat 整理完成")
                 break
             except Exception as e:
+                self.log.warning(f"deepseek-chat 调用失败（第 {attempt+1} 次）: {e}")
                 if attempt == MAX_RETRIES - 1:
-                    print(f"[Publisher] deepseek-chat 调用失败，使用降级方案: {e}")
-                await asyncio.sleep(1)
+                    self.log.error(f"deepseek-chat 最终失败，使用降级方案: {e}")
+                await asyncio.sleep(2 ** attempt)
 
         report_path = self.paths["report"]
         with open(report_path, "w", encoding="utf-8") as f:
@@ -241,7 +252,7 @@ Researcher任务列表：
 - 不要包含特殊字符（/、\\、:、*、?、"、<、>、|）
 - 能准确反映报告主题
 """
-        result: ReportNameResponse = await _call_gemini_with_retry(prompt, ReportNameResponse)
+        result: ReportNameResponse = await _call_gemini_with_retry(prompt, ReportNameResponse, self.log)
 
         safe_name = result.report_name
         for ch in r'/\:*?"<>|':
@@ -251,4 +262,5 @@ Researcher任务列表：
         base_dir = os.path.dirname(report_path)
         new_path = os.path.join(base_dir, f"{safe_name}.md")
         os.rename(report_path, new_path)
+        self.log.info(f"报告重命名为：{safe_name}.md")
         return new_path

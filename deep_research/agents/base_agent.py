@@ -13,16 +13,15 @@ from datetime import datetime
 from google.genai import types
 from pydantic import BaseModel, Field
 
-# 确保 deep_research 根目录在 sys.path 中（agents 子包调用时需要）
+# 确保 deep_research 根目录在 sys.path 中
 _root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _root not in sys.path:
     sys.path.insert(0, _root)
 
-from gemini_client import client, MODEL
+from gemini_client import PROJECTS_DIR
+from logger import get_project_logger
 from utils import read_jsonl, write_jsonl_append
 from utils.file_lock import write_jsonl_all
-
-PROJECTS_DIR = os.getenv("PROJECTS_DIR", "projects")
 
 
 class AgentResult(BaseModel):
@@ -47,6 +46,7 @@ class BaseAgent(ABC):
         self.goal = goal
         self.project_dir = project_dir
         self.researcher_id = researcher_id
+        self.log = get_project_logger(project_dir, f"{self.agent_class}.{researcher_id}")
 
         base = os.path.join(PROJECTS_DIR, project_dir)
         r_dir = os.path.join(base, researcher_id)
@@ -79,7 +79,12 @@ class BaseAgent(ABC):
         3. 调用 Supervisor 评分
         4. 写入 memory.jsonl 和 shared_memory.jsonl
         """
-        result = await self.run()
+        self.log.info(f"[{self.agent_class}] 开始执行任务 [{self.task_id}]：{self.goal[:60]}...")
+        try:
+            result = await self.run()
+        except Exception as e:
+            self.log.error(f"[{self.agent_class}] 任务 [{self.task_id}] 执行失败: {e}", exc_info=True)
+            raise
 
         star = {
             "task_id": self.task_id,
@@ -92,14 +97,18 @@ class BaseAgent(ABC):
             "C": 0,
         }
 
-        from Supervisor import Supervisor
-        supervisor = Supervisor(self.project_dir, self.researcher_id)
-        credibility, refined_action, refined_conclusion = await supervisor.evaluate(star)
+        try:
+            from Supervisor import Supervisor
+            supervisor = Supervisor(self.project_dir, self.researcher_id)
+            credibility, refined_action, refined_conclusion = await supervisor.evaluate(star)
+        except Exception as e:
+            self.log.error(f"Supervisor 评分失败，使用默认值: {e}", exc_info=True)
+            credibility, refined_action, refined_conclusion = 50, result.action[:500], result.conclusion[:500]
 
         star["C"] = credibility
         write_jsonl_append(self.paths["memory"], star)
         self._update_shared_memory(refined_action, refined_conclusion, credibility)
-
+        self.log.info(f"[{self.agent_class}] 任务 [{self.task_id}] 完成，可信度：{credibility}")
         return result
 
     def _update_shared_memory(

@@ -193,7 +193,7 @@ def render_project_detail(project_dir: str):
     st.markdown("---")
 
     # Tabs
-    tab_mind, tab_doubt, tab_report = st.tabs(["🗺️ 研究进展", "💬 质询记录", "📄 研究报告"])
+    tab_mind, tab_doubt, tab_report, tab_log = st.tabs(["🗺️ 研究进展", "💬 质询记录", "📄 研究报告", "📋 执行日志"])
 
     # ---- Tab1: 思维导图 ----
     with tab_mind:
@@ -206,6 +206,10 @@ def render_project_detail(project_dir: str):
     # ---- Tab3: 研究报告 ----
     with tab_report:
         render_report(project_dir, progress)
+
+    # ---- Tab4: 执行日志 ----
+    with tab_log:
+        render_logs(project_dir)
 
     # 自动刷新（运行中时每5秒刷新）
     if status == "running":
@@ -303,6 +307,25 @@ def render_doubts(doubts: list):
                 st.caption(f"判断理由：{doubt['reason']}")
 
             st.markdown("---")
+
+
+def render_logs(project_dir: str):
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        log_type = st.selectbox("日志类型", ["research", "error"], key="log_type_select")
+    with col2:
+        lines = st.number_input("显示行数", min_value=50, max_value=2000, value=200, step=50, key="log_lines")
+
+    if st.button("🔄 刷新日志", key="refresh_log"):
+        pass
+
+    resp = _api("get", f"/logs/{project_dir}", params={"log_type": log_type, "lines": lines})
+    if resp:
+        content = resp.text
+        if content.strip() == "（暂无日志）":
+            st.info("暂无日志，研究启动后将在此显示")
+        else:
+            st.code(content, language="text")
 
 
 def render_report(project_dir: str, progress: dict):

@@ -2,35 +2,45 @@
 main.py — Deep Research 服务入口
 端口：3031
 提供：
-- POST /research         启动深度研究，返回 project_dir（时间戳）
-- GET  /progress/{project_dir}  轮询研究进展
-- GET  /report/{project_dir}    获取最终报告
-- GET  /projects         列出所有历史研究项目
+- POST /research                  启动深度研究，返回 project_dir（时间戳）
+- GET  /progress/{project_dir}    轮询研究进展
+- GET  /report/{project_dir}      获取最终报告
+- GET  /detail/{project_dir}      获取详细数据（思维导图、质疑等）
+- GET  /logs/{project_dir}        获取项目日志
+- GET  /projects                  列出所有历史研究项目
 """
 
 import asyncio
 import glob
 import json
 import os
-import time
+import sys
 from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import Optional
 
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, PlainTextResponse
+from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
 
-load_dotenv()
+# 确保 deep_research 目录在 sys.path 中（从任意工作目录启动均可）
+_HERE = os.path.dirname(os.path.abspath(__file__))
+if _HERE not in sys.path:
+    sys.path.insert(0, _HERE)
 
-PROJECTS_DIR = os.getenv("PROJECTS_DIR", "projects")
+load_dotenv(os.path.join(_HERE, ".env"))
+
+from gemini_client import PROJECTS_DIR
+from logger import get_framework_logger, get_project_logger
+
 PORT = int(os.getenv("DEEP_RESEARCH_PORT", 3031))
 
-# 运行中的研究任务状态
+# 运行中的研究任务状态（内存缓存）
 _running_tasks: dict[str, dict] = {}
+
+fw_log = get_framework_logger("main")
 
 
 # ==================== 请求/响应模型 ====================
@@ -48,6 +58,7 @@ class ResearchResponse(BaseModel):
 
 async def _run_research(project_dir: str, question: str) -> None:
     """在后台执行完整深度研究流程"""
+    log = get_project_logger(project_dir, "main")
     _running_tasks[project_dir] = {
         "status": "running",
         "start_time": datetime.now().isoformat(),
@@ -55,17 +66,19 @@ async def _run_research(project_dir: str, question: str) -> None:
         "current_stage": "Planner",
         "error": None,
     }
+    log.info(f"研究任务启动，问题：{question[:80]}...")
     try:
         from Planner import Planner
         planner = Planner(project_dir)
         await planner.init_research(question)
         _running_tasks[project_dir]["status"] = "completed"
         _running_tasks[project_dir]["end_time"] = datetime.now().isoformat()
+        log.info("研究任务全部完成")
     except Exception as e:
         _running_tasks[project_dir]["status"] = "failed"
         _running_tasks[project_dir]["error"] = str(e)
         _running_tasks[project_dir]["end_time"] = datetime.now().isoformat()
-        print(f"[main] 研究失败 [{project_dir}]: {e}")
+        log.error(f"研究任务失败: {e}", exc_info=True)
 
 
 # ==================== FastAPI 应用 ====================
@@ -73,13 +86,17 @@ async def _run_research(project_dir: str, question: str) -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     os.makedirs(PROJECTS_DIR, exist_ok=True)
-    print("=" * 60)
+    fw_log.info("=" * 50)
+    fw_log.info(f"Deep Research 服务启动，端口: {PORT}")
+    fw_log.info(f"项目目录: {PROJECTS_DIR}")
+    fw_log.info("=" * 50)
+    print(f"\n{'='*60}")
     print(f"🔬 Deep Research 服务启动")
     print(f"📡 端口: {PORT}")
-    print(f"📁 项目目录: {os.path.abspath(PROJECTS_DIR)}")
-    print("=" * 60)
+    print(f"📁 项目目录: {PROJECTS_DIR}")
+    print(f"{'='*60}\n")
     yield
-    print("\n✓ Deep Research 服务已关闭")
+    fw_log.info("Deep Research 服务关闭")
 
 
 app = FastAPI(
@@ -108,6 +125,7 @@ async def start_research(request: ResearchRequest, background_tasks: BackgroundT
     planner = Planner.create_project()
     project_dir = planner.project_dir
 
+    fw_log.info(f"新研究任务创建：{project_dir}，问题：{request.question[:80]}...")
     background_tasks.add_task(_run_research, project_dir, request.question)
 
     return ResearchResponse(
@@ -124,24 +142,17 @@ async def get_progress(project_dir: str):
         raise HTTPException(status_code=404, detail="项目不存在")
 
     task_info = _running_tasks.get(project_dir, {})
+    researcher_list = _read_jsonl_safe(os.path.join(base, "Researcher_list.jsonl"))
 
-    # 读取 Researcher_list
-    researcher_list_path = os.path.join(base, "Researcher_list.jsonl")
-    researcher_list = _read_jsonl_safe(researcher_list_path)
-
-    # 统计进度
     total = len(researcher_list)
     completed = sum(1 for r in researcher_list if r.get("status") == "completed")
     running = sum(1 for r in researcher_list if r.get("status") == "running")
 
-    # 检查是否有最终报告
     report_files = glob.glob(os.path.join(base, "*.md"))
     has_report = len(report_files) > 0
     report_name = os.path.basename(report_files[0]) if report_files else None
 
-    # 读取 doubt.jsonl
-    doubt_path = os.path.join(base, "doubt.jsonl")
-    doubts = _read_jsonl_safe(doubt_path)
+    doubts = _read_jsonl_safe(os.path.join(base, "doubt.jsonl"))
 
     return {
         "project_dir": project_dir,
@@ -191,12 +202,10 @@ async def get_detail(project_dir: str):
     doubts = _read_jsonl_safe(os.path.join(base, "doubt.jsonl"))
     shared_memory = _read_jsonl_safe(os.path.join(base, "shared_memory.jsonl"))
 
-    # 读取每个 Researcher 的 task_list
     researcher_tasks = {}
     for i in range(1, 6):
         r_id = f"Researcher{i}"
-        task_path = os.path.join(base, r_id, "task_list.jsonl")
-        tasks = _read_jsonl_safe(task_path)
+        tasks = _read_jsonl_safe(os.path.join(base, r_id, "task_list.jsonl"))
         if tasks:
             researcher_tasks[r_id] = tasks
 
@@ -221,6 +230,42 @@ async def get_detail(project_dir: str):
     }
 
 
+@app.get("/logs/{project_dir}")
+async def get_logs(project_dir: str, log_type: str = "research", lines: int = 200):
+    """
+    获取项目日志
+    - log_type: research（默认）| error
+    - lines: 返回最后 N 行，默认200
+    """
+    base = os.path.join(PROJECTS_DIR, project_dir)
+    if not os.path.exists(base):
+        raise HTTPException(status_code=404, detail="项目不存在")
+
+    log_file = os.path.join(base, "logs", f"{log_type}.log")
+    if not os.path.exists(log_file):
+        return PlainTextResponse(content="（暂无日志）", media_type="text/plain; charset=utf-8")
+
+    with open(log_file, "r", encoding="utf-8") as f:
+        all_lines = f.readlines()
+
+    tail = "".join(all_lines[-lines:])
+    return PlainTextResponse(content=tail, media_type="text/plain; charset=utf-8")
+
+
+@app.get("/logs")
+async def get_framework_logs(lines: int = 200):
+    """获取框架级日志"""
+    log_file = os.path.join(PROJECTS_DIR, "logs", "framework.log")
+    if not os.path.exists(log_file):
+        return PlainTextResponse(content="（暂无框架日志）", media_type="text/plain; charset=utf-8")
+
+    with open(log_file, "r", encoding="utf-8") as f:
+        all_lines = f.readlines()
+
+    tail = "".join(all_lines[-lines:])
+    return PlainTextResponse(content=tail, media_type="text/plain; charset=utf-8")
+
+
 @app.get("/projects")
 async def list_projects():
     """列出所有历史研究项目"""
@@ -229,20 +274,16 @@ async def list_projects():
 
     projects = []
     for entry in sorted(os.scandir(PROJECTS_DIR), key=lambda e: e.name, reverse=True):
-        if not entry.is_dir():
+        # 跳过 logs 目录
+        if not entry.is_dir() or entry.name == "logs":
             continue
 
         base = entry.path
         researcher_list = _read_jsonl_safe(os.path.join(base, "Researcher_list.jsonl"))
         report_files = glob.glob(os.path.join(base, "*.md"))
 
-        # 读取初始问题
         shared = _read_jsonl_safe(os.path.join(base, "shared_memory.jsonl"))
-        question = ""
-        for rec in shared:
-            if rec.get("type") == "init":
-                question = rec.get("user_question", "")
-                break
+        question = next((r.get("user_question", "") for r in shared if r.get("type") == "init"), "")
 
         task_info = _running_tasks.get(entry.name, {})
 
@@ -260,7 +301,6 @@ async def list_projects():
 
 
 def _read_jsonl_safe(path: str) -> list:
-    """安全读取 jsonl 文件"""
     if not os.path.exists(path):
         return []
     records = []

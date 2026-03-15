@@ -15,14 +15,12 @@ from typing import Tuple
 from google.genai import types
 from pydantic import BaseModel, Field
 
-from gemini_client import client, MODEL
+from gemini_client import client, MODEL, PROJECTS_DIR
+from logger import get_project_logger
 from utils import read_jsonl
 
-PROJECTS_DIR = os.getenv("PROJECTS_DIR", "projects")
 MAX_RETRIES = 3
 
-
-# ==================== 结构化返回模型 ====================
 
 class SupervisorEvaluation(BaseModel):
     credibility: int = Field(description="可信度评分（0-100分）")
@@ -31,12 +29,11 @@ class SupervisorEvaluation(BaseModel):
     evaluation_reason: str = Field(description="评分理由")
 
 
-# ==================== Supervisor 核心逻辑 ====================
-
 class Supervisor:
     def __init__(self, project_dir: str, researcher_id: str):
         self.project_dir = project_dir
         self.researcher_id = researcher_id
+        self.log = get_project_logger(project_dir, f"Supervisor.{researcher_id}")
 
         base = os.path.join(PROJECTS_DIR, project_dir)
         r_dir = os.path.join(base, researcher_id)
@@ -93,8 +90,11 @@ class Supervisor:
                 data = json.loads(response.text)
                 result = SupervisorEvaluation(**data)
                 credibility = max(0, min(100, result.credibility))
+                self.log.info(f"任务 [{star.get('task_id', '?')}] 评分：{credibility}分")
                 return credibility, result.refined_action, result.refined_conclusion
             except Exception as e:
+                self.log.warning(f"Supervisor 评估失败（第 {attempt+1} 次）: {e}")
                 if attempt == MAX_RETRIES - 1:
+                    self.log.error(f"Supervisor 评估最终失败: {e}", exc_info=True)
                     raise RuntimeError(f"Supervisor 评估失败（已重试 {MAX_RETRIES} 次）: {e}") from e
-                await asyncio.sleep(1)
+                await asyncio.sleep(2 ** attempt)

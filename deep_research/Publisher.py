@@ -24,7 +24,7 @@ from utils.file_lock import write_json
 
 MAX_RETRIES = 3
 
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "sk-87d7368283d2467888f2c94dddba0857")
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "YOUR_DEEPSEEK_API_KEY")
 DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
 
 
@@ -147,6 +147,9 @@ Researcher任务列表：
 
 注意：章节应覆盖所有重要研究结论，逻辑清晰，层次分明。
 """
+
+#TODO 撰写部分非常重要，需要精调一下AI的提示词
+
         return await _call_gemini_with_retry(prompt, PublisherPlanResponse, self.log)
 
     async def _write_chapters(self, plan: PublisherPlanResponse) -> List[ChapterContent]:
@@ -214,6 +217,8 @@ Researcher任务列表：
             },
         ]
 
+
+#TODO publisher需要看到质疑表，修改模型为gemini突破上下文
         markdown_content = f"# {article_data.get('title', '深度研究报告')}\n\n{chapters_text}"
         for attempt in range(MAX_RETRIES):
             try:

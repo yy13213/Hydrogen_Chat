@@ -1,0 +1,112 @@
+2026-03-16 22:05:01 [ERROR] [dr.20260316_220458_609337.Planner] Gemini 调用最终失败（已重试 3 次）: [Errno 111] Connection refused
+2026-03-16 22:05:01 [ERROR] [dr.20260316_220458_609337.main] 研究任务失败: Gemini 调用失败（已重试 3 次）: [Errno 111] Connection refused
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 101, in handle_request
+    raise exc
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/httpcore/_backends/sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 88, in _call_gemini_with_retry
+    response = await asyncio.to_thread(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 5709, in generate_content
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/models.py", line 4371, in _generate_content
+    response = self._api_client.request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1401, in request
+    response = self._request(http_request, http_options, stream=False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1237, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 470, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 371, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 413, in exc_check
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 184, in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/tenacity/__init__.py", line 473, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 1207, in _request_once
+    response = self._httpx_client.request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/httpx/_client.py", line 825, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/httpx/_transports/default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/.pyenv/versions/3.12.12/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/venv/lib/python3.12/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/main.py", line 73, in _run_research
+    await planner.init_research(question)
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 155, in init_research
+    result: PlannerInitResponse = await _call_gemini_with_retry(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/Planner.py", line 103, in _call_gemini_with_retry
+    raise RuntimeError(f"Gemini 调用失败（已重试 {max_retries} 次）: {e}") from e
+RuntimeError: Gemini 调用失败（已重试 3 次）: [Errno 111] Connection refused

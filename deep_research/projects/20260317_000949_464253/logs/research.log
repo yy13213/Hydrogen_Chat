@@ -1282,3 +1282,7 @@ google.genai.errors.ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429,
 2026-03-17 00:23:16 [INFO] [dr.20260317_000949_464253.Publisher] Gemini 整理完成，报告长度 10598 字
 2026-03-17 00:23:27 [INFO] [dr.20260317_000949_464253.Publisher] 报告重命名为：全球氢能人才培养系统性断层与产教生态演进.md
 2026-03-17 00:23:27 [INFO] [dr.20260317_000949_464253.Publisher] 报告发布完成：/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/projects/20260317_000949_464253/全球氢能人才培养系统性断层与产教生态演进.md
+2026-03-17 00:24:26 [INFO] [dr.20260317_000949_464253.Publisher] Gemini 整理完成，报告长度 9068 字
+2026-03-17 00:24:37 [INFO] [dr.20260317_000949_464253.Publisher] 报告重命名为：全球氢能人才培养底层矛盾与生态突围.md
+2026-03-17 00:24:37 [INFO] [dr.20260317_000949_464253.Publisher] 报告发布完成：/home/hongchang/HydrogenChat_qwen3.5/Hydrogen_Chat/deep_research/projects/20260317_000949_464253/全球氢能人才培养底层矛盾与生态突围.md
+2026-03-17 00:24:37 [INFO] [dr.20260317_000949_464253.main] 研究任务全部完成

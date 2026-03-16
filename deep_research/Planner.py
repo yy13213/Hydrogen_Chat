@@ -151,6 +151,8 @@ class Planner:
 - 子研究ID字段留空，系统会自动生成
 - 尽量让子研究相互独立，可以并行进行
 - 每个子研究要有清晰的研究边界
+- “在构建任务时，请不仅考虑‘是什么’，更要要求探讨‘为什么’以及‘如果...会怎样’
+- 深挖问题的本质，逃避了复杂矛盾，挑战探讨问题的根源，而非停留在表面。
 """
         result: PlannerInitResponse = await _call_gemini_with_retry(
             prompt, PlannerInitResponse, self.project_dir
@@ -267,6 +269,8 @@ Researcher任务列表：
 2. 如果需要，为空闲的Researcher安排新的子研究任务
 3. 注意：每个Researcher有自己的记忆，建议为同一Researcher分配相关工作；新工作尽量给未参与过的Researcher
 4. 如果所有研究目标已达成，返回 continue_research: false
+5. “在构建任务时，请不仅考虑‘是什么’，更要要求探讨‘为什么’以及‘如果...会怎样’
+6. 深挖问题的本质，逃避了复杂矛盾，挑战探讨问题的根源，而非停留在表面。
 
 注意：Planner无需规划撰写报告，只需把研究所需要的所有结论得出即可。
 """

@@ -14,11 +14,15 @@ from datetime import datetime
 
 from google import genai
 from google.genai import types
+from dotenv import load_dotenv
 
+
+# 加载 .env 文件中的环境变量
+load_dotenv()
 # ==================== 配置 ====================
 # 本地代理端口（Google_ai2dify_port6773.py 提供）
 GEMINI_BASE_URL = "http://localhost:6773"
-GEMINI_MODEL = "gemini-2.5-pro-preview-03-25"
+GEMINI_MODEL = "gemini-3.1-pro-preview"
 
 DATA_DIR = Path(__file__).parent / "data_collection"
 DATA_JSONL = DATA_DIR / "data.jsonl"

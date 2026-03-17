@@ -291,38 +291,39 @@ def run_data_processing(progress_callback=None) -> tuple[int, int]:
 
 
 # ==================== GRPO 数据集生成 ====================
-GRPO_SCHEMA = {
-    "type": "object",
-    "properties": {
-        "items": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "image_index": {
-                        "type": ["integer", "null"],
-                        "description": "输入图片列表中的第几张（0-based），无图片时为 null"
-                    },
-                    "prompt": {"type": "string"},
-                    "ground_truth": {"type": "string"},
-                    "reference_guideline": {"type": "string"}
-                },
-                "required": ["image_index", "prompt", "ground_truth", "reference_guideline"]
-            }
-        }
-    },
-    "required": ["items"]
-}
+GRPO_SCHEMA = types.Schema(
+    type=types.Type.OBJECT,
+    required=["items"],
+    properties={
+        "items": types.Schema(
+            type=types.Type.ARRAY,
+            items=types.Schema(
+                type=types.Type.OBJECT,
+                required=["image_index", "prompt", "ground_truth", "reference_guideline"],
+                properties={
+                    "image_index": types.Schema(
+                        type=types.Type.INTEGER,
+                        nullable=True,
+                        description="输入图片列表中的第几张（0-based），无图片时为 -1"
+                    ),
+                    "prompt": types.Schema(type=types.Type.STRING),
+                    "ground_truth": types.Schema(type=types.Type.STRING),
+                    "reference_guideline": types.Schema(type=types.Type.STRING),
+                }
+            )
+        )
+    }
+)
 
 GRPO_SYSTEM_PROMPT = """你是一位专业的多模态数据集标注专家。
 你的任务是基于给定的文本分段（以及可能附带的图片），生成用于 GRPO 强化学习微调的高质量问答数据。
 
 要求：
 1. prompt 必须要求回答者在 <think></think> 标签内写出推理过程，并在 <answer></answer> 标签内给出最终结论。
-2. ground_truth 必须极其简短（关键词/核心结论），不超过 30 字。
+2. ground_truth 必须极其简短（关键词/核心结论），不超过 10 字。
 3. reference_guideline 提供 3 条评分细则，说明如何评价推理过程和最终结论。
 4. 若分段内容不足以生成有效问答，返回空 items 列表。
-5. 若有图片，image_index 填写该图片在输入列表中的序号（0-based）；无图片时填 null。
+5. 若有图片，image_index 填写该图片在输入列表中的序号（0-based）；无图片时填 -1。
 6. 可一次返回多条数据（每张图片可对应一条，或纯文本生成 1~3 条）。
 """
 
@@ -379,8 +380,8 @@ async def generate_grpo_for_segment(
 
                 results = []
                 for item in items:
-                    idx = item.get("image_index")
-                    img_path = image_paths[idx] if (idx is not None and 0 <= idx < len(image_paths)) else None
+                    idx = item.get("image_index", -1)
+                    img_path = image_paths[idx] if (idx is not None and idx >= 0 and idx < len(image_paths)) else None
                     results.append({
                         "image_path": img_path,
                         "prompt": item["prompt"],

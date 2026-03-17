@@ -18,3 +18,26 @@ Data_collection.py
 Data_processing.py
 1。使用PyMuPDF库处理PDF，要求如下
 对每个data_collection/papers下的每个PDF进行处理，每5000字进行一次分段（上下浮动1000字的前提下，寻找换行符合，并以此分段，如果上下1000字都没有换行符号，则直接在5000字处截断）
+将分段内容的文本内容和图片处理为（文本+图片保存的地址，图片使用雪花算法重命名，存放于data_collection/images中），并存入data_collection/database.jsonl中。
+处理过程中需要有进度条和总分段数的显示。
+文件夹内可能有markdown的txt的文件，这些文件也需要直接处理为文本，并存入data_collection/database.jsonl中。
+注意，分段中可能没有图像，也可能有多张图像
+注意不要最后再保存，要分段保存，每保存一次，就上传一次jsonl
+2.调用gemini-3.1-pro-preview，自动从data_collection/database.jsonl中加载内容，读取每个分段的内容（对应的图片需要一同输入大模型）
+大模型基于这个分段的内容，生成GRPO微调所需数据集，格式为：image_path、prompt、ground_truth、reference_guideline，需要结构化返回
+注意，image_path通过询问AI第几张图片，依靠作为输入给Ai图片的顺序，来得到具体的路径。
+可以没有图片，该字段能为空。
+可以一次返回多条数据，也可以空返回，即没有有效的数据
+{
+    "image_path": "图片路径",
+    "prompt": "基于给定图像提问的具体问题。必须要求回答者在 <think></think> 标签内写出推理过程，并在 <answer></answer> 标签内给出最终结论。",
+    "ground_truth": "极其简短的客观事实（如最终答案、核心机理词汇等）。",
+    "reference_guideline": "1. ...\n2. ...\n3. ... (提供给大模型裁判的 3 条评分参考细则，说明如何评价推理过程和最终结论)"
+}
+
+最后的数据连同图片放在data_collection/dataset中，并命名为dataset.jsonl
+注意不要最后再保存，要分段保存，每保存一次，就上传一次json
+用户可设置并行Ai调用的数量，最大25个
+建立重启机制，再次运行可直接从上次中断的地方开始。
+从代码中设置主模型和备用模型，主模型调用三次失败后使用备用模型替换，备用模型调用三次失败后，提示用户，并退出程序。
+建立streamlit前端，分为两个页面，一个用于数据处理，一个用于数据集生成。

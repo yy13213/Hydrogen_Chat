@@ -1,0 +1,20 @@
+自动化多模态构建管线
+
+已完成工作
+大模型连接端口@api/Google_ai2dify_port6773.py 
+（使用geminiSDK，并使用
+from google import genai
+from google.genai import types导入）
+
+1分析数据
+Data_collection.py
+通过gemini-3.1-pro-preview，分析用户输入的研究方向，
+询问关于Ai关于该方向的前提知识、领域方向、交叉方向的关键词。（分三次询问AI，结构化返回所以关键词）
+给予生成的关键词，使用网络爬虫收集所有的相关信息，并下载为jsonl，存入data_collection/data.jsonl中。
+生成的关键词,使用arxiv下载相关的论文，并下载为pdf，存入data_collection/papers中。
+构建streamlit前端，用于一步步操作并展示如上过程。
+
+2.处理数据
+Data_processing.py
+1。使用PyMuPDF库处理PDF，要求如下
+对

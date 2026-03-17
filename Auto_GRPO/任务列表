@@ -17,4 +17,4 @@ Data_collection.py
 2.处理数据
 Data_processing.py
 1。使用PyMuPDF库处理PDF，要求如下
-对
+对每个data_collection/papers下的每个PDF进行处理，每5000字

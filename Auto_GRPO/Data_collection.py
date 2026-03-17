@@ -310,42 +310,81 @@ def main():
     )
 
     st.title("🔬 自动化多模态构建管线 · 数据收集")
-    st.caption("Step 1 / 2 — 关键词生成 → 网络爬取 → 论文下载")
-
-    # ── 侧边栏配置 ──────────────────────────────────────────
-    with st.sidebar:
-        st.header("⚙️ 配置")
-        max_web_per_kw = st.slider("每个关键词爬取网页数", 1, 10, 5)
-        max_paper_per_kw = st.slider("每个关键词下载论文数", 1, 5, 2)
-        st.divider()
-        st.info(f"数据保存路径：\n`{DATA_DIR}`")
-        st.info(f"论文保存路径：\n`{PAPERS_DIR}`")
-
-        if DATA_JSONL.exists():
-            with open(DATA_JSONL, "r", encoding="utf-8") as f:
-                lines = f.readlines()
-            st.metric("已收集条目", len(lines))
-
-        pdf_count = len(list(PAPERS_DIR.glob("*.pdf")))
-        st.metric("已下载论文", pdf_count)
-
-    # ── 主流程 ──────────────────────────────────────────────
-    # Step 1: 输入研究方向
-    st.header("📌 Step 1：输入研究方向")
-    research_direction = st.text_input(
-        "请输入您的研究方向",
-        placeholder="例如：Reinforcement Learning from Human Feedback",
-        help="支持中英文，AI 会自动生成英文检索关键词"
-    )
+    st.caption("关键词生成 → 网络爬取 → 论文下载")
 
     if "keywords_result" not in st.session_state:
         st.session_state.keywords_result = None
+    if "run_web_crawl" not in st.session_state:
+        st.session_state.run_web_crawl = False
+    if "run_paper_download" not in st.session_state:
+        st.session_state.run_paper_download = False
 
-    # Step 2: 生成关键词
-    st.header("🔑 Step 2：AI 生成关键词")
-    col1, col2 = st.columns([1, 3])
-    with col1:
-        gen_btn = st.button("🚀 生成关键词", disabled=not research_direction, use_container_width=True)
+    # ── 侧边栏 ──────────────────────────────────────────────
+    with st.sidebar:
+        st.header("🔬 数据收集管线")
+
+        # 研究方向输入
+        research_direction = st.text_input(
+            "研究方向",
+            placeholder="例如：Reinforcement Learning from Human Feedback",
+            help="支持中英文，AI 会自动生成英文检索关键词"
+        )
+
+        st.divider()
+
+        # ── Part 1：关键词生成 ──
+        st.subheader("① 关键词生成")
+        gen_btn = st.button(
+            "🚀 生成关键词",
+            disabled=not research_direction,
+            use_container_width=True
+        )
+
+        st.divider()
+
+        # ── Part 2：网络爬取 ──
+        st.subheader("② 网络爬取")
+        max_web_per_kw = st.slider("每个关键词爬取网页数", 1, 10, 5)
+        has_keywords = st.session_state.keywords_result is not None
+        if st.button(
+            "🕷️ 开始爬取",
+            disabled=not has_keywords,
+            use_container_width=True,
+            help="请先生成关键词"
+        ):
+            st.session_state.run_web_crawl = True
+
+        st.divider()
+
+        # ── Part 3：论文下载 ──
+        st.subheader("③ 论文下载")
+        max_paper_per_kw = st.slider("每个关键词下载论文数", 1, 5, 2)
+        if st.button(
+            "📥 开始下载论文",
+            disabled=not has_keywords,
+            use_container_width=True,
+            help="请先生成关键词"
+        ):
+            st.session_state.run_paper_download = True
+
+        st.divider()
+
+        # ── 统计信息 ──
+        st.caption("📊 当前数据统计")
+        col_a, col_b = st.columns(2)
+        with col_a:
+            jsonl_count = 0
+            if DATA_JSONL.exists():
+                with open(DATA_JSONL, "r", encoding="utf-8") as f:
+                    jsonl_count = sum(1 for _ in f)
+            st.metric("已收集条目", jsonl_count)
+        with col_b:
+            st.metric("已下载论文", len(list(PAPERS_DIR.glob("*.pdf"))))
+
+    # ── 主区域 ──────────────────────────────────────────────
+
+    # ── Section 1：关键词生成结果 ──
+    st.header("🔑 关键词生成")
 
     if gen_btn and research_direction:
         progress_bar = st.progress(0)
@@ -359,101 +398,113 @@ def main():
             try:
                 result = collect_all_keywords(research_direction, progress_callback=kw_progress)
                 st.session_state.keywords_result = result
+                st.session_state.run_web_crawl = False
+                st.session_state.run_paper_download = False
                 st.success(f"✅ 共生成 {len(result['all'])} 个关键词")
             except Exception as e:
                 st.error(f"❌ 关键词生成失败：{e}")
 
-    # 展示关键词
     if st.session_state.keywords_result:
         kw_result = st.session_state.keywords_result
+        st.caption(f"研究方向：**{kw_result['research_direction']}**　|　共 {len(kw_result['all'])} 个关键词（已去重）")
+
         tab1, tab2, tab3, tab4 = st.tabs(["📚 前提知识", "🎯 核心领域", "🔀 交叉方向", "📋 全部关键词"])
-
         with tab1:
-            st.subheader(f"前提知识关键词（{len(kw_result['prerequisite'])} 个）")
+            st.subheader(f"前提知识（{len(kw_result['prerequisite'])} 个）")
             render_keyword_badges(kw_result["prerequisite"], "#2196F3")
-
         with tab2:
-            st.subheader(f"核心领域关键词（{len(kw_result['domain'])} 个）")
+            st.subheader(f"核心领域（{len(kw_result['domain'])} 个）")
             render_keyword_badges(kw_result["domain"], "#4CAF50")
-
         with tab3:
-            st.subheader(f"交叉方向关键词（{len(kw_result['crossdomain'])} 个）")
+            st.subheader(f"交叉方向（{len(kw_result['crossdomain'])} 个）")
             render_keyword_badges(kw_result["crossdomain"], "#FF9800")
-
         with tab4:
-            st.subheader(f"全部关键词（{len(kw_result['all'])} 个，已去重）")
+            st.subheader(f"全部关键词（{len(kw_result['all'])} 个）")
             render_keyword_badges(kw_result["all"], "#9C27B0")
             st.code("\n".join(kw_result["all"]), language="text")
+    else:
+        st.info("请在左侧输入研究方向并点击「生成关键词」")
 
-        st.divider()
+    st.divider()
 
-        # Step 3: 网络爬取
-        st.header("🌐 Step 3：网络信息爬取")
-        st.caption(f"将对 {len(kw_result['all'])} 个关键词进行 DuckDuckGo 搜索，结果保存至 `data.jsonl`")
+    # ── Section 2：网络爬取 ──
+    st.header("🌐 网络信息爬取")
 
-        if st.button("🕷️ 开始爬取网络数据", use_container_width=True):
-            progress_bar2 = st.progress(0)
-            status_text2 = st.empty()
-            log_area = st.empty()
-            logs = []
+    if st.session_state.run_web_crawl and st.session_state.keywords_result:
+        st.session_state.run_web_crawl = False
+        kw_result = st.session_state.keywords_result
+        st.caption(f"对 {len(kw_result['all'])} 个关键词进行 DuckDuckGo 搜索，结果保存至 `data.jsonl`")
 
-            def web_progress(msg, val):
-                status_text2.text(msg)
-                progress_bar2.progress(val)
-                logs.append(msg)
-                log_area.text_area("爬取日志", "\n".join(logs[-20:]), height=150)
+        progress_bar2 = st.progress(0)
+        status_text2 = st.empty()
+        log_area = st.empty()
+        logs = []
 
-            with st.spinner("爬取中..."):
-                try:
-                    count = collect_web_data(kw_result["all"], progress_callback=web_progress)
-                    st.success(f"✅ 网络数据爬取完成，共写入 {count} 条到 `data.jsonl`")
-                except Exception as e:
-                    st.error(f"❌ 爬取失败：{e}")
+        def web_progress(msg, val):
+            status_text2.text(msg)
+            progress_bar2.progress(val)
+            logs.append(msg)
+            log_area.text_area("爬取日志", "\n".join(logs[-20:]), height=150)
 
-        st.divider()
+        with st.spinner("爬取中..."):
+            try:
+                count = collect_web_data(kw_result["all"], progress_callback=web_progress)
+                st.success(f"✅ 爬取完成，共写入 {count} 条到 `data.jsonl`")
+            except Exception as e:
+                st.error(f"❌ 爬取失败：{e}")
+    elif st.session_state.keywords_result:
+        st.info("点击左侧「开始爬取」按钮启动网络数据收集")
+    else:
+        st.info("请先完成关键词生成")
 
-        # Step 4: arxiv 论文下载
-        st.header("📄 Step 4：arxiv 论文下载")
-        st.caption(f"将根据关键词搜索并下载 arxiv 论文 PDF，保存至 `papers/` 目录")
+    # 数据预览
+    if DATA_JSONL.exists():
+        with open(DATA_JSONL, "r", encoding="utf-8") as f:
+            lines = [l for l in f.readlines() if l.strip()]
+        if lines:
+            with st.expander(f"查看已收集数据（共 {len(lines)} 条，显示最新 10 条）"):
+                st.json([json.loads(l) for l in lines[-10:]])
 
-        if st.button("📥 开始下载论文", use_container_width=True):
-            progress_bar3 = st.progress(0)
-            status_text3 = st.empty()
-            log_area3 = st.empty()
-            logs3 = []
+    st.divider()
 
-            def paper_progress(msg, val):
-                status_text3.text(msg)
-                progress_bar3.progress(val)
-                logs3.append(msg)
-                log_area3.text_area("下载日志", "\n".join(logs3[-20:]), height=150)
+    # ── Section 3：论文下载 ──
+    st.header("📄 arxiv 论文下载")
 
-            with st.spinner("下载中..."):
-                try:
-                    count = download_arxiv_papers(
-                        kw_result["all"],
-                        max_per_keyword=max_paper_per_kw,
-                        progress_callback=paper_progress
-                    )
-                    st.success(f"✅ 论文下载完成，共下载 {count} 篇 PDF")
-                except Exception as e:
-                    st.error(f"❌ 下载失败：{e}")
+    if st.session_state.run_paper_download and st.session_state.keywords_result:
+        st.session_state.run_paper_download = False
+        kw_result = st.session_state.keywords_result
+        st.caption(f"根据 {len(kw_result['all'])} 个关键词搜索并下载 arxiv 论文 PDF")
 
-        st.divider()
+        progress_bar3 = st.progress(0)
+        status_text3 = st.empty()
+        log_area3 = st.empty()
+        logs3 = []
 
-        # 数据预览
-        st.header("👁️ 数据预览")
-        if DATA_JSONL.exists():
-            with open(DATA_JSONL, "r", encoding="utf-8") as f:
-                lines = f.readlines()
+        def paper_progress(msg, val):
+            status_text3.text(msg)
+            progress_bar3.progress(val)
+            logs3.append(msg)
+            log_area3.text_area("下载日志", "\n".join(logs3[-20:]), height=150)
 
-            st.caption(f"共 {len(lines)} 条记录（显示最新 20 条）")
-            preview_data = [json.loads(l) for l in lines[-20:] if l.strip()]
-            st.json(preview_data)
+        with st.spinner("下载中..."):
+            try:
+                count = download_arxiv_papers(
+                    kw_result["all"],
+                    max_per_keyword=max_paper_per_kw,
+                    progress_callback=paper_progress
+                )
+                st.success(f"✅ 论文下载完成，共下载 {count} 篇 PDF")
+            except Exception as e:
+                st.error(f"❌ 下载失败：{e}")
+    elif st.session_state.keywords_result:
+        st.info("点击左侧「开始下载论文」按钮启动 arxiv 论文下载")
+    else:
+        st.info("请先完成关键词生成")
 
-        pdf_files = list(PAPERS_DIR.glob("*.pdf"))
-        if pdf_files:
-            st.subheader(f"已下载论文（{len(pdf_files)} 篇）")
+    # 已下载论文列表
+    pdf_files = list(PAPERS_DIR.glob("*.pdf"))
+    if pdf_files:
+        with st.expander(f"已下载论文（{len(pdf_files)} 篇）"):
             for pdf in pdf_files:
                 st.text(f"📄 {pdf.name}")
 

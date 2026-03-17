@@ -17,4 +17,4 @@ Data_collection.py
 2.处理数据
 Data_processing.py
 1。使用PyMuPDF库处理PDF，要求如下
-对每个data_collection/papers下的每个PDF进行处理，每5000字
+对每个data_collection/papers下的每个PDF进行处理，每5000字进行一次分段（上下浮动1000字的前提下，寻找换行符合，并以此分段，如果上下1000字都没有换行符号，则直接在5000字处截断）

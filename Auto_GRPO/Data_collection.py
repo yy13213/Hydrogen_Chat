@@ -318,6 +318,10 @@ def main():
         st.session_state.run_web_crawl = False
     if "run_paper_download" not in st.session_state:
         st.session_state.run_paper_download = False
+    if "research_direction" not in st.session_state:
+        st.session_state.research_direction = ""
+    if "gen_triggered" not in st.session_state:
+        st.session_state.gen_triggered = False
 
     # ── 侧边栏 ──────────────────────────────────────────────
     with st.sidebar:
@@ -326,29 +330,31 @@ def main():
         # 研究方向输入
         research_direction = st.text_input(
             "研究方向",
+            value=st.session_state.research_direction,
             placeholder="例如：Reinforcement Learning from Human Feedback",
             help="支持中英文，AI 会自动生成英文检索关键词"
         )
+        st.session_state.research_direction = research_direction
 
         st.divider()
 
         # ── Part 1：关键词生成 ──
         st.subheader("① 关键词生成")
-        gen_btn = st.button(
+        if st.button(
             "🚀 生成关键词",
             disabled=not research_direction,
             use_container_width=True
-        )
+        ):
+            st.session_state.gen_triggered = True
 
         st.divider()
 
         # ── Part 2：网络爬取 ──
         st.subheader("② 网络爬取")
         max_web_per_kw = st.slider("每个关键词爬取网页数", 1, 10, 5)
-        has_keywords = st.session_state.keywords_result is not None
         if st.button(
             "🕷️ 开始爬取",
-            disabled=not has_keywords,
+            disabled=st.session_state.keywords_result is None,
             use_container_width=True,
             help="请先生成关键词"
         ):
@@ -361,7 +367,7 @@ def main():
         max_paper_per_kw = st.slider("每个关键词下载论文数", 1, 5, 2)
         if st.button(
             "📥 开始下载论文",
-            disabled=not has_keywords,
+            disabled=st.session_state.keywords_result is None,
             use_container_width=True,
             help="请先生成关键词"
         ):
@@ -386,7 +392,8 @@ def main():
     # ── Section 1：关键词生成结果 ──
     st.header("🔑 关键词生成")
 
-    if gen_btn and research_direction:
+    if st.session_state.gen_triggered and research_direction:
+        st.session_state.gen_triggered = False
         progress_bar = st.progress(0)
         status_text = st.empty()
 
@@ -401,6 +408,7 @@ def main():
                 st.session_state.run_web_crawl = False
                 st.session_state.run_paper_download = False
                 st.success(f"✅ 共生成 {len(result['all'])} 个关键词")
+                st.rerun()
             except Exception as e:
                 st.error(f"❌ 关键词生成失败：{e}")
 

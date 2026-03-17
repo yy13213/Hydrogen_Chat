@@ -68,6 +68,7 @@ def _get_project_paths(project_dir: str) -> dict:
         "article": os.path.join(base, "article.json"),
         "doubt": os.path.join(base, "doubt.jsonl"),
         "report": os.path.join(base, "research_report.md"),
+        "finalized_flag": os.path.join(base, ".finalized"),
     }
 
 
@@ -228,6 +229,11 @@ class Planner:
         paths = self.paths
         self.log.info(f"{researcher_id} 完成，当前第 {self.serial_round} 轮")
 
+        # 若已进入收尾阶段，直接跳过（防止并发重复触发）
+        if os.path.exists(paths["finalized_flag"]):
+            self.log.info(f"{researcher_id} 完成通知到达，但项目已进入收尾阶段，跳过")
+            return False
+
         update_jsonl_record(
             paths["researcher_list"],
             lambda r: r.get("researcher_id") == researcher_id and r.get("status") == "running",
@@ -280,6 +286,10 @@ Researcher任务列表：
         self.log.info(f"Planner 决策：continue={result.continue_research}，理由：{result.reason[:80]}")
 
         if not result.continue_research:
+            # 再次检查，防止 AI 决策期间另一个协程已触发收尾
+            if os.path.exists(paths["finalized_flag"]):
+                self.log.info("AI 决策期间项目已进入收尾阶段，跳过重复触发")
+                return False
             return await self._finalize_research()
 
         # 写入新子研究并并行启动
@@ -393,7 +403,21 @@ Researcher任务列表：
         await self._launch_researchers(sub_research_tasks)
 
     async def _finalize_research(self) -> bool:
-        """所有研究完成，调用 Doubter"""
+        """所有研究完成，调用 Doubter（幂等保护：整个项目生命周期只执行一次）"""
+        from filelock import FileLock
+
+        flag = self.paths["finalized_flag"]
+        lock_path = flag + ".lock"
+
+        # 用文件锁保证原子性：只有第一个抢到锁且 flag 不存在的协程才能继续
+        with FileLock(lock_path, timeout=5):
+            if os.path.exists(flag):
+                self.log.info("_finalize_research 已由其他协程触发，跳过重复执行")
+                return False
+            # 写入标志位，后续所有并发调用都会跳过
+            with open(flag, "w") as f:
+                f.write("finalized")
+
         self.log.info("所有子研究完成，调用 Doubter 进行质疑验证")
         from Doubter import Doubter
         doubter = Doubter(self.project_dir)

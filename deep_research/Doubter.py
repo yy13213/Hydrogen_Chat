@@ -24,6 +24,8 @@ from utils import generate_id, read_jsonl, write_jsonl_append, update_jsonl_reco
 
 MAX_RETRIES = 3
 
+#TODO 需要等待所有的质疑被解决，质疑研究完全结束后再进行文章撰写工作。目前存在二次撰写的问题。
+
 
 # ==================== 结构化返回模型（全部使用具体 Pydantic 子模型，禁止 list[dict]）====================
 
@@ -87,6 +89,7 @@ def _get_paths(project_dir: str) -> dict:
         "shared_memory": os.path.join(base, "shared_memory.jsonl"),
         "researcher_list": os.path.join(base, "Researcher_list.jsonl"),
         "doubt": os.path.join(base, "doubt.jsonl"),
+        "published_flag": os.path.join(base, ".published"),
     }
 
 
@@ -117,6 +120,19 @@ class Doubter:
         self.log = get_project_logger(project_dir, "Doubter")
 
     async def run(self) -> None:
+        """质疑主流程（幂等保护：整个项目生命周期只执行一次）"""
+        from filelock import FileLock
+
+        # 用独立的 doubter_running flag 防止并发重入
+        running_flag = os.path.join(self.paths["base"], ".doubter_running")
+        lock_path = running_flag + ".lock"
+        with FileLock(lock_path, timeout=5):
+            if os.path.exists(running_flag):
+                self.log.info("Doubter.run() 已在执行中或已完成，跳过重复触发")
+                return
+            with open(running_flag, "w") as f:
+                f.write("running")
+
         participated = _get_participated_researchers(self.project_dir)
         self.log.info(f"开始质疑流程，参与研究的 Researcher：{participated}")
 
@@ -366,6 +382,19 @@ class Doubter:
                 self.log.error(f"补充研究 #{i} 失败: {res}", exc_info=False)
 
     async def _call_publisher(self) -> None:
+        """调用 Publisher（幂等保护：整个项目生命周期只执行一次）"""
+        from filelock import FileLock
+
+        flag = self.paths["published_flag"]
+        lock_path = flag + ".lock"
+
+        with FileLock(lock_path, timeout=5):
+            if os.path.exists(flag):
+                self.log.info("_call_publisher 已由其他协程触发，跳过重复执行")
+                return
+            with open(flag, "w") as f:
+                f.write("published")
+
         from Publisher import Publisher
         publisher = Publisher(self.project_dir)
         await publisher.run()

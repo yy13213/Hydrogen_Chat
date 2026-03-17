@@ -168,7 +168,7 @@ Researcher任务列表：
 注意：章节应覆盖所有重要研究结论，逻辑清晰，层次分明。
 """
 
-#TODO 撰写部分非常重要，需要精调一下AI的提示词
+
 
         return await _call_gemini_with_retry(prompt, PublisherPlanResponse, self.log)
 

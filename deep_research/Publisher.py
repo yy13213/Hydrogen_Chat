@@ -169,6 +169,7 @@ Researcher任务列表：
 """
 
 
+#TODO 尝试将撰写改为串行，并能看到上一次生成的内容，接着写。
 
         return await _call_gemini_with_retry(prompt, PublisherPlanResponse, self.log)
 

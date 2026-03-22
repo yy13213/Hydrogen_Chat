@@ -333,50 +333,83 @@ def stream_response(user_message: str, uploaded_files: list):
             "query_database": "🗄️",
         }
 
-        max_tool_rounds = 5
+        # 每个工具的失败次数，超过阈值后放弃该工具
+        TOOL_MAX_FAILURES = 3
+        tool_failure_counts: dict[str, int] = {}
+        # 已放弃的工具集合，放弃后将错误信息直接回传，不再重试
+        abandoned_tools: set[str] = set()
+
+        def _call_tool_with_limit(tool_name: str, tool_args: dict) -> str:
+            """执行工具，失败计数超限后放弃并返回降级提示"""
+            if tool_name in abandoned_tools:
+                return f"[工具 {tool_name} 已不可用，请根据已有信息直接回答]"
+            try:
+                result = execute_tool(tool_name, tool_args)
+                # 重置该工具的失败计数（成功一次即重置）
+                tool_failure_counts[tool_name] = 0
+                return result
+            except Exception as e:
+                tool_failure_counts[tool_name] = tool_failure_counts.get(tool_name, 0) + 1
+                count = tool_failure_counts[tool_name]
+                if count >= TOOL_MAX_FAILURES:
+                    abandoned_tools.add(tool_name)
+                    return (
+                        f"[工具 {tool_name} 连续失败 {TOOL_MAX_FAILURES} 次已放弃。"
+                        f"最后错误：{e}。请根据已有信息直接回答用户问题，无需再调用此工具。]"
+                    )
+                return f"[工具 {tool_name} 调用失败（第 {count}/{TOOL_MAX_FAILURES} 次）：{e}，请重试或换用其他方式]"
+
+        def _build_error_response(err: str) -> str:
+            if "111" in err or "Connection refused" in err:
+                return (
+                    "❌ **无法连接到 Gemini 代理服务**\n\n"
+                    f"**错误详情：** `{err}`\n\n"
+                    "**可能原因及解决方法：**\n"
+                    f"- Gemini 代理服务未启动，请先运行：`python api/Google_ai2dify_port6773.py`\n"
+                    f"- 代理服务监听端口不是 `6773`，请检查 `GEMINI_BASE_URL` 配置\n"
+                    "- 防火墙或网络策略阻止了本地端口访问"
+                )
+            elif "timeout" in err.lower() or "timed out" in err.lower():
+                return (
+                    "❌ **请求超时**\n\n"
+                    f"**错误详情：** `{err}`\n\n"
+                    "**可能原因：** 网络延迟过高，或 Gemini API 响应缓慢，请稍后重试。"
+                )
+            elif "401" in err or "403" in err or "API key" in err.lower():
+                return (
+                    "❌ **API 鉴权失败**\n\n"
+                    f"**错误详情：** `{err}`\n\n"
+                    "**可能原因：** API Key 无效或未配置，请检查代理服务的 `GEMINI_API_KEY` 环境变量。"
+                )
+            elif "400" in err:
+                return (
+                    "❌ **请求参数错误**\n\n"
+                    f"**错误详情：** `{err}`\n\n"
+                    "**可能原因：** 发送的内容格式不被模型支持，请检查上传的文件类型或消息内容。"
+                )
+            return f"❌ **请求失败**\n\n**错误详情：** `{err}`"
+
+        # 当所有工具均被放弃时，切换到无工具模式让模型直接回答
+        def _all_tools_abandoned() -> bool:
+            return abandoned_tools >= CUSTOM_TOOL_NAMES
+
+        max_tool_rounds = 10
         for _ in range(max_tool_rounds):
             try:
+                # 所有工具都放弃后，不再传入工具列表，让模型直接回答
+                current_tools = None if _all_tools_abandoned() else TOOLS
                 response = client.models.generate_content(
                     model=CHAT_MODEL,
                     contents=all_contents,
                     config=types.GenerateContentConfig(
-                        tools=TOOLS,
+                        tools=current_tools,
                         automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
                         temperature=0.7,
                         system_instruction="你是 Hydrogen Chat 智能助手，能够搜索网络、查询知识库和数据库来回答问题。请用中文回复。"
                     )
                 )
             except Exception as e:
-                err = str(e)
-                if "111" in err or "Connection refused" in err:
-                    full_response = (
-                        "❌ **无法连接到 Gemini 代理服务**\n\n"
-                        f"**错误详情：** `{err}`\n\n"
-                        "**可能原因及解决方法：**\n"
-                        f"- Gemini 代理服务未启动，请先运行：`python api/Google_ai2dify_port6773.py`\n"
-                        f"- 代理服务监听端口不是 `6773`，请检查 `GEMINI_BASE_URL` 配置\n"
-                        "- 防火墙或网络策略阻止了本地端口访问"
-                    )
-                elif "timeout" in err.lower() or "timed out" in err.lower():
-                    full_response = (
-                        "❌ **请求超时**\n\n"
-                        f"**错误详情：** `{err}`\n\n"
-                        "**可能原因：** 网络延迟过高，或 Gemini API 响应缓慢，请稍后重试。"
-                    )
-                elif "401" in err or "403" in err or "API key" in err.lower():
-                    full_response = (
-                        "❌ **API 鉴权失败**\n\n"
-                        f"**错误详情：** `{err}`\n\n"
-                        "**可能原因：** API Key 无效或未配置，请检查代理服务的 `GEMINI_API_KEY` 环境变量。"
-                    )
-                elif "400" in err:
-                    full_response = (
-                        "❌ **请求参数错误**\n\n"
-                        f"**错误详情：** `{err}`\n\n"
-                        "**可能原因：** 发送的内容格式不被模型支持，请检查上传的文件类型或消息内容。"
-                    )
-                else:
-                    full_response = f"❌ **请求失败**\n\n**错误详情：** `{err}`"
+                full_response = _build_error_response(str(e))
                 response_placeholder.markdown(full_response)
                 break
 
@@ -392,20 +425,27 @@ def stream_response(user_message: str, uploaded_files: list):
                 # 将模型回复（含 function_call）加入上下文
                 all_contents.append(response.candidates[0].content)
 
-                # 逐个执行自定义工具并收集结果
+                # 逐个执行工具（含失败限制）并收集结果
                 function_response_parts = []
                 for fc in custom_tool_calls:
                     tool_name = fc.name
                     tool_args = dict(fc.args) if fc.args else {}
-                    used_tools.append(tool_name)
+                    if tool_name not in used_tools:
+                        used_tools.append(tool_name)
 
                     icon = icon_map.get(tool_name, "🔧")
-                    tool_placeholder.markdown(
-                        f'<div class="tool-call-badge">{icon} 正在调用: <b>{tool_name}</b>...</div>',
-                        unsafe_allow_html=True
-                    )
+                    if tool_name in abandoned_tools:
+                        tool_placeholder.markdown(
+                            f'<div class="tool-call-badge">⚠️ 工具已放弃: <b>{tool_name}</b></div>',
+                            unsafe_allow_html=True
+                        )
+                    else:
+                        tool_placeholder.markdown(
+                            f'<div class="tool-call-badge">{icon} 正在调用: <b>{tool_name}</b>...</div>',
+                            unsafe_allow_html=True
+                        )
 
-                    tool_result = execute_tool(tool_name, tool_args)
+                    tool_result = _call_tool_with_limit(tool_name, tool_args)
                     function_response_parts.append(
                         types.Part.from_function_response(
                             name=tool_name,

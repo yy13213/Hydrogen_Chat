@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}注册 · HydrogenX{% endblock %}
+{% block content %}
+<section class="container auth-shell">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="auth-layout">
+        <div class="auth-layout__intro">
+          <span class="eyebrow">Create Workspace Access</span>
+          <h1>创建 HydrogenX 账号</h1>
+          <p>注册完成后可进入统一工作台，并在其中访问 Hydrogen Chat、Hydrogen Chart、Hydrogen Research 与 Hydrogen Assistant。</p>
+          <div class="auth-badges">
+            <span>统一账号体系</span>
+            <span>极简现代界面</span>
+            <span>科研场景优先</span>
+          </div>
+        </div>
+
+        <div class="auth-card">
+          <h2>新建账号</h2>
+          <p class="text-secondary mb-4">填写以下信息，开启 HydrogenX 使用权限。</p>
+
+          <form method="post" novalidate>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="mb-3">
+              <label class="form-label">用户名</label>
+              <input type="text" name="username" class="form-control form-control-lg" placeholder="至少 3 个字符" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">邮箱</label>
+              <input type="email" name="email" class="form-control form-control-lg" placeholder="you@example.com" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">密码</label>
+              <input type="password" name="password" class="form-control form-control-lg" placeholder="至少 8 个字符" required>
+            </div>
+            <div class="mb-4">
+              <label class="form-label">确认密码</label>
+              <input type="password" name="confirm_password" class="form-control form-control-lg" placeholder="再次输入密码" required>
+            </div>
+            <button class="btn btn-dark btn-lg w-100" type="submit">注册 HydrogenX</button>
+          </form>
+
+          <p class="text-secondary small mt-4 mb-0">
+            已有账号？
+            <a href="{{ url_for('auth.login') }}" class="link-dark fw-semibold">去登录</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

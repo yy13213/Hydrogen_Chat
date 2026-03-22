@@ -391,22 +391,24 @@ def stream_response(user_message: str, uploaded_files: list):
 
         # 当所有工具均被放弃时，切换到无工具模式让模型直接回答
         def _all_tools_abandoned() -> bool:
-            return abandoned_tools >= CUSTOM_TOOL_NAMES
+            return CUSTOM_TOOL_NAMES <= abandoned_tools
 
         max_tool_rounds = 10
         for _ in range(max_tool_rounds):
             try:
                 # 所有工具都放弃后，不再传入工具列表，让模型直接回答
-                current_tools = None if _all_tools_abandoned() else TOOLS
+                use_tools = not _all_tools_abandoned()
+                config_kwargs = dict(
+                    temperature=0.7,
+                    system_instruction="你是 Hydrogen Chat 智能助手，能够搜索网络、查询知识库和数据库来回答问题。请用中文回复。"
+                )
+                if use_tools:
+                    config_kwargs["tools"] = TOOLS
+                    config_kwargs["automatic_function_calling"] = types.AutomaticFunctionCallingConfig(disable=True)
                 response = client.models.generate_content(
                     model=CHAT_MODEL,
                     contents=all_contents,
-                    config=types.GenerateContentConfig(
-                        tools=current_tools,
-                        automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
-                        temperature=0.7,
-                        system_instruction="你是 Hydrogen Chat 智能助手，能够搜索网络、查询知识库和数据库来回答问题。请用中文回复。"
-                    )
+                    config=types.GenerateContentConfig(**config_kwargs)
                 )
             except Exception as e:
                 full_response = _build_error_response(str(e))

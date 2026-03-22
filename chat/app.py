@@ -117,23 +117,12 @@ def get_client():
 
 
 # ── 工具定义 ───────────────────────────────────────────────
+# GoogleSearch 与 FunctionDeclaration 必须合并在同一个 Tool 对象中，
+# 否则 SDK 会报 AFC 不兼容警告并禁用自动函数调用。
 TOOLS = [
     types.Tool(
+        google_search=types.GoogleSearch(),
         function_declarations=[
-            types.FunctionDeclaration(
-                name="search_web",
-                description="使用 Google 搜索获取最新网络信息，适用于需要实时数据、新闻或不确定的问题",
-                parameters=types.Schema(
-                    type=types.Type.OBJECT,
-                    properties={
-                        "query": types.Schema(
-                            type=types.Type.STRING,
-                            description="搜索关键词"
-                        )
-                    },
-                    required=["query"]
-                )
-            ),
             types.FunctionDeclaration(
                 name="query_knowledge_base",
                 description="查询本地知识库，获取专业领域文档和资料",
@@ -163,9 +152,11 @@ TOOLS = [
                 )
             )
         ]
-    ),
-    types.Tool(google_search=types.GoogleSearch())
+    )
 ]
+
+# 需要手动处理的自定义工具名称集合（GoogleSearch 由模型内部处理，不在此列）
+CUSTOM_TOOL_NAMES = {"query_knowledge_base", "query_database"}
 
 
 # ── 工具执行 ───────────────────────────────────────────────
@@ -174,8 +165,6 @@ def execute_tool(tool_name: str, tool_args: dict) -> str:
         return query_knowledge_base(tool_args.get("question", ""))
     elif tool_name == "query_database":
         return query_database(tool_args.get("sql", ""))
-    elif tool_name == "search_web":
-        return f"已通过 Google 搜索: {tool_args.get('query', '')}"
     return "未知工具"
 
 
@@ -253,7 +242,6 @@ def render_messages():
                     icon_map = {
                         "query_knowledge_base": "📚",
                         "query_database": "🗄️",
-                        "search_web": "🔍",
                         "google_search": "🌐"
                     }
                     icon = icon_map.get(tc, "🔧")
@@ -327,6 +315,12 @@ def stream_response(user_message: str, uploaded_files: list):
         response_placeholder = st.empty()
         full_response = ""
 
+        icon_map = {
+            "query_knowledge_base": "📚",
+            "query_database": "🗄️",
+            "google_search": "🌐"
+        }
+
         max_tool_rounds = 5
         for _ in range(max_tool_rounds):
             try:
@@ -335,6 +329,7 @@ def stream_response(user_message: str, uploaded_files: list):
                     contents=all_contents,
                     config=types.GenerateContentConfig(
                         tools=TOOLS,
+                        automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
                         temperature=0.7,
                         system_instruction="你是 Hydrogen Chat 智能助手，能够搜索网络、查询知识库和数据库来回答问题。请用中文回复。"
                     )
@@ -344,47 +339,56 @@ def stream_response(user_message: str, uploaded_files: list):
                 response_placeholder.markdown(full_response)
                 break
 
-            # 检查是否有工具调用
-            has_tool_call = False
+            # 检查是否有需要手动处理的自定义工具调用
+            custom_tool_calls = []
             if response.candidates and response.candidates[0].content.parts:
                 for part in response.candidates[0].content.parts:
-                    if hasattr(part, "function_call") and part.function_call:
-                        has_tool_call = True
-                        fc = part.function_call
-                        tool_name = fc.name
-                        tool_args = dict(fc.args) if fc.args else {}
-                        used_tools.append(tool_name)
+                    if (hasattr(part, "function_call") and part.function_call
+                            and part.function_call.name in CUSTOM_TOOL_NAMES):
+                        custom_tool_calls.append(part.function_call)
 
-                        # 显示工具调用状态
-                        icon_map = {
-                            "query_knowledge_base": "📚",
-                            "query_database": "🗄️",
-                            "search_web": "🔍",
-                            "google_search": "🌐"
-                        }
-                        icon = icon_map.get(tool_name, "🔧")
-                        tool_placeholder.markdown(
-                            f'<div class="tool-call-badge">{icon} 正在调用: <b>{tool_name}</b>...</div>',
-                            unsafe_allow_html=True
+            if custom_tool_calls:
+                # 将模型回复（含 function_call）加入上下文
+                all_contents.append(response.candidates[0].content)
+
+                # 逐个执行自定义工具并收集结果
+                function_response_parts = []
+                for fc in custom_tool_calls:
+                    tool_name = fc.name
+                    tool_args = dict(fc.args) if fc.args else {}
+                    used_tools.append(tool_name)
+
+                    icon = icon_map.get(tool_name, "🔧")
+                    tool_placeholder.markdown(
+                        f'<div class="tool-call-badge">{icon} 正在调用: <b>{tool_name}</b>...</div>',
+                        unsafe_allow_html=True
+                    )
+
+                    tool_result = execute_tool(tool_name, tool_args)
+                    function_response_parts.append(
+                        types.Part.from_function_response(
+                            name=tool_name,
+                            response={"result": tool_result}
                         )
+                    )
 
-                        # 执行工具
-                        tool_result = execute_tool(tool_name, tool_args)
-
-                        # 将工具结果加入对话
-                        all_contents.append(response.candidates[0].content)
-                        all_contents.append(types.Content(
-                            role="user",
-                            parts=[types.Part.from_function_response(
-                                name=tool_name,
-                                response={"result": tool_result}
-                            )]
-                        ))
-
-            if not has_tool_call:
-                # 最终文本回复
+                # 将所有工具结果一次性回传
+                all_contents.append(types.Content(
+                    role="user",
+                    parts=function_response_parts
+                ))
+            else:
+                # 无自定义工具调用（可能是 GoogleSearch 内置处理完毕，或直接文本回复）
                 tool_placeholder.empty()
                 full_response = response.text or ""
+
+                # 若模型调用了 GoogleSearch，在徽章中标记
+                if response.candidates and response.candidates[0].content.parts:
+                    for part in response.candidates[0].content.parts:
+                        if hasattr(part, "function_call") and part.function_call:
+                            gname = part.function_call.name
+                            if gname not in CUSTOM_TOOL_NAMES and gname not in used_tools:
+                                used_tools.append(gname)
 
                 # 流式显示效果
                 displayed = ""

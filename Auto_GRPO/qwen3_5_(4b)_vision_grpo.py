@@ -7,7 +7,7 @@ Original file is located at
     https://colab.research.google.com/github/unslothai/notebooks/blob/main/nb/Qwen3_5_(4B)_Vision_GRPO.ipynb
 
 To run this, press "*Runtime*" and press "*Run all*" on a **free** Tesla T4 Google Colab instance!
-<div class="align-center">
+<div class="align-center9">
 <a href="https://unsloth.ai/"><img src="https://github.com/unslothai/unsloth/raw/main/images/unsloth%20new%20logo.png" width="115"></a>
 <a href="https://discord.gg/unsloth"><img src="https://github.com/unslothai/unsloth/raw/main/images/Discord button.png" width="145"></a>
 <a href="https://unsloth.ai/docs/"><img src="https://github.com/unslothai/unsloth/blob/main/images/documentation%20green%20button.png?raw=true" width="125"></a> Join Discord if you need help + ⭐ <i>Star us on <a href="https://github.com/unslothai/unsloth">Github</a> </i> ⭐
@@ -52,8 +52,9 @@ lora_rank = 16 # Larger rank = smarter, but slower
 model, tokenizer = FastVisionModel.from_pretrained(
     model_name = "unsloth/Qwen3.5-4B",
     max_seq_length = max_seq_length,
-    load_in_4bit = False, # False for LoRA 16bit
-    fast_inference = False, # Enable vLLM fast inference
+    load_in_4bit = False,  # False for LoRA 16bit
+    fast_inference = True, # 必须开启，规避 chunked_hidden_states dtype 不匹配问题
+    dtype = torch.bfloat16, # 明确指定 bfloat16，防止混合精度导致 @ 运算 dtype 冲突
 )
 
 """In Unsloth, we share vLLM's weights directly, reducing VRAM usage by > 50%. vLLM also does not yet support LoRA on the vision layers, so we can only add them on the language layers. Vision GRPO still works though!"""
@@ -362,11 +363,13 @@ training_args = GRPOConfig(
     max_grad_norm = 0.1,
     report_to = "none", # Can use Weights & Biases
     output_dir = "outputs",
+    bf16 = True,  # 全程 bfloat16，与模型 dtype 保持一致，防止 lm_head @ 时 dtype 不匹配
 
     # Below enables GSPO:
     importance_sampling_level = "sequence",
     mask_truncated_completions = False,
     loss_type = "dr_grpo",
+    
 )
 
 """And let's run the trainer! If you scroll up, you'll see a table of rewards. The goal is to see the `reward` column increase!

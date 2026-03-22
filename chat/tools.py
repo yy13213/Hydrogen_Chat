@@ -2,18 +2,22 @@ import httpx
 import json
 import csv
 import io
+import os
 import importlib.util
 import psycopg2
 from pathlib import Path
+from dotenv import load_dotenv
 from tavily import TavilyClient
 from google import genai
 from google.genai import types
 
+load_dotenv(Path(__file__).parent / ".env")
+
 # ── 知识库配置 ─────────────────────────────────────────────
-KNOWLEDGE_BASE_URL = "http://localhost:6772/triggers/webhook-debug/mnwXLKRp0WDOeH7XjBjAAOO6"
+KNOWLEDGE_BASE_URL = os.getenv("KNOWLEDGE_BASE_URL", "http://localhost:6772/triggers/webhook-debug/mnwXLKRp0WDOeH7XjBjAAOO6")
 
 # ── Tavily 网络搜索 ────────────────────────────────────────
-TAVILY_API_KEY = "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"
+TAVILY_API_KEY = os.getenv("TAVILY_API_KEY", "")
 
 # ── 数据库配置（复用 chart_agent/database_query.py） ────────
 _db_module_path = Path(__file__).parent.parent / "chart_agent" / "database_query.py"
@@ -25,15 +29,16 @@ DB_CONFIG = _db_module.DB_CONFIG
 # ── ER 图路径（与 sql_generation.py 相同） ──────────────────
 ER_CHART_PATH = Path(__file__).parent.parent / "chart_agent" / "ER_chart.jpg"
 
-# ── Gemini 客户端（复用 app.py 的代理地址） ─────────────────
-GEMINI_BASE_URL = "http://localhost:6773"
-SQL_MODEL = "gemini-3.1-pro-preview-customtools"
+# ── Gemini 客户端配置 ────────────────────────────────────────
+GEMINI_BASE_URL = os.getenv("GEMINI_BASE_URL", "http://localhost:6773")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "placeholder")
+SQL_MODEL = os.getenv("SQL_MODEL", "gemini-3.1-pro-preview-customtools")
 MAX_RETRY = 5
 
 
 def _get_client() -> genai.Client:
     return genai.Client(
-        api_key="placeholder",
+        api_key=GEMINI_API_KEY,
         http_options=types.HttpOptions(base_url=GEMINI_BASE_URL)
     )
 

@@ -2,12 +2,18 @@ import json
 import os
 import uuid
 from datetime import datetime
+from pathlib import Path
 from typing import Optional
+from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
+load_dotenv(Path(__file__).parent / ".env")
+
 HISTORY_FILE = os.path.join(os.path.dirname(__file__), "chat_history.json")
-GEMINI_BASE_URL = "http://localhost:6773"
+GEMINI_BASE_URL = os.getenv("GEMINI_BASE_URL", "http://localhost:6773")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "placeholder")
+TITLE_MODEL = os.getenv("TITLE_MODEL", "gemini-2.0-flash-lite")
 
 
 def _load_all() -> dict:
@@ -97,12 +103,12 @@ def delete_session(session_id: str):
 
 
 def generate_title(messages: list[dict]) -> str:
-    """使用 gemini-3.1-flash-lite-preview 为对话生成标题"""
+    """使用 TITLE_MODEL 为对话生成标题"""
     if not messages:
         return "新对话"
     try:
         client = genai.Client(
-            api_key="placeholder",
+            api_key=GEMINI_API_KEY,
             http_options=types.HttpOptions(base_url=GEMINI_BASE_URL)
         )
         conversation_text = "\n".join(
@@ -111,7 +117,7 @@ def generate_title(messages: list[dict]) -> str:
         )
         prompt = f"请为以下对话生成一个简洁的标题（不超过15个字，不加引号）：\n\n{conversation_text}"
         response = client.models.generate_content(
-            model="gemini-3.1-flash-lite-preview",
+            model=TITLE_MODEL,
             contents=prompt
         )
         title = response.text.strip().strip('"').strip("'")

@@ -3,6 +3,8 @@ import base64
 import mimetypes
 import os
 import threading
+from pathlib import Path
+from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from history import (
@@ -10,6 +12,8 @@ from history import (
     add_message, update_session_title, delete_session, generate_title
 )
 from tools import search_web, query_knowledge_base, query_database
+
+load_dotenv(Path(__file__).parent / ".env")
 
 # ── 页面配置 ──────────────────────────────────────────────
 st.set_page_config(
@@ -19,8 +23,9 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-GEMINI_BASE_URL = "http://localhost:6773"
-CHAT_MODEL = "gemini-3.1-pro-preview-customtools"
+GEMINI_BASE_URL = os.getenv("GEMINI_BASE_URL", "http://localhost:6773")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "placeholder")
+CHAT_MODEL = os.getenv("CHAT_MODEL", "gemini-3.1-pro-preview-customtools")
 
 # ── 自定义样式 ─────────────────────────────────────────────
 st.markdown("""
@@ -108,10 +113,10 @@ init_state()
 
 
 # ── Gemini 客户端 ──────────────────────────────────────────
-@st.cache_resource
+# 不缓存 client，每次创建新实例，避免 AFC 状态跨请求持久化（SDK issue #1818）
 def get_client():
     return genai.Client(
-        api_key="placeholder",
+        api_key=GEMINI_API_KEY,
         http_options=types.HttpOptions(base_url=GEMINI_BASE_URL)
     )
 
@@ -404,7 +409,11 @@ def stream_response(user_message: str, uploaded_files: list):
                 )
                 if use_tools:
                     config_kwargs["tools"] = TOOLS
-                    config_kwargs["automatic_function_calling"] = types.AutomaticFunctionCallingConfig(disable=True)
+                    config_kwargs["tool_config"] = types.ToolConfig(
+                        function_calling_config=types.FunctionCallingConfig(
+                            mode=types.FunctionCallingConfigMode.AUTO
+                        )
+                    )
                 response = client.models.generate_content(
                     model=CHAT_MODEL,
                     contents=all_contents,

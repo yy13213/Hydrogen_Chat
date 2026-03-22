@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}服务异常 - {{ APP_BRAND }}{% endblock %}
+{% block content %}
+<section class="container">
+  <div class="card border-0 shadow-soft">
+    <div class="card-body p-5 text-center">
+      <h1 class="display-6 fw-bold">500</h1>
+      <p class="text-secondary">服务器内部发生错误，请检查日志。</p>
+      <a href="{{ url_for('dashboard.home') }}" class="btn btn-dark">返回首页</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

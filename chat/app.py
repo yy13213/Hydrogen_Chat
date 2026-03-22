@@ -335,7 +335,36 @@ def stream_response(user_message: str, uploaded_files: list):
                     )
                 )
             except Exception as e:
-                full_response = f"❌ 请求失败: {str(e)}"
+                err = str(e)
+                if "111" in err or "Connection refused" in err:
+                    full_response = (
+                        "❌ **无法连接到 Gemini 代理服务**\n\n"
+                        f"**错误详情：** `{err}`\n\n"
+                        "**可能原因及解决方法：**\n"
+                        f"- Gemini 代理服务未启动，请先运行：`python api/Google_ai2dify_port6773.py`\n"
+                        f"- 代理服务监听端口不是 `6773`，请检查 `GEMINI_BASE_URL` 配置\n"
+                        "- 防火墙或网络策略阻止了本地端口访问"
+                    )
+                elif "timeout" in err.lower() or "timed out" in err.lower():
+                    full_response = (
+                        "❌ **请求超时**\n\n"
+                        f"**错误详情：** `{err}`\n\n"
+                        "**可能原因：** 网络延迟过高，或 Gemini API 响应缓慢，请稍后重试。"
+                    )
+                elif "401" in err or "403" in err or "API key" in err.lower():
+                    full_response = (
+                        "❌ **API 鉴权失败**\n\n"
+                        f"**错误详情：** `{err}`\n\n"
+                        "**可能原因：** API Key 无效或未配置，请检查代理服务的 `GEMINI_API_KEY` 环境变量。"
+                    )
+                elif "400" in err:
+                    full_response = (
+                        "❌ **请求参数错误**\n\n"
+                        f"**错误详情：** `{err}`\n\n"
+                        "**可能原因：** 发送的内容格式不被模型支持，请检查上传的文件类型或消息内容。"
+                    )
+                else:
+                    full_response = f"❌ **请求失败**\n\n**错误详情：** `{err}`"
                 response_placeholder.markdown(full_response)
                 break
 

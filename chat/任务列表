@@ -18,3 +18,10 @@ from google.genai import types导入）
 接受用户的问题，调用gemini-3.1-pro-preview-customtools，自定义工具调用，提供网络搜索（gemini内置），知识库查询，数据库查询。
 注意支持用户的传入的图片和文件。
 侧边栏为历史聊天记录，用户的历史聊天记录使用gemini-3.1-flash-lite-preview生成题目。
+
+from tavily import TavilyClient
+
+tavily_client = TavilyClient(api_key="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")
+response = tavily_client.search("Who is Leo Messi?")
+
+print(response)

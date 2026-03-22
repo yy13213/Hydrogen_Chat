@@ -9,7 +9,7 @@ from history import (
     get_all_sessions, create_session, get_session_messages,
     add_message, update_session_title, delete_session, generate_title
 )
-from tools import query_knowledge_base, query_database
+from tools import search_web, query_knowledge_base, query_database
 
 # ── 页面配置 ──────────────────────────────────────────────
 st.set_page_config(
@@ -117,12 +117,23 @@ def get_client():
 
 
 # ── 工具定义 ───────────────────────────────────────────────
-# GoogleSearch 与 FunctionDeclaration 必须合并在同一个 Tool 对象中，
-# 否则 SDK 会报 AFC 不兼容警告并禁用自动函数调用。
 TOOLS = [
     types.Tool(
-        google_search=types.GoogleSearch(),
         function_declarations=[
+            types.FunctionDeclaration(
+                name="search_web",
+                description="使用 Tavily 搜索网络，获取最新资讯、新闻或实时信息",
+                parameters=types.Schema(
+                    type=types.Type.OBJECT,
+                    properties={
+                        "query": types.Schema(
+                            type=types.Type.STRING,
+                            description="搜索关键词或问题"
+                        )
+                    },
+                    required=["query"]
+                )
+            ),
             types.FunctionDeclaration(
                 name="query_knowledge_base",
                 description="查询本地知识库，获取专业领域文档和资料",
@@ -139,32 +150,33 @@ TOOLS = [
             ),
             types.FunctionDeclaration(
                 name="query_database",
-                description="执行 SQL 查询数据库，获取结构化数据",
+                description="查询数据库，自动生成 SQL 并返回结果。传入用户的自然语言问题即可，无需手写 SQL。",
                 parameters=types.Schema(
                     type=types.Type.OBJECT,
                     properties={
-                        "sql": types.Schema(
+                        "user_question": types.Schema(
                             type=types.Type.STRING,
-                            description="要执行的 SQL 查询语句"
+                            description="用自然语言描述要查询的内容，例如：查询最近10篇文章的标题和发布时间"
                         )
                     },
-                    required=["sql"]
+                    required=["user_question"]
                 )
             )
         ]
     )
 ]
 
-# 需要手动处理的自定义工具名称集合（GoogleSearch 由模型内部处理，不在此列）
-CUSTOM_TOOL_NAMES = {"query_knowledge_base", "query_database"}
+CUSTOM_TOOL_NAMES = {"search_web", "query_knowledge_base", "query_database"}
 
 
 # ── 工具执行 ───────────────────────────────────────────────
 def execute_tool(tool_name: str, tool_args: dict) -> str:
-    if tool_name == "query_knowledge_base":
+    if tool_name == "search_web":
+        return search_web(tool_args.get("query", ""))
+    elif tool_name == "query_knowledge_base":
         return query_knowledge_base(tool_args.get("question", ""))
     elif tool_name == "query_database":
-        return query_database(tool_args.get("sql", ""))
+        return query_database(tool_args.get("user_question", ""))
     return "未知工具"
 
 
@@ -240,9 +252,9 @@ def render_messages():
             if tool_calls:
                 for tc in tool_calls:
                     icon_map = {
+                        "search_web": "🔍",
                         "query_knowledge_base": "📚",
                         "query_database": "🗄️",
-                        "google_search": "🌐"
                     }
                     icon = icon_map.get(tc, "🔧")
                     st.markdown(
@@ -316,9 +328,9 @@ def stream_response(user_message: str, uploaded_files: list):
         full_response = ""
 
         icon_map = {
+            "search_web": "🔍",
             "query_knowledge_base": "📚",
             "query_database": "🗄️",
-            "google_search": "🌐"
         }
 
         max_tool_rounds = 5
@@ -407,17 +419,9 @@ def stream_response(user_message: str, uploaded_files: list):
                     parts=function_response_parts
                 ))
             else:
-                # 无自定义工具调用（可能是 GoogleSearch 内置处理完毕，或直接文本回复）
+                # 无工具调用，直接输出文本回复
                 tool_placeholder.empty()
                 full_response = response.text or ""
-
-                # 若模型调用了 GoogleSearch，在徽章中标记
-                if response.candidates and response.candidates[0].content.parts:
-                    for part in response.candidates[0].content.parts:
-                        if hasattr(part, "function_call") and part.function_call:
-                            gname = part.function_call.name
-                            if gname not in CUSTOM_TOOL_NAMES and gname not in used_tools:
-                                used_tools.append(gname)
 
                 # 流式显示效果
                 displayed = ""

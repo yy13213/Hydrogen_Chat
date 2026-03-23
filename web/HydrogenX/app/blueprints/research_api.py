@@ -147,6 +147,12 @@ def _proxy_post(path: str, payload: dict, base_url: str = None):
             timeout=_DR_TIMEOUT,
         )
         return resp
+    except requests.exceptions.ConnectionError:
+        return None
+    except Exception:
+        return None
+
+
 def _proxy_post_with_fallback(path: str, payload: dict):
     """
     启动阶段自动探测可用 deep_research 地址。
@@ -169,10 +175,6 @@ def _proxy_post_with_fallback(path: str, payload: dict):
             detail = resp.text
         last_error = f"{base} 返回 {resp.status_code}: {detail[:500]}"
     return None, None, last_error
-    except requests.exceptions.ConnectionError:
-        return None
-    except Exception:
-        return None
 
 
 # ── API 路由 ──────────────────────────────────────────────────

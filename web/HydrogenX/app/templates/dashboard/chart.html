@@ -370,7 +370,6 @@
       const data = await api('/api/chart/chat', {
         method: 'POST',
         body: formData,
-        headers: {}
       });
 
       currentProject = data.project_name || currentProject;

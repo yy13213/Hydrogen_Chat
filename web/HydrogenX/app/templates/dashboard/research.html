@@ -335,6 +335,10 @@
     stopPolling();
     pollFailures = 0;
     pollStartTime = Date.now();
+    // 提交后立即进入“研究进展进行中”动画，避免首轮轮询前静止
+    setBarState(fillProgress, flowBar1, 12, false, true);
+    setBarState(fillDoubt, flowBar2, 0, false, false);
+    setBarState(fillReport, null, 0, false, false);
     doPoll(projectDir);
   }
 
@@ -405,31 +409,38 @@
     const hasDoubts = (progress.doubts_count || 0) > 0;
     const hasReport = progress.has_report;
     const status = progress.status;
+    const isTerminal = status === 'completed' || status === 'failed';
+    const isRunning = status === 'running';
 
-    // 研究进展进度条
-    setBarState(fillProgress, flowBar1, pct, isCompleted && !hasDoubts && !hasReport);
+    // 研究进展：只要研究结束（completed/failed）就必须停止动画并置为完成态
+    // 运行中即使百分比较低，也保持扫描动画，确保视觉一致性
+    const progressPct = isRunning ? Math.max(pct, 12) : pct;
+    setBarState(fillProgress, flowBar1, progressPct, isTerminal, isRunning && !isTerminal);
 
     // 质询记录进度条
     if (hasDoubts || status === 'completed') {
-      setBarState(fillDoubt, flowBar2, hasReport ? 100 : (hasDoubts ? 60 : 0), hasReport);
+      const doubtPct = hasReport ? 100 : (hasDoubts ? 60 : (status === 'completed' ? 30 : 0));
+      const doubtRunning = !hasReport && (hasDoubts || status === 'completed');
+      setBarState(fillDoubt, flowBar2, doubtPct, hasReport, doubtRunning);
     } else {
-      setBarState(fillDoubt, flowBar2, 0, false);
+      setBarState(fillDoubt, flowBar2, 0, false, false);
     }
 
     // 报告进度条
     if (hasReport) {
-      setBarState(fillReport, null, 100, true);
+      setBarState(fillReport, null, 100, true, false);
     } else {
-      setBarState(fillReport, null, 0, false);
+      const reportRunning = status === 'completed' && !hasReport;
+      setBarState(fillReport, null, reportRunning ? 25 : 0, false, reportRunning);
     }
   }
 
-  function setBarState(fill, flowEl, pct, done) {
+  function setBarState(fill, flowEl, pct, done, running = false) {
     fill.style.width = pct + '%';
     fill.classList.toggle('rpb-fill--done', done);
-    fill.classList.toggle('rpb-fill--running', !done && pct > 0);
+    fill.classList.toggle('rpb-fill--running', !done && running);
     if (flowEl) {
-      flowEl.classList.toggle('rpb-flow--active', pct > 0 && !done);
+      flowEl.classList.toggle('rpb-flow--active', !done && running);
       flowEl.classList.toggle('rpb-flow--done', done);
     }
   }

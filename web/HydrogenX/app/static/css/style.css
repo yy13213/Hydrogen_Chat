@@ -2473,10 +2473,6 @@ a { color: inherit; text-decoration: none; }
   background: var(--green) !important;
 }
 
-.rpb-fill--done-blue {
-  background: var(--accent) !important;
-}
-
 @keyframes rpbScan {
   from { left: -60%; }
   to   { left: 120%; }
@@ -2503,10 +2499,6 @@ a { color: inherit; text-decoration: none; }
 
 .rpb-flow--done {
   background: var(--green);
-}
-
-.rpb-flow--done-blue {
-  background: var(--accent);
 }
 
 @keyframes flowMove {
@@ -2871,4 +2863,144 @@ a { color: inherit; text-decoration: none; }
 
 /* ── c-danger 变量（复用） ── */
 :root { --c-danger: var(--red); }
+
+/* ═══════════════════════════════════════════════════════════
+   HYDROGEN CHART PAGE
+   ═══════════════════════════════════════════════════════════ */
+
+/* Chart 页面不需要 site-main 滚动 */
+.site-main:has(.chat-page#chart-app) { overflow: hidden; }
+
+/* ── 顶部状态栏 ── */
+.chart-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.78rem;
+  color: var(--text-2);
+  background: var(--bg-3);
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+
+.chart-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.chart-status-dot--running {
+  background: var(--yellow);
+  animation: statusPulse 1s ease-in-out infinite;
+}
+
+.chart-status-dot--done  { background: var(--green); }
+.chart-status-dot--error { background: var(--red); }
+
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+/* ── 图表图片网格 ── */
+.chart-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.chart-img {
+  max-width: 100%;
+  max-height: 480px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  cursor: zoom-in;
+  transition: transform var(--transition), box-shadow var(--transition);
+  background: var(--bg-2);
+  object-fit: contain;
+}
+
+.chart-img:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ── 灯箱 ── */
+.chart-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-lightbox-bg {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(6px);
+}
+
+.chart-lightbox-content {
+  position: relative;
+  z-index: 1;
+  max-width: 92vw;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.chart-lightbox-content img {
+  max-width: 100%;
+  max-height: 85vh;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  object-fit: contain;
+}
+
+.chart-lightbox-close {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-3);
+  border: 1px solid var(--border-2);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  transition: background var(--transition);
+}
+
+.chart-lightbox-close:hover { background: var(--bg-4); }
+
+/* ── 消息中的文件附件 ── */
+.msg-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.msg-file-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 0.75rem;
+  color: var(--text-2);
+}
 

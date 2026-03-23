@@ -41,6 +41,12 @@ def research():
     return render_template("dashboard/research.html")
 
 
+@dashboard_bp.get("/chart")
+@login_required
+def chart():
+    return render_template("dashboard/chart.html")
+
+
 @dashboard_bp.get("/dashboard")
 @login_required
 def index():

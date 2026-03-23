@@ -1,0 +1,566 @@
+{% extends "base.html" %}
+{% block title %}Hydrogen Chart · HydrogenX{% endblock %}
+
+{% block navbar %}
+<nav class="app-navbar">
+  <div class="nav-inner">
+    <a class="brand-mark" href="{{ url_for('dashboard.workspace') }}">
+      <span class="brand-mark__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5"/>
+          <line x1="12" y1="2" x2="12" y2="22"/>
+          <line x1="2" y1="8.5" x2="22" y2="8.5"/>
+          <line x1="2" y1="15.5" x2="22" y2="15.5"/>
+        </svg>
+      </span>
+      <span class="brand-mark__text">
+        <span class="brand-mark__title">Hydrogen Chart</span>
+        <span class="brand-mark__sub">Intelligent Chart Agent</span>
+      </span>
+    </a>
+    <div class="nav-actions">
+      <a class="nav-link-item" href="{{ url_for('dashboard.workspace') }}">
+        <i class="bi bi-grid"></i> 工作台
+      </a>
+      <span class="user-pill">
+        <i class="bi bi-person-circle"></i>
+        {{ current_user.username }}
+      </span>
+    </div>
+  </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="chat-page" id="chart-app">
+
+  <!-- 拖拽上传遮罩 -->
+  <div class="drop-overlay" id="drop-overlay">
+    <div class="drop-overlay-icon"><i class="bi bi-cloud-upload"></i></div>
+    <div class="drop-overlay-text">松开鼠标上传文件</div>
+  </div>
+
+  <!-- 隐藏文件输入 -->
+  <input type="file" id="file-input" multiple
+    accept=".png,.jpg,.jpeg,.gif,.webp,.txt,.csv"
+    style="display:none">
+
+  <!-- ── 侧边栏 ── -->
+  <aside class="chat-sidebar" id="chart-sidebar">
+    <div class="sidebar-head">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-icon">📊</div>
+        <span>Hydrogen Chart</span>
+      </div>
+      <button class="btn-new-chat" id="btn-new-chart" title="新建对话">
+        <i class="bi bi-plus-lg"></i>
+      </button>
+    </div>
+
+    <div class="sidebar-sessions" id="sidebar-sessions">
+      <div class="sidebar-section-label">历史对话</div>
+      <div id="session-list">
+        <div class="sidebar-empty">加载中…</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── 主聊天区 ── -->
+  <div class="chat-main">
+    <div class="chat-header">
+      <div>
+        <div class="chat-header-title" id="chat-title">新对话</div>
+        <div class="chat-header-sub">支持数据库查询 · 自动生成图表 · 多轮对话 · 图片/CSV 上传</div>
+      </div>
+      <!-- 进度状态指示 -->
+      <div class="chart-status-bar" id="chart-status-bar" style="display:none">
+        <span class="chart-status-dot" id="chart-status-dot"></span>
+        <span class="chart-status-text" id="chart-status-text">处理中…</span>
+      </div>
+    </div>
+
+    <!-- 消息列表 -->
+    <div class="chat-messages" id="chat-messages">
+      <div class="chat-messages-inner" id="messages-inner">
+        <!-- 欢迎界面 -->
+        <div class="chat-welcome" id="chat-welcome">
+          <div class="chat-welcome-icon">📊</div>
+          <h2>Hydrogen Chart</h2>
+          <p>智能图表绘制助手，支持数据库查询、CSV 分析与 Matplotlib 图表自动生成。上传图片或文件，开启多模态数据分析。</p>
+          <div class="chat-welcome-hints">
+            <span class="hint-chip" data-text="查询最近30天的氢能项目数量趋势，并绘制折线图">📈 项目趋势折线图</span>
+            <span class="hint-chip" data-text="统计各类型氢能设备的数量分布，绘制饼图">🥧 设备分布饼图</span>
+            <span class="hint-chip" data-text="查询数据库中最近的10条记录并展示">🗄️ 查询最新数据</span>
+            <span class="hint-chip" data-text="帮我分析这份CSV数据，绘制柱状图">📊 分析CSV数据</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 输入区 -->
+    <div class="chat-input-area">
+      <div class="chat-input-inner">
+        <!-- 待上传文件预览 -->
+        <div class="pending-files-bar" id="pending-files-bar" style="display:none"></div>
+
+        <div class="chat-input-box" id="chat-input-box">
+          <button class="btn-attach" id="btn-attach" title="上传文件/图片">
+            <i class="bi bi-plus-lg"></i>
+          </button>
+          <textarea class="chat-textarea" id="chat-textarea"
+            placeholder="发送消息…（Shift+Enter 换行，Enter 发送）支持上传图片、CSV 文件"
+            rows="1"></textarea>
+          <button class="btn-send" id="btn-send" disabled>
+            <i class="bi bi-arrow-up"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
+<script>
+(() => {
+  // ── Config ──────────────────────────────────────────────
+  const CSRF          = document.querySelector('meta[name="csrf-token"]').content;
+  const TOKENS_PER_SEC = 80;
+  const POLL_INTERVAL  = 2500;
+  const MAX_POLL_FAIL  = 15;
+  const MAX_POLL_MS    = 240000;
+  const USER_INITIAL   = '{{ current_user.username[0].upper() }}';
+
+  // ── DOM refs ────────────────────────────────────────────
+  const sessionList   = document.getElementById('session-list');
+  const btnNew        = document.getElementById('btn-new-chart');
+  const messagesInner = document.getElementById('messages-inner');
+  const chatWelcome   = document.getElementById('chat-welcome');
+  const chatMessages  = document.getElementById('chat-messages');
+  const chatTitle     = document.getElementById('chat-title');
+  const textarea      = document.getElementById('chat-textarea');
+  const btnSend       = document.getElementById('btn-send');
+  const btnAttach     = document.getElementById('btn-attach');
+  const fileInput     = document.getElementById('file-input');
+  const pendingBar    = document.getElementById('pending-files-bar');
+  const dropOverlay   = document.getElementById('drop-overlay');
+  const statusBar     = document.getElementById('chart-status-bar');
+  const statusDot     = document.getElementById('chart-status-dot');
+  const statusText    = document.getElementById('chart-status-text');
+
+  // ── State ────────────────────────────────────────────────
+  let currentProject  = null;
+  let pendingFiles    = [];
+  let isGenerating    = false;
+  let pollTimer       = null;
+  let pollFailures    = 0;
+  let pollStartTime   = 0;
+
+  // ── marked config ────────────────────────────────────────
+  marked.setOptions({ breaks: true, gfm: true });
+
+  // ── API helper ───────────────────────────────────────────
+  async function api(url, opts = {}) {
+    const headers = {
+      'Accept': 'application/json',
+      'X-CSRFToken': CSRF,
+      ...(opts.headers || {})
+    };
+    if (!(opts.body instanceof FormData) && !headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
+    }
+    const res = await fetch(url, { credentials: 'same-origin', headers, ...opts });
+    const text = await res.text();
+    let data = {};
+    try { data = text ? JSON.parse(text) : {}; } catch (_) {}
+    if (!res.ok) {
+      const err = new Error(data.error || `HTTP ${res.status}`);
+      err.status = res.status;
+      throw err;
+    }
+    return data;
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function fileIcon(name) {
+    const ext = (name.split('.').pop() || '').toLowerCase();
+    const map = { png:'bi-file-image', jpg:'bi-file-image', jpeg:'bi-file-image',
+                  gif:'bi-file-image', webp:'bi-file-image',
+                  txt:'bi-file-text', csv:'bi-file-spreadsheet' };
+    return map[ext] || 'bi-file-earmark';
+  }
+
+  // ── 侧边栏 ───────────────────────────────────────────────
+  async function loadSessions() {
+    try {
+      const data = await api('/api/chart/projects');
+      renderSessionList(data.projects || []);
+    } catch (e) {
+      sessionList.innerHTML = `<div class="sidebar-empty" style="color:var(--c-danger)">加载失败</div>`;
+    }
+  }
+
+  function renderSessionList(projects) {
+    if (!projects.length) {
+      sessionList.innerHTML = `<div class="sidebar-empty">暂无历史对话</div>`;
+      return;
+    }
+    sessionList.innerHTML = projects.map(p => {
+      const label = (p.question || p.project_name).slice(0, 32) + ((p.question||'').length > 32 ? '…' : '');
+      const active = currentProject === p.project_name ? ' active' : '';
+      return `<div class="session-item${active}" data-pid="${escHtml(p.project_name)}" title="${escHtml(p.question||p.project_name)}">
+        <span class="session-icon">📊</span>
+        <span class="session-title">${escHtml(label)}</span>
+      </div>`;
+    }).join('');
+    sessionList.querySelectorAll('.session-item').forEach(el => {
+      el.addEventListener('click', () => loadProject(el.dataset.pid));
+    });
+  }
+
+  // ── 加载历史项目 ─────────────────────────────────────────
+  async function loadProject(projectName) {
+    currentProject = projectName;
+    loadSessions();
+    // 从 progress 接口重建消息
+    try {
+      const data = await api(`/api/chart/progress/${projectName}`);
+      const records = data.records || [];
+      messagesInner.innerHTML = '';
+      chatWelcome.style.display = 'none';
+
+      // 重建对话
+      let firstQuestion = '';
+      for (const r of records) {
+        if (r.status === 'user_turn') {
+          if (!firstQuestion) firstQuestion = r.text || '';
+          appendUserBubble(r.text || '', r.files || []);
+        } else if (r.status === 'model_turn') {
+          appendAiBubble(r.text || '', r.files || [], true);
+        }
+      }
+      chatTitle.textContent = firstQuestion.slice(0, 40) + (firstQuestion.length > 40 ? '…' : '') || '历史对话';
+      scrollToBottom();
+    } catch (e) {
+      showError('加载历史记录失败：' + e.message);
+    }
+  }
+
+  // ── 新建对话 ─────────────────────────────────────────────
+  btnNew.addEventListener('click', () => {
+    stopPolling();
+    currentProject = null;
+    messagesInner.innerHTML = '';
+    messagesInner.appendChild(chatWelcome);
+    chatWelcome.style.display = '';
+    chatTitle.textContent = '新对话';
+    pendingFiles = [];
+    renderPendingFiles();
+    setGenerating(false);
+    loadSessions();
+  });
+
+  // ── 文件上传 ─────────────────────────────────────────────
+  btnAttach.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', () => {
+    addFiles(Array.from(fileInput.files));
+    fileInput.value = '';
+  });
+
+  // 拖拽
+  const chatPage = document.getElementById('chart-app');
+  chatPage.addEventListener('dragover', e => { e.preventDefault(); dropOverlay.style.display = 'flex'; });
+  chatPage.addEventListener('dragleave', e => { if (!chatPage.contains(e.relatedTarget)) dropOverlay.style.display = 'none'; });
+  chatPage.addEventListener('drop', e => {
+    e.preventDefault();
+    dropOverlay.style.display = 'none';
+    addFiles(Array.from(e.dataTransfer.files));
+  });
+
+  function addFiles(files) {
+    const allowed = ['image/png','image/jpeg','image/gif','image/webp','text/plain','text/csv','application/octet-stream'];
+    files.forEach(f => {
+      if (pendingFiles.length >= 5) return;
+      pendingFiles.push(f);
+    });
+    renderPendingFiles();
+  }
+
+  function renderPendingFiles() {
+    if (!pendingFiles.length) {
+      pendingBar.style.display = 'none';
+      return;
+    }
+    pendingBar.style.display = 'flex';
+    pendingBar.innerHTML = pendingFiles.map((f, i) => `
+      <div class="pending-file-chip">
+        <i class="bi ${fileIcon(f.name)}"></i>
+        <span>${escHtml(f.name.slice(0, 20))}</span>
+        <button class="pending-file-rm" data-idx="${i}">×</button>
+      </div>`).join('');
+    pendingBar.querySelectorAll('.pending-file-rm').forEach(btn => {
+      btn.addEventListener('click', () => {
+        pendingFiles.splice(parseInt(btn.dataset.idx), 1);
+        renderPendingFiles();
+      });
+    });
+  }
+
+  // ── 输入框自动高度 ───────────────────────────────────────
+  textarea.addEventListener('input', () => {
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 160) + 'px';
+    btnSend.disabled = !textarea.value.trim() && !pendingFiles.length;
+  });
+
+  textarea.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+
+  // 提示词快捷填充
+  document.querySelectorAll('.hint-chip[data-text]').forEach(chip => {
+    chip.addEventListener('click', () => {
+      textarea.value = chip.dataset.text;
+      textarea.dispatchEvent(new Event('input'));
+      textarea.focus();
+    });
+  });
+
+  // ── 发送消息 ─────────────────────────────────────────────
+  async function sendMessage() {
+    const text = textarea.value.trim();
+    if ((!text && !pendingFiles.length) || isGenerating) return;
+
+    const files = [...pendingFiles];
+    pendingFiles = [];
+    renderPendingFiles();
+    textarea.value = '';
+    textarea.style.height = 'auto';
+    btnSend.disabled = true;
+    setGenerating(true);
+
+    // 隐藏欢迎界面
+    chatWelcome.style.display = 'none';
+
+    // 渲染用户消息
+    appendUserBubble(text, files.map(f => f.name));
+
+    // 渲染 AI 占位
+    const aiBubble = appendAiBubble('', [], false);
+    const aiBubbleBody = aiBubble.querySelector('.msg-body');
+    aiBubbleBody.innerHTML = `<span class="typing-cursor"></span>`;
+
+    // 更新标题
+    if (!currentProject) {
+      chatTitle.textContent = text.slice(0, 40) + (text.length > 40 ? '…' : '');
+    }
+
+    // 构建 FormData
+    const formData = new FormData();
+    formData.append('user_input', text);
+    if (currentProject) formData.append('project_name', currentProject);
+    files.forEach(f => formData.append('files', f));
+
+    try {
+      setStatus('正在分析请求…', 'running');
+      const data = await api('/api/chart/chat', {
+        method: 'POST',
+        body: formData,
+        headers: {}
+      });
+
+      currentProject = data.project_name || currentProject;
+      loadSessions();
+
+      // 渲染回复
+      const replyText = data.reply_text || '';
+      const imageUrls = data.image_urls || [];
+
+      aiBubbleBody.innerHTML = '';
+      if (replyText) {
+        const mdDiv = document.createElement('div');
+        mdDiv.className = 'msg-md';
+        aiBubbleBody.appendChild(mdDiv);
+        streamText(mdDiv, replyText, () => {});
+      }
+      // 渲染图片
+      if (imageUrls.length) {
+        const imgWrap = document.createElement('div');
+        imgWrap.className = 'chart-images';
+        imageUrls.forEach(url => {
+          const img = document.createElement('img');
+          img.src = url;
+          img.className = 'chart-img';
+          img.alt = '生成的图表';
+          img.addEventListener('click', () => openLightbox(url));
+          imgWrap.appendChild(img);
+        });
+        aiBubbleBody.appendChild(imgWrap);
+      }
+
+      if (!replyText && !imageUrls.length) {
+        aiBubbleBody.innerHTML = `<span style="color:var(--text-3)">（无回复内容）</span>`;
+      }
+
+      setStatus('完成', 'done');
+      setTimeout(() => hideStatus(), 2000);
+
+    } catch (e) {
+      aiBubbleBody.innerHTML = `<span style="color:var(--red)">❌ 请求失败：${escHtml(e.message)}</span>`;
+      setStatus('失败', 'error');
+      setTimeout(() => hideStatus(), 3000);
+    }
+
+    setGenerating(false);
+    scrollToBottom();
+  }
+
+  btnSend.addEventListener('click', sendMessage);
+
+  // ── 消息渲染 ─────────────────────────────────────────────
+  function appendUserBubble(text, fileNames) {
+    const row = document.createElement('div');
+    row.className = 'msg-row msg-row--user';
+    const filesHtml = fileNames.length ? `<div class="msg-files">${fileNames.map(n =>
+      `<span class="msg-file-chip"><i class="bi ${fileIcon(n)}"></i> ${escHtml(n.slice(0,24))}</span>`
+    ).join('')}</div>` : '';
+    row.innerHTML = `
+      <div class="msg-avatar msg-avatar--user">${escHtml(USER_INITIAL)}</div>
+      <div class="msg-bubble msg-bubble--user">
+        ${filesHtml}
+        <div class="msg-body">${escHtml(text)}</div>
+      </div>`;
+    messagesInner.appendChild(row);
+    scrollToBottom();
+    return row;
+  }
+
+  function appendAiBubble(text, imageUrls, immediate) {
+    const row = document.createElement('div');
+    row.className = 'msg-row msg-row--ai';
+    row.innerHTML = `
+      <div class="msg-avatar msg-avatar--ai">⚡</div>
+      <div class="msg-bubble msg-bubble--ai">
+        <div class="msg-body"></div>
+      </div>`;
+    messagesInner.appendChild(row);
+    const body = row.querySelector('.msg-body');
+
+    if (text || imageUrls.length) {
+      if (text) {
+        const mdDiv = document.createElement('div');
+        mdDiv.className = 'msg-md';
+        if (immediate) {
+          mdDiv.innerHTML = marked.parse(text);
+        } else {
+          streamText(mdDiv, text, () => {});
+        }
+        body.appendChild(mdDiv);
+      }
+      if (imageUrls.length) {
+        const imgWrap = document.createElement('div');
+        imgWrap.className = 'chart-images';
+        imageUrls.forEach(url => {
+          const img = document.createElement('img');
+          img.src = url;
+          img.className = 'chart-img';
+          img.alt = '生成的图表';
+          img.addEventListener('click', () => openLightbox(url));
+          imgWrap.appendChild(img);
+        });
+        body.appendChild(imgWrap);
+      }
+    }
+
+    scrollToBottom();
+    return row;
+  }
+
+  // ── 流式文字输出 ─────────────────────────────────────────
+  function streamText(el, text, onDone) {
+    const html = marked.parse(text);
+    const chars = Array.from(html);
+    let i = 0;
+    const delay = Math.max(1, Math.round(1000 / TOKENS_PER_SEC));
+    el.innerHTML = '<span class="typing-cursor"></span>';
+
+    function tick() {
+      const batch = Math.max(1, Math.round(chars.length / 200));
+      for (let b = 0; b < batch && i < chars.length; b++, i++) {
+        el.innerHTML = chars.slice(0, i + 1).join('') + '<span class="typing-cursor"></span>';
+      }
+      if (i < chars.length) {
+        setTimeout(tick, delay);
+      } else {
+        el.innerHTML = html;
+        onDone && onDone();
+      }
+      scrollToBottom();
+    }
+    tick();
+  }
+
+  // ── 状态栏 ───────────────────────────────────────────────
+  function setStatus(msg, type) {
+    statusBar.style.display = 'flex';
+    statusText.textContent = msg;
+    statusDot.className = 'chart-status-dot chart-status-dot--' + type;
+  }
+  function hideStatus() { statusBar.style.display = 'none'; }
+
+  // ── 生成中状态 ───────────────────────────────────────────
+  function setGenerating(v) {
+    isGenerating = v;
+    btnSend.disabled = v || (!textarea.value.trim() && !pendingFiles.length);
+    btnAttach.disabled = v;
+    textarea.disabled = v;
+  }
+
+  // ── 灯箱 ─────────────────────────────────────────────────
+  function openLightbox(src) {
+    const lb = document.createElement('div');
+    lb.className = 'chart-lightbox';
+    lb.innerHTML = `<div class="chart-lightbox-bg"></div>
+      <div class="chart-lightbox-content">
+        <img src="${escHtml(src)}" alt="图表">
+        <button class="chart-lightbox-close"><i class="bi bi-x-lg"></i></button>
+      </div>`;
+    document.body.appendChild(lb);
+    lb.querySelector('.chart-lightbox-bg').addEventListener('click', () => lb.remove());
+    lb.querySelector('.chart-lightbox-close').addEventListener('click', () => lb.remove());
+    document.addEventListener('keydown', function esc(e) {
+      if (e.key === 'Escape') { lb.remove(); document.removeEventListener('keydown', esc); }
+    });
+  }
+
+  // ── 轮询（用于展示进度状态，可选） ──────────────────────
+  function stopPolling() {
+    if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
+  }
+
+  // ── 工具 ─────────────────────────────────────────────────
+  function scrollToBottom() {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function showError(msg) {
+    const row = document.createElement('div');
+    row.className = 'msg-row msg-row--ai';
+    row.innerHTML = `<div class="msg-avatar msg-avatar--ai">⚡</div>
+      <div class="msg-bubble msg-bubble--ai">
+        <div class="msg-body" style="color:var(--red)">${escHtml(msg)}</div>
+      </div>`;
+    messagesInner.appendChild(row);
+    scrollToBottom();
+  }
+
+  // ── 初始化 ───────────────────────────────────────────────
+  loadSessions();
+
+})();
+</script>
+{% endblock %}

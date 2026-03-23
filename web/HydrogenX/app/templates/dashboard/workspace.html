@@ -33,21 +33,21 @@
     </div>
 
     <!-- Hydrogen Chart -->
-    <div class="workspace-tile workspace-tile--chart">
+    <div class="workspace-tile workspace-tile--chart" onclick="location.href='{{ url_for('dashboard.chart') }}'">
       <div class="wtile-header">
         <span class="wtile-num">Module 02</span>
-        <span class="wtile-status wtile-status--soon">Coming Soon</span>
+        <span class="wtile-status wtile-status--live">Live</span>
       </div>
       <div class="wtile-icon wtile-icon--chart">
         <i class="bi bi-bar-chart-line"></i>
       </div>
       <div class="wtile-title">Hydrogen Chart</div>
       <div class="wtile-desc">
-        图表生成、指标可视化与研究表达能力的统一承载区，将数据洞察转化为清晰直观的可视化输出。
+        智能图表绘制助手，支持数据库查询、CSV 分析与 Matplotlib 图表自动生成，多模态数据可视化。
       </div>
-      <span class="wtile-enter" style="cursor:default;">
-        敬请期待 <i class="bi bi-clock"></i>
-      </span>
+      <a href="{{ url_for('dashboard.chart') }}" class="wtile-enter" onclick="event.stopPropagation()">
+        进入 Chart <i class="bi bi-arrow-right"></i>
+      </a>
     </div>
 
     <!-- Hydrogen Research -->

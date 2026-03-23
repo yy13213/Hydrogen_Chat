@@ -9,6 +9,7 @@ from .blueprints.auth import auth_bp
 from .blueprints.chat_api import chat_api_bp
 from .blueprints.dashboard import dashboard_bp
 from .blueprints.research_api import research_api_bp
+from .blueprints.chart_api import chart_api_bp as chart_api_blueprint
 from .config import Config
 from .extensions import csrf, db, login_manager
 from .models import User
@@ -49,6 +50,7 @@ def register_blueprints(app: Flask) -> None:
     app.register_blueprint(api_bp)
     app.register_blueprint(chat_api_bp)
     app.register_blueprint(research_api_bp)
+    app.register_blueprint(chart_api_blueprint)
 
 
 def register_cli(app: Flask) -> None:

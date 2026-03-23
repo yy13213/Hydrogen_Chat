@@ -1,0 +1,252 @@
+"""
+Hydrogen Chart API Blueprint
+代理转发 chart_agent/main.py 的 FastAPI 服务（端口 9621）。
+维护用户-项目历史 JSON 表：instance/chart_histories/user_{id}.json
+图片通过 Cloudinary 图床中转，前端直接使用 CDN URL 渲染。
+"""
+import json
+import os
+import re
+from datetime import datetime
+from pathlib import Path
+
+import requests
+from flask import Blueprint, jsonify, request, current_app
+from flask_login import current_user, login_required
+
+chart_api_bp = Blueprint("chart_api", __name__, url_prefix="/api/chart")
+
+# ── chart_agent 服务地址 ──────────────────────────────────────
+_CA_BASE    = os.getenv("CHART_AGENT_BASE_URL", "http://localhost:9621")
+_CA_TIMEOUT = int(os.getenv("CHART_AGENT_TIMEOUT", "180"))   # AI 生成可能较慢
+
+# ── Cloudinary 配置 ───────────────────────────────────────────
+_CLOUDINARY_URL = os.getenv(
+    "CLOUDINARY_URL",
+    "cloudinary://197649926776445:StS2x9wYGP3wkyNT_XFuIRPqyvM@dmxrefnzd"
+)
+
+def _parse_cloudinary_url(url: str):
+    """解析 cloudinary://api_key:api_secret@cloud_name"""
+    m = re.match(r"cloudinary://([^:]+):([^@]+)@(.+)", url or "")
+    if not m:
+        return None, None, None
+    return m.group(1), m.group(2), m.group(3)
+
+_CL_API_KEY, _CL_API_SECRET, _CL_CLOUD_NAME = _parse_cloudinary_url(_CLOUDINARY_URL)
+
+
+def _upload_to_cloudinary(image_url_on_agent: str) -> str:
+    """
+    将 chart_agent 返回的相对图片 URL 下载后上传到 Cloudinary，
+    返回 Cloudinary CDN URL。失败时返回原始 URL。
+    """
+    if not _CL_CLOUD_NAME:
+        return image_url_on_agent
+
+    # 拼接 chart_agent 的完整图片地址
+    full_url = _CA_BASE.rstrip("/") + "/" + image_url_on_agent.lstrip("/")
+    try:
+        img_resp = requests.get(full_url, timeout=30)
+        if not img_resp.ok:
+            return image_url_on_agent
+        img_bytes = img_resp.content
+    except Exception:
+        return image_url_on_agent
+
+    # 上传到 Cloudinary（使用 Basic Auth）
+    upload_url = f"https://api.cloudinary.com/v1_1/{_CL_CLOUD_NAME}/image/upload"
+    try:
+        import base64 as _b64
+        resp = requests.post(
+            upload_url,
+            auth=(_CL_API_KEY, _CL_API_SECRET),
+            files={"file": ("chart.png", img_bytes, "image/png")},
+            data={"upload_preset": "ml_default"} if False else {},
+            timeout=30,
+        )
+        if resp.ok:
+            return resp.json().get("secure_url", image_url_on_agent)
+    except Exception:
+        pass
+
+    # 降级：直接返回 chart_agent 的完整 URL
+    return full_url
+
+
+# ── 用户历史记录文件 ──────────────────────────────────────────
+
+def _history_file(user_id: int) -> Path:
+    base = Path(__file__).parent.parent.parent / "instance" / "chart_histories"
+    base.mkdir(parents=True, exist_ok=True)
+    return base / f"user_{user_id}.json"
+
+
+def _load_history(user_id: int) -> dict:
+    f = _history_file(user_id)
+    if not f.exists():
+        return {}
+    try:
+        return json.loads(f.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _save_history(user_id: int, data: dict):
+    _history_file(user_id).write_text(
+        json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
+
+def _add_project(user_id: int, project_name: str, first_question: str):
+    data = _load_history(user_id)
+    data[project_name] = {
+        "question": first_question,
+        "created_at": datetime.now().isoformat(),
+        "updated_at": datetime.now().isoformat(),
+    }
+    _save_history(user_id, data)
+
+
+def _touch_project(user_id: int, project_name: str):
+    data = _load_history(user_id)
+    if project_name in data:
+        data[project_name]["updated_at"] = datetime.now().isoformat()
+        _save_history(user_id, data)
+
+
+def _get_user_projects(user_id: int) -> list:
+    data = _load_history(user_id)
+    projects = []
+    for pn, info in data.items():
+        projects.append({
+            "project_name": pn,
+            "question": info.get("question", ""),
+            "created_at": info.get("created_at", ""),
+            "updated_at": info.get("updated_at", ""),
+        })
+    projects.sort(key=lambda x: x.get("updated_at", ""), reverse=True)
+    return projects
+
+
+def _delete_project_history(user_id: int, project_name: str):
+    data = _load_history(user_id)
+    if project_name in data:
+        del data[project_name]
+        _save_history(user_id, data)
+
+
+# ── 代理请求工具 ──────────────────────────────────────────────
+
+def _proxy_get(path: str, params: dict = None):
+    try:
+        resp = requests.get(
+            f"{_CA_BASE}{path}", params=params, timeout=_CA_TIMEOUT
+        )
+        return resp
+    except Exception:
+        return None
+
+
+def _proxy_post_form(path: str, data: dict, files=None):
+    try:
+        resp = requests.post(
+            f"{_CA_BASE}{path}", data=data, files=files, timeout=_CA_TIMEOUT
+        )
+        return resp
+    except Exception:
+        return None
+
+
+# ── API 路由 ──────────────────────────────────────────────────
+
+@chart_api_bp.route("/projects", methods=["GET"])
+@login_required
+def list_projects():
+    """列出当前用户的历史图表项目"""
+    projects = _get_user_projects(current_user.id)
+    return jsonify({"projects": projects})
+
+
+@chart_api_bp.route("/chat", methods=["POST"])
+@login_required
+def chat():
+    """
+    发送消息（支持文件上传）。
+    首次调用不传 project_name，服务端创建新项目并返回。
+    后续多轮对话传入 project_name。
+    """
+    user_input   = (request.form.get("user_input") or "").strip()
+    project_name = (request.form.get("project_name") or "").strip() or None
+
+    if not user_input:
+        return jsonify({"error": "消息不能为空"}), 400
+
+    # 转发文件
+    forwarded_files = []
+    for key in request.files:
+        for fobj in request.files.getlist(key):
+            if fobj.filename:
+                forwarded_files.append(
+                    ("files", (fobj.filename, fobj.stream, fobj.mimetype))
+                )
+
+    form_data = {"user_input": user_input}
+    if project_name:
+        form_data["project_name"] = project_name
+
+    resp = _proxy_post_form("/chat", data=form_data,
+                            files=forwarded_files if forwarded_files else None)
+
+    if resp is None:
+        return jsonify({"error": "无法连接到 Chart Agent 服务，请确认 chart_agent/main.py 已启动（端口 9621）"}), 503
+
+    if resp.status_code != 200:
+        try:
+            detail = resp.json().get("detail", resp.text[:400])
+        except Exception:
+            detail = resp.text[:400]
+        return jsonify({"error": f"Chart Agent 服务错误：{detail}"}), resp.status_code
+
+    data = resp.json()
+    returned_project = data.get("project_name", "")
+
+    # 维护用户历史
+    if returned_project:
+        existing = _load_history(current_user.id)
+        if returned_project not in existing:
+            _add_project(current_user.id, returned_project, user_input)
+        else:
+            _touch_project(current_user.id, returned_project)
+
+    # 将图片上传到 Cloudinary，替换为 CDN URL
+    raw_image_urls = data.get("image_urls") or []
+    cdn_image_urls = []
+    for img_url in raw_image_urls:
+        cdn_url = _upload_to_cloudinary(img_url)
+        cdn_image_urls.append(cdn_url)
+
+    data["image_urls"] = cdn_image_urls
+    return jsonify(data)
+
+
+@chart_api_bp.route("/progress/<project_name>", methods=["GET"])
+@login_required
+def get_progress(project_name):
+    """轮询执行记录（jsonl 条目列表）"""
+    resp = _proxy_get(f"/progress/{project_name}")
+    if resp is None:
+        return jsonify({"error": "无法连接到 Chart Agent 服务"}), 503
+    if resp.status_code == 404:
+        return jsonify({"error": "项目不存在"}), 404
+    if resp.status_code != 200:
+        return jsonify({"error": "获取进展失败"}), resp.status_code
+    return jsonify(resp.json())
+
+
+@chart_api_bp.route("/projects/<project_name>", methods=["DELETE"])
+@login_required
+def delete_project(project_name):
+    """从用户历史中删除项目记录"""
+    _delete_project_history(current_user.id, project_name)
+    return jsonify({"ok": True})

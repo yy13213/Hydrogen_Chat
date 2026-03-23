@@ -2473,6 +2473,10 @@ a { color: inherit; text-decoration: none; }
   background: var(--green) !important;
 }
 
+.rpb-fill--done-blue {
+  background: var(--accent) !important;
+}
+
 @keyframes rpbScan {
   from { left: -60%; }
   to   { left: 120%; }
@@ -2499,6 +2503,10 @@ a { color: inherit; text-decoration: none; }
 
 .rpb-flow--done {
   background: var(--green);
+}
+
+.rpb-flow--done-blue {
+  background: var(--accent);
 }
 
 @keyframes flowMove {

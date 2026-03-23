@@ -336,9 +336,9 @@
     pollFailures = 0;
     pollStartTime = Date.now();
     // 提交后立即进入“研究进展进行中”动画，避免首轮轮询前静止
-    setBarState(fillProgress, flowBar1, 12, false, true);
-    setBarState(fillDoubt, flowBar2, 0, false, false);
-    setBarState(fillReport, null, 0, false, false);
+    setBarState(fillProgress, flowBar1, 12, false, true, false);
+    setBarState(fillDoubt, flowBar2, 0, false, false, false);
+    setBarState(fillReport, null, 0, false, false, false);
     doPoll(projectDir);
   }
 
@@ -415,33 +415,36 @@
     // 研究进展：只要研究结束（completed/failed）就必须停止动画并置为完成态
     // 运行中即使百分比较低，也保持扫描动画，确保视觉一致性
     const progressPct = isRunning ? Math.max(pct, 12) : pct;
-    setBarState(fillProgress, flowBar1, progressPct, isTerminal, isRunning && !isTerminal);
+    const progressDoneBlue = isTerminal;
+    setBarState(fillProgress, flowBar1, progressPct, isTerminal, isRunning && !isTerminal, progressDoneBlue);
 
     // 质询记录进度条
     if (hasDoubts || status === 'completed') {
       const doubtPct = hasReport ? 100 : (hasDoubts ? 60 : (status === 'completed' ? 30 : 0));
       const doubtRunning = !hasReport && (hasDoubts || status === 'completed');
-      setBarState(fillDoubt, flowBar2, doubtPct, hasReport, doubtRunning);
+      setBarState(fillDoubt, flowBar2, doubtPct, hasReport, doubtRunning, false);
     } else {
-      setBarState(fillDoubt, flowBar2, 0, false, false);
+      setBarState(fillDoubt, flowBar2, 0, false, false, false);
     }
 
     // 报告进度条
     if (hasReport) {
-      setBarState(fillReport, null, 100, true, false);
+      setBarState(fillReport, null, 100, true, false, false);
     } else {
       const reportRunning = status === 'completed' && !hasReport;
-      setBarState(fillReport, null, reportRunning ? 25 : 0, false, reportRunning);
+      setBarState(fillReport, null, reportRunning ? 25 : 0, false, reportRunning, false);
     }
   }
 
-  function setBarState(fill, flowEl, pct, done, running = false) {
+  function setBarState(fill, flowEl, pct, done, running = false, doneBlue = false) {
     fill.style.width = pct + '%';
     fill.classList.toggle('rpb-fill--done', done);
     fill.classList.toggle('rpb-fill--running', !done && running);
+    fill.classList.toggle('rpb-fill--done-blue', done && doneBlue);
     if (flowEl) {
       flowEl.classList.toggle('rpb-flow--active', !done && running);
       flowEl.classList.toggle('rpb-flow--done', done);
+      flowEl.classList.toggle('rpb-flow--done-blue', done && doneBlue);
     }
   }
 

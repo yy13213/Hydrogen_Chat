@@ -112,7 +112,7 @@ def _proxy_post(path: str, payload: dict):
 
 # ── API 路由 ──────────────────────────────────────────────────
 
-@research_api_bp.post("/start")
+@research_api_bp.route("/start", methods=["POST"])
 @login_required
 def start_research():
     """启动深度研究，返回 project_dir（时间戳）"""
@@ -140,7 +140,7 @@ def start_research():
     return jsonify(data)
 
 
-@research_api_bp.get("/projects")
+@research_api_bp.route("/projects", methods=["GET"])
 @login_required
 def list_projects():
     """列出当前用户的历史研究项目"""
@@ -148,9 +148,9 @@ def list_projects():
     return jsonify({"projects": projects})
 
 
-@research_api_bp.get("/progress/<project_dir>")
+@research_api_bp.route("/progress/<project_dir>", methods=["GET"])
 @login_required
-def get_progress(project_dir: str):
+def get_progress(project_dir):
     """轮询研究进展（代理转发 + 同步用户历史状态）"""
     resp = _proxy_get(f"/progress/{project_dir}")
     if resp is None:
@@ -161,7 +161,6 @@ def get_progress(project_dir: str):
         return jsonify({"error": "获取进展失败"}), resp.status_code
 
     data = resp.json()
-    # 同步用户历史状态
     status = data.get("status", "")
     if status in ("completed", "failed"):
         _update_project_status(current_user.id, project_dir, status)
@@ -169,9 +168,9 @@ def get_progress(project_dir: str):
     return jsonify(data)
 
 
-@research_api_bp.get("/detail/<project_dir>")
+@research_api_bp.route("/detail/<project_dir>", methods=["GET"])
 @login_required
-def get_detail(project_dir: str):
+def get_detail(project_dir):
     """获取详细数据（思维导图、质疑等）"""
     resp = _proxy_get(f"/detail/{project_dir}")
     if resp is None:
@@ -181,9 +180,9 @@ def get_detail(project_dir: str):
     return jsonify(resp.json())
 
 
-@research_api_bp.get("/report/<project_dir>")
+@research_api_bp.route("/report/<project_dir>", methods=["GET"])
 @login_required
-def get_report(project_dir: str):
+def get_report(project_dir):
     """获取最终研究报告（Markdown 原始内容）"""
     resp = _proxy_get(f"/report/{project_dir}")
     if resp is None:
@@ -192,16 +191,15 @@ def get_report(project_dir: str):
         return jsonify({"error": "报告尚未生成"}), 404
     if resp.status_code != 200:
         return jsonify({"error": "获取报告失败"}), resp.status_code
-    # 返回原始 Markdown 文本
     return current_app.response_class(
         resp.text,
         mimetype="text/plain; charset=utf-8",
     )
 
 
-@research_api_bp.get("/logs/<project_dir>")
+@research_api_bp.route("/logs/<project_dir>", methods=["GET"])
 @login_required
-def get_logs(project_dir: str):
+def get_logs(project_dir):
     """获取项目日志"""
     log_type = request.args.get("log_type", "research")
     lines = request.args.get("lines", 200)

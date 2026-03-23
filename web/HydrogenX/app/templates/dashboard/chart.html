@@ -156,6 +156,8 @@
   let pollTimer       = null;
   let pollFailures    = 0;
   let pollStartTime   = 0;
+  let lastStatusSig   = '';
+  let activeAiBubble  = null;
 
   // ── marked config ────────────────────────────────────────
   marked.setOptions({ breaks: true, gfm: true });
@@ -226,28 +228,39 @@
   async function loadProject(projectName) {
     currentProject = projectName;
     loadSessions();
-    // 从 progress 接口重建消息
-    try {
-      const data = await api(`/api/chart/progress/${projectName}`);
-      const records = data.records || [];
-      messagesInner.innerHTML = '';
-      chatWelcome.style.display = 'none';
+    await loadProjectWithRetry(projectName);
+  }
 
-      // 重建对话
-      let firstQuestion = '';
-      for (const r of records) {
-        if (r.status === 'user_turn') {
-          if (!firstQuestion) firstQuestion = r.text || '';
-          appendUserBubble(r.text || '', r.files || []);
-        } else if (r.status === 'model_turn') {
-          appendAiBubble(r.text || '', r.files || [], true);
+  async function loadProjectWithRetry(projectName) {
+    const started = Date.now();
+    let fails = 0;
+    while (Date.now() - started <= MAX_POLL_MS && fails < MAX_POLL_FAIL) {
+      try {
+        const data = await api(`/api/chart/progress/${projectName}`);
+        const records = data.records || [];
+        messagesInner.innerHTML = '';
+        chatWelcome.style.display = 'none';
+
+        // 重建对话
+        let firstQuestion = '';
+        for (const r of records) {
+          if (r.status === 'user_turn') {
+            if (!firstQuestion) firstQuestion = r.text || '';
+            appendUserBubble(r.text || '', r.files || []);
+          } else if (r.status === 'model_turn') {
+            appendAiBubble(r.text || '', r.render_files || r.files || [], true);
+          }
         }
+        chatTitle.textContent = firstQuestion.slice(0, 40) + (firstQuestion.length > 40 ? '…' : '') || '历史对话';
+        scrollToBottom();
+        return;
+      } catch (e) {
+        fails++;
+        if (fails >= MAX_POLL_FAIL) break;
+        await sleep(1500);
       }
-      chatTitle.textContent = firstQuestion.slice(0, 40) + (firstQuestion.length > 40 ? '…' : '') || '历史对话';
-      scrollToBottom();
-    } catch (e) {
-      showError('加载历史记录失败：' + e.message);
     }
+    showError('加载历史记录失败：网络不稳定，请稍后重试');
   }
 
   // ── 新建对话 ─────────────────────────────────────────────
@@ -351,6 +364,7 @@
 
     // 渲染 AI 占位
     const aiBubble = appendAiBubble('', [], false);
+    activeAiBubble = aiBubble;
     const aiBubbleBody = aiBubble.querySelector('.msg-body');
     aiBubbleBody.innerHTML = `<span class="typing-cursor"></span>`;
 
@@ -367,6 +381,8 @@
 
     try {
       setStatus('正在分析请求…', 'running');
+      // 多轮场景下可提前轮询状态
+      if (currentProject) startProgressPolling(currentProject, aiBubble);
       const data = await api('/api/chart/chat', {
         method: 'POST',
         body: formData,
@@ -374,6 +390,8 @@
 
       currentProject = data.project_name || currentProject;
       loadSessions();
+      await fetchAndRenderProgress(currentProject, aiBubble, true);
+      stopPolling();
 
       // 渲染回复
       const replyText = data.reply_text || '';
@@ -444,6 +462,7 @@
     row.innerHTML = `
       <div class="msg-avatar msg-avatar--ai">⚡</div>
       <div class="msg-bubble msg-bubble--ai">
+        <div class="status-flow" style="display:none"></div>
         <div class="msg-body"></div>
       </div>`;
     messagesInner.appendChild(row);
@@ -519,6 +538,64 @@
     textarea.disabled = v;
   }
 
+  // ── 进度轮询与状态链渲染 ───────────────────────────────
+  function startProgressPolling(projectName, bubble) {
+    stopPolling();
+    pollFailures = 0;
+    pollStartTime = Date.now();
+    (async function loop() {
+      if (!currentProject || projectName !== currentProject) return;
+      const elapsed = Date.now() - pollStartTime;
+      if (elapsed > MAX_POLL_MS) return;
+      try {
+        await fetchAndRenderProgress(projectName, bubble, false);
+        pollFailures = 0;
+      } catch (_) {
+        pollFailures += 1;
+        if (pollFailures >= MAX_POLL_FAIL) return;
+      }
+      pollTimer = setTimeout(loop, POLL_INTERVAL);
+    })();
+  }
+
+  async function fetchAndRenderProgress(projectName, bubble, forceStopLast) {
+    if (!projectName || !bubble) return;
+    const data = await api(`/api/chart/progress/${projectName}`);
+    const records = data.records || [];
+    const flow = bubble.querySelector('.status-flow');
+    if (!flow) return;
+    renderStatusFlow(flow, records, !!forceStopLast);
+  }
+
+  function renderStatusFlow(flowEl, records, forceStopLast) {
+    const statuses = [];
+    for (const r of records) {
+      const s = (r.status || '').trim();
+      if (!s || s === 'user_turn' || s === 'model_turn') continue;
+      if (!statuses.length || statuses[statuses.length - 1] !== s) {
+        statuses.push(s);
+      }
+    }
+    if (!statuses.length) {
+      flowEl.style.display = 'none';
+      return;
+    }
+
+    const sig = statuses.join('|') + '|' + (forceStopLast ? 'done' : 'run');
+    if (sig === lastStatusSig && flowEl.dataset.rendered === '1') return;
+    lastStatusSig = sig;
+
+    flowEl.style.display = 'flex';
+    flowEl.dataset.rendered = '1';
+    flowEl.innerHTML = statuses.map((s, i) => {
+      const isLast = i === statuses.length - 1;
+      const running = isLast && !forceStopLast;
+      const cls = running ? 'tool-badge tool-badge--running' : 'tool-badge';
+      const arrow = i < statuses.length - 1 ? '<span class=\"status-arrow\">→</span>' : '';
+      return `<span class=\"${cls}\" data-tool=\"status\">${escHtml(s)}</span>${arrow}`;
+    }).join('');
+  }
+
   // ── 灯箱 ─────────────────────────────────────────────────
   function openLightbox(src) {
     const lb = document.createElement('div');
@@ -544,6 +621,10 @@
   // ── 工具 ─────────────────────────────────────────────────
   function scrollToBottom() {
     chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   function showError(msg) {

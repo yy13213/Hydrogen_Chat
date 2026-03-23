@@ -74,6 +74,51 @@ def _upload_to_cloudinary(image_url_on_agent: str) -> str:
     return full_url
 
 
+def _build_agent_image_url(project_name: str, image_ref: str) -> str:
+    """
+    将 chart_agent 的图片引用（可能是绝对路径/相对路径/文件名）转换为可访问 URL。
+    """
+    if not image_ref:
+        return image_ref
+    ref = str(image_ref).strip()
+    if ref.startswith("http://") or ref.startswith("https://"):
+        return ref
+
+    # 已经是 /projects/... 形式
+    if ref.startswith("/projects/"):
+        return _CA_BASE.rstrip("/") + ref
+
+    # 绝对路径里包含 /projects/<project_name>/...
+    marker = f"/projects/{project_name}/"
+    if marker in ref:
+        tail = ref.split(marker, 1)[1].replace("\\", "/")
+        return f"{_CA_BASE.rstrip('/')}/projects/{project_name}/{tail}"
+
+    # 最后降级：当成项目目录下文件名
+    name = Path(ref).name
+    return f"{_CA_BASE.rstrip('/')}/projects/{project_name}/{name}"
+
+
+def _normalize_progress_records(project_name: str, records: list) -> list:
+    """
+    统一进度记录中的图片字段，确保前端拿到的是可访问 URL（优先 Cloudinary）。
+    """
+    normalized = []
+    for r in records or []:
+        item = dict(r)
+        src_files = item.get("files") or item.get("image_paths") or []
+        render_files = []
+        for f in src_files:
+            agent_url = _build_agent_image_url(project_name, f)
+            # 再上传/转换到 Cloudinary，保证外网可访问
+            cdn_url = _upload_to_cloudinary(agent_url)
+            render_files.append(cdn_url)
+        if render_files:
+            item["render_files"] = render_files
+        normalized.append(item)
+    return normalized
+
+
 # ── 用户历史记录文件 ──────────────────────────────────────────
 
 def _history_file(user_id: int) -> Path:
@@ -240,8 +285,16 @@ def get_progress(project_name):
     if resp.status_code == 404:
         return jsonify({"error": "项目不存在"}), 404
     if resp.status_code != 200:
-        return jsonify({"error": "获取进展失败"}), resp.status_code
-    return jsonify(resp.json())
+        # 将上游错误细节透传，便于前端定位问题
+        try:
+            detail = resp.json().get("detail", resp.text[:300])
+        except Exception:
+            detail = resp.text[:300]
+        return jsonify({"error": f"获取进展失败：{detail}"}), resp.status_code
+
+    data = resp.json()
+    data["records"] = _normalize_progress_records(project_name, data.get("records") or [])
+    return jsonify(data)
 
 
 @chart_api_bp.route("/projects/<project_name>", methods=["DELETE"])

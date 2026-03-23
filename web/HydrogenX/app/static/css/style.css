@@ -3004,3 +3004,24 @@ a { color: inherit; text-decoration: none; }
   color: var(--text-2);
 }
 
+/* Chart 状态流（横向多状态 + 箭头） */
+.status-flow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.status-flow .tool-badge {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+}
+
+.status-arrow {
+  color: var(--text-3);
+  font-size: 0.8rem;
+  margin: 0 2px;
+}
+

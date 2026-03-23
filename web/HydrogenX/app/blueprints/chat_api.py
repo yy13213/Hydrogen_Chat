@@ -18,7 +18,16 @@ from flask import Blueprint, current_app, jsonify, request
 from flask_login import current_user, login_required
 
 # ── 将 chat/ 目录加入 sys.path，复用工具模块 ────────────────
-_CHAT_DIR = Path(__file__).parent.parent.parent.parent / "chat"
+def _find_chat_dir() -> Path:
+    # 兼容 Windows/Linux 的目录层级差异：向上查找仓库根下的 chat/
+    for p in Path(__file__).resolve().parents:
+        cand = p / "chat"
+        if (cand / "tools.py").exists() and (cand / "history.py").exists():
+            return cand
+    raise FileNotFoundError("无法定位 chat/ 目录（需要 chat/tools.py 与 chat/history.py）")
+
+
+_CHAT_DIR = _find_chat_dir()
 if str(_CHAT_DIR) not in sys.path:
     sys.path.insert(0, str(_CHAT_DIR))
 

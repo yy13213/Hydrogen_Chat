@@ -6,12 +6,6 @@ from ..models import ChatTask
 dashboard_bp = Blueprint("dashboard", __name__)
 
 
-@dashboard_bp.get("/research")
-@login_required
-def research():
-    return render_template("dashboard/research.html")
-
-
 @dashboard_bp.get("/")
 def home():
     return render_template("landing.html")

@@ -10,7 +10,6 @@ import os
 import sys
 import threading
 import uuid
-import time
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from datetime import datetime
 from pathlib import Path
@@ -63,10 +62,25 @@ def _history_file(user_id: int) -> Path:
     return base / f"user_{user_id}.json"
 
 
+def _legacy_history_file() -> Path:
+    # 兼容旧版 chat/history.py 使用的历史文件
+    return _CHAT_DIR / "chat_history.json"
+
+
 # ── 历史记录操作（按用户隔离） ────────────────────────────────
 def _load(user_id: int) -> dict:
     f = _history_file(user_id)
     if not f.exists():
+        # 首次访问时，自动迁移旧版历史（若存在）
+        legacy = _legacy_history_file()
+        if legacy.exists():
+            try:
+                data = json.loads(legacy.read_text(encoding="utf-8"))
+                if isinstance(data, dict) and data:
+                    _save(user_id, data)
+                    return data
+            except Exception:
+                pass
         return {}
     try:
         return json.loads(f.read_text(encoding="utf-8"))
@@ -135,9 +149,21 @@ def _delete_session(user_id: int, session_id: str):
 
 
 def _delete_empty_sessions(user_id: int):
-    """删除没有任何消息的空会话"""
+    """删除空会话（仅清理较早创建的，避免刚新建会话被立即删掉）"""
     data = _load(user_id)
-    empty = [sid for sid, s in data.items() if not s.get("messages")]
+    now_ts = datetime.now().timestamp()
+    empty = []
+    for sid, s in data.items():
+        if s.get("messages"):
+            continue
+        created_at = s.get("created_at")
+        try:
+            created_ts = datetime.fromisoformat(created_at).timestamp() if created_at else now_ts
+        except Exception:
+            created_ts = now_ts
+        # 仅删除创建超过 30 分钟且仍为空的会话
+        if (now_ts - created_ts) > 30 * 60:
+            empty.append(sid)
     if empty:
         for sid in empty:
             del data[sid]

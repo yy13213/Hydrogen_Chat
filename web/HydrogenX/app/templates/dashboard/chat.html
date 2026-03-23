@@ -552,50 +552,71 @@
       formData.append('session_id', currentSessionId);
       filesToSend.forEach(f => formData.append('files', f));
 
-      // 1) 创建异步任务
-      const kickoff = await api('/api/chat/send_async', {
-        method: 'POST',
-        body: formData,
-        headers: {}
-      });
-      const jobId = kickoff.job_id;
-      if (!jobId) {
-        throw new Error('未获取到任务ID');
+      // 1) 创建异步任务（兼容旧后端：若 404 自动降级到 /send）
+      let data = null;
+      let kickoff = null;
+      try {
+        kickoff = await api('/api/chat/send_async', {
+          method: 'POST',
+          body: formData,
+          headers: {}
+        });
+      } catch (err) {
+        if (String(err.message).includes('HTTP 404')) {
+          // 旧版本后端未提供 send_async，回退到同步接口
+          const syncData = await api('/api/chat/send', {
+            method: 'POST',
+            body: formData,
+            headers: {}
+          });
+          data = {
+            response: syncData.response || '',
+            tool_calls: syncData.tool_calls || [],
+            title: syncData.title || null,
+          };
+        } else {
+          throw err;
+        }
       }
 
-      // 2) 轮询任务进度，实时展示工具调用
-      let data = null;
-      let lastEventCount = 0;
-      const startedAt = Date.now();
-      const POLL_INTERVAL_MS = 600;
-      const POLL_TIMEOUT_MS = 120000;
+      // 2) 若是异步模式，则轮询任务进度并实时展示工具调用
+      if (!data) {
+        const jobId = kickoff?.job_id;
+        if (!jobId) {
+          throw new Error('未获取到任务ID');
+        }
+        let lastEventCount = 0;
+        const startedAt = Date.now();
+        const POLL_INTERVAL_MS = 600;
+        const POLL_TIMEOUT_MS = 120000;
 
-      while (true) {
-        const job = await api(`/api/chat/jobs/${jobId}`, { method: 'GET' });
-        const events = job.tool_events || [];
-        if (events.length > lastEventCount) {
-          for (let i = lastEventCount; i < events.length; i++) {
-            const ev = events[i];
-            upsertToolBadge(ev.tool_name, ev.status);
+        while (true) {
+          const job = await api(`/api/chat/jobs/${jobId}`, { method: 'GET' });
+          const events = job.tool_events || [];
+          if (events.length > lastEventCount) {
+            for (let i = lastEventCount; i < events.length; i++) {
+              const ev = events[i];
+              upsertToolBadge(ev.tool_name, ev.status);
+            }
+            lastEventCount = events.length;
           }
-          lastEventCount = events.length;
-        }
 
-        if (job.status === 'done') {
-          data = {
-            response: job.response || '',
-            tool_calls: job.tool_calls || [],
-            title: job.title || null,
-          };
-          break;
+          if (job.status === 'done') {
+            data = {
+              response: job.response || '',
+              tool_calls: job.tool_calls || [],
+              title: job.title || null,
+            };
+            break;
+          }
+          if (job.status === 'error') {
+            throw new Error(job.error || '请求失败');
+          }
+          if (Date.now() - startedAt > POLL_TIMEOUT_MS) {
+            throw new Error('请求轮询超时，请稍后重试');
+          }
+          await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
         }
-        if (job.status === 'error') {
-          throw new Error(job.error || '请求失败');
-        }
-        if (Date.now() - startedAt > POLL_TIMEOUT_MS) {
-          throw new Error('请求轮询超时，请稍后重试');
-        }
-        await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
       }
 
       removeThinking();

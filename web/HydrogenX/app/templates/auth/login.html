@@ -1,46 +1,130 @@
 {% extends "base.html" %}
 {% block title %}登录 · HydrogenX{% endblock %}
 {% block content %}
-<section class="container auth-shell">
-  <div class="row justify-content-center">
-    <div class="col-lg-10">
-      <div class="auth-layout">
-        <div class="auth-layout__intro">
-          <span class="eyebrow">HydrogenX Access</span>
-          <h1>欢迎回来</h1>
-          <p>登录后进入 HydrogenX 工作台，访问四大功能模块，并从 Hydrogen Assistant 进入现有科研助手能力。</p>
-          <div class="auth-badges">
-            <span>Hydrogen Chat</span>
-            <span>Hydrogen Chart</span>
-            <span>Hydrogen Research</span>
-            <span>Hydrogen Assistant</span>
+<div class="auth-page">
+  <div class="auth-wrap">
+    <!-- 左侧介绍 -->
+    <div class="auth-intro">
+      <div>
+        <div class="auth-intro-badge">
+          <i class="bi bi-hexagon-half"></i>
+          HydrogenX Platform
+        </div>
+        <h1>欢迎回来</h1>
+        <p>登录后进入 HydrogenX 工作台，访问四大功能模块，开启氢能科研智能协作之旅。</p>
+      </div>
+
+      <div class="auth-module-list">
+        <div class="auth-module-item">
+          <div class="auth-module-icon" style="background:rgba(79,142,247,0.12);color:#4f8ef7;">
+            <i class="bi bi-chat-dots"></i>
+          </div>
+          <div>
+            <div class="auth-module-name">Hydrogen Chat</div>
+            <div class="auth-module-desc">多场景智能对话与知识辅助</div>
           </div>
         </div>
-
-        <div class="auth-card">
-          <h2>账号登录</h2>
-          <p class="text-secondary mb-4">使用你的 HydrogenX 账号进入统一门户。</p>
-
-          <form method="post" novalidate>
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div class="mb-3">
-              <label class="form-label">用户名</label>
-              <input type="text" name="username" class="form-control form-control-lg" placeholder="请输入用户名" required>
-            </div>
-            <div class="mb-4">
-              <label class="form-label">密码</label>
-              <input type="password" name="password" class="form-control form-control-lg" placeholder="请输入密码" required>
-            </div>
-            <button class="btn btn-dark btn-lg w-100" type="submit">登录 HydrogenX</button>
-          </form>
-
-          <p class="text-secondary small mt-4 mb-0">
-            还没有账号？
-            <a href="{{ url_for('auth.register') }}" class="link-dark fw-semibold">立即注册</a>
-          </p>
+        <div class="auth-module-item">
+          <div class="auth-module-icon" style="background:rgba(52,211,153,0.12);color:#34d399;">
+            <i class="bi bi-bar-chart"></i>
+          </div>
+          <div>
+            <div class="auth-module-name">Hydrogen Chart</div>
+            <div class="auth-module-desc">图表生成与数据可视分析</div>
+          </div>
+        </div>
+        <div class="auth-module-item">
+          <div class="auth-module-icon" style="background:rgba(251,191,36,0.12);color:#fbbf24;">
+            <i class="bi bi-search"></i>
+          </div>
+          <div>
+            <div class="auth-module-name">Hydrogen Research</div>
+            <div class="auth-module-desc">研究任务与洞察沉淀管理</div>
+          </div>
+        </div>
+        <div class="auth-module-item">
+          <div class="auth-module-icon" style="background:rgba(167,139,250,0.12);color:#a78bfa;">
+            <i class="bi bi-stars"></i>
+          </div>
+          <div>
+            <div class="auth-module-name">Hydrogen Assistant</div>
+            <div class="auth-module-desc">基于 OpenClaw 的科研助手</div>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- 右侧表单 -->
+    <div class="auth-form-panel">
+      <h2>账号登录</h2>
+      <p class="auth-sub">使用你的 HydrogenX 账号进入统一门户</p>
+
+      <form method="post" novalidate id="login-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-group">
+          <label class="form-label-dark">用户名</label>
+          <div class="input-wrap">
+            <i class="bi bi-person input-icon"></i>
+            <input type="text" name="username" class="form-input-dark"
+                   placeholder="请输入用户名" required autocomplete="username">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label-dark">密码</label>
+          <div class="input-wrap">
+            <i class="bi bi-lock input-icon"></i>
+            <input type="password" name="password" id="password-input" class="form-input-dark"
+                   placeholder="请输入密码" required autocomplete="current-password">
+            <button type="button" class="input-toggle" id="toggle-pw" title="显示/隐藏密码">
+              <i class="bi bi-eye" id="toggle-pw-icon"></i>
+            </button>
+          </div>
+        </div>
+
+        <button class="btn-submit-dark" type="submit" id="login-btn">
+          <i class="bi bi-box-arrow-in-right"></i>
+          <span id="login-btn-text">登录 HydrogenX</span>
+        </button>
+      </form>
+
+      <p class="auth-footer-link">
+        还没有账号？<a href="{{ url_for('auth.register') }}">立即注册</a>
+      </p>
+    </div>
   </div>
-</section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// 密码显示/隐藏
+const pwInput = document.getElementById('password-input');
+const toggleBtn = document.getElementById('toggle-pw');
+const toggleIcon = document.getElementById('toggle-pw-icon');
+if (toggleBtn) {
+  toggleBtn.addEventListener('click', () => {
+    const isText = pwInput.type === 'text';
+    pwInput.type = isText ? 'password' : 'text';
+    toggleIcon.className = isText ? 'bi bi-eye' : 'bi bi-eye-slash';
+  });
+}
+
+// 提交动画
+const loginForm = document.getElementById('login-form');
+const loginBtn = document.getElementById('login-btn');
+const loginBtnText = document.getElementById('login-btn-text');
+if (loginForm) {
+  loginForm.addEventListener('submit', () => {
+    loginBtn.disabled = true;
+    loginBtnText.textContent = '登录中...';
+    loginBtn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i><span>登录中...</span>';
+  });
+}
+</script>
+<style>
+.spin { animation: spin 1s linear infinite; display: inline-block; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+</style>
 {% endblock %}

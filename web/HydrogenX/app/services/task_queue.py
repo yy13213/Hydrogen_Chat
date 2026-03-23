@@ -10,6 +10,7 @@ from ..extensions import db
 from ..models import ChatTask
 from .artifact_service import ArtifactService
 from .openclaw_client import OpenClawClient
+from .upload_service import UploadService
 
 
 class TaskQueue:
@@ -62,8 +63,12 @@ class TaskQueue:
             db.session.commit()
 
             try:
+                upload_service = UploadService()
+                attached_uploads = [attachment.upload for attachment in task.attachments if attachment.upload]
+                effective_prompt = upload_service.build_prompt_with_uploads(task.prompt, attached_uploads)
+
                 result = OpenClawClient().call(
-                    prompt=task.prompt,
+                    prompt=effective_prompt,
                     user_id=task.user_id,
                     agent_id=task.agent_id,
                     session_key=task.session_key,
@@ -72,7 +77,12 @@ class TaskQueue:
                 task.response_text = result["output_text"]
                 task.raw_response_json = json.dumps(result["raw"], ensure_ascii=False, indent=2)
 
-                artifacts = ArtifactService().persist_from_response(task=task, raw_response=result["raw"], manifest=result.get("artifact_manifest"), output_text=result.get("output_text"))
+                artifacts = ArtifactService().persist_from_response(
+                    task=task,
+                    raw_response=result["raw"],
+                    manifest=result.get("artifact_manifest"),
+                    output_text=result.get("output_text"),
+                )
                 for artifact in artifacts:
                     db.session.add(artifact)
             except Exception as exc:

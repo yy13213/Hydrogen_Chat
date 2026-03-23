@@ -1,9 +1,12 @@
 import click
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 from dotenv import load_dotenv
+from werkzeug.exceptions import HTTPException, RequestEntityTooLarge
+from flask_wtf.csrf import CSRFError
 
 from .blueprints.api import api_bp
 from .blueprints.auth import auth_bp
+from .blueprints.chat_api import chat_api_bp
 from .blueprints.dashboard import dashboard_bp
 from .config import Config
 from .extensions import csrf, db, login_manager
@@ -43,6 +46,7 @@ def register_blueprints(app: Flask) -> None:
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(api_bp)
+    app.register_blueprint(chat_api_bp)
 
 
 def register_cli(app: Flask) -> None:
@@ -54,12 +58,34 @@ def register_cli(app: Flask) -> None:
 
 
 def register_error_handlers(app: Flask) -> None:
-    @app.errorhandler(404)
-    def not_found(_error):
-        return render_template("404.html"), 404
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(error):
+        message = error.description or "页面令牌已失效，请刷新页面后重试。"
+        if request.path.startswith("/api/"):
+            return jsonify({"error": message}), 400
+        return render_template("500.html"), 400
 
-    @app.errorhandler(500)
-    def server_error(_error):
+    @app.errorhandler(RequestEntityTooLarge)
+    def handle_request_entity_too_large(_error):
+        message = "上传内容过大，请缩小文件体积后重试。"
+        if request.path.startswith("/api/"):
+            return jsonify({"error": message}), 413
+        return render_template("500.html"), 413
+
+    @app.errorhandler(HTTPException)
+    def handle_http_exception(error):
+        if request.path.startswith("/api/"):
+            message = getattr(error, "description", None) or error.name or "请求失败。"
+            return jsonify({"error": message}), error.code or 500
+        if getattr(error, "code", None) == 404:
+            return render_template("404.html"), 404
+        return render_template("500.html"), error.code or 500
+
+    @app.errorhandler(Exception)
+    def handle_unexpected_exception(error):
+        app.logger.exception("Unhandled exception for path=%s", request.path)
+        if request.path.startswith("/api/"):
+            return jsonify({"error": f"服务器内部错误（{error.__class__.__name__}），请查看后端日志。"}), 500
         return render_template("500.html"), 500
 
     @app.get("/healthz")

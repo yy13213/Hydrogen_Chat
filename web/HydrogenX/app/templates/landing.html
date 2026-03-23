@@ -1,67 +1,102 @@
 {% extends "base.html" %}
 {% block title %}HydrogenX · 氢能智能工作台{% endblock %}
 {% block content %}
-<section class="container">
-  <div class="hero-card hero-card--portal p-4 p-lg-5">
-    <div class="row align-items-center g-4 g-lg-5">
-      <div class="col-lg-7">
-        <span class="eyebrow">HydrogenX Platform</span>
-        <h1 class="display-4 fw-bold mb-3">面向氢能科研与业务协同的一体化智能工作台</h1>
-        <p class="hero-copy mb-4">
-          统一承载 Hydrogen Chat、Hydrogen Chart、Hydrogen Research 与 Hydrogen Assistant。
-          从科研问答、图表洞察到研究工作流，都在同一套现代化门户中完成。
-        </p>
-        <div class="d-flex flex-wrap gap-3">
-          <a href="{{ url_for('auth.register') }}" class="btn btn-dark btn-lg px-4">开始使用</a>
-          <a href="{{ url_for('auth.login') }}" class="btn btn-ghost btn-lg px-4">已有账号，立即登录</a>
-        </div>
+<div class="landing-hero">
+  <!-- 顶部介绍区 -->
+  <div class="landing-top">
+    <div class="landing-eyebrow">HydrogenX Platform</div>
+    <h1 class="landing-title">
+      面向氢能科研与业务协同的<br>
+      <span>一体化智能工作台</span>
+    </h1>
+    <p class="landing-desc">
+      统一承载 Hydrogen Chat、Hydrogen Chart、Hydrogen Research 与 Hydrogen Assistant。<br>
+      从科研问答、图表洞察到研究工作流，都在同一套现代化门户中完成。
+    </p>
+    <div class="landing-cta">
+      <a href="{{ url_for('auth.register') }}" class="btn-primary-dark">
+        <i class="bi bi-arrow-right-circle"></i>
+        开始使用
+      </a>
+      <a href="{{ url_for('auth.login') }}" class="btn-ghost-dark">
+        已有账号，立即登录
+      </a>
+    </div>
+  </div>
 
-        <div class="hero-metrics mt-4">
-          <div class="metric-chip"><strong>4</strong><span>核心模块</span></div>
-          <div class="metric-chip"><strong>1</strong><span>统一入口</span></div>
-          <div class="metric-chip"><strong>24/7</strong><span>科研辅助</span></div>
+  <!-- 四板块全屏网格 -->
+  <div class="modules-grid">
+    <!-- Hydrogen Chat -->
+    <div class="module-tile module-tile--chat" onclick="location.href='{{ url_for('auth.login') }}'">
+      <div>
+        <div class="tile-num">Module 01</div>
+        <div class="tile-icon tile-icon--chat">
+          <i class="bi bi-chat-dots"></i>
+        </div>
+        <div class="tile-title">Hydrogen Chat</div>
+        <div class="tile-desc">
+          面向氢能团队的多场景智能对话入口，支持网络搜索、知识库查询、数据库查询与文件上传，提供 ChatGPT 级别的对话体验。
         </div>
       </div>
+      <div class="tile-footer">
+        <span class="tile-tag tile-tag--live">Live</span>
+        <div class="tile-arrow"><i class="bi bi-arrow-right"></i></div>
+      </div>
+    </div>
 
-      <div class="col-lg-5">
-        <div class="feature-panel">
-          <div class="feature-panel__head">
-            <span>产品矩阵</span>
-            <i class="bi bi-grid-1x2-fill"></i>
-          </div>
-          <div class="module-stack">
-            <div class="module-stack__item">
-              <div>
-                <h3>Hydrogen Chat</h3>
-                <p>多场景对话与知识辅助入口</p>
-              </div>
-              <span class="status-tag">Portal</span>
-            </div>
-            <div class="module-stack__item">
-              <div>
-                <h3>Hydrogen Chart</h3>
-                <p>图表生成、数据表达与可视分析</p>
-              </div>
-              <span class="status-tag">Portal</span>
-            </div>
-            <div class="module-stack__item">
-              <div>
-                <h3>Hydrogen Research</h3>
-                <p>研究任务、资料整理与洞察沉淀</p>
-              </div>
-              <span class="status-tag">Portal</span>
-            </div>
-            <div class="module-stack__item active">
-              <div>
-                <h3>Hydrogen Assistant</h3>
-                <p>基于 OpenClaw 的氢能科研助手</p>
-              </div>
-              <span class="status-tag status-tag--active">Live</span>
-            </div>
-          </div>
+    <!-- Hydrogen Chart -->
+    <div class="module-tile module-tile--chart">
+      <div>
+        <div class="tile-num">Module 02</div>
+        <div class="tile-icon tile-icon--chart">
+          <i class="bi bi-bar-chart-line"></i>
         </div>
+        <div class="tile-title">Hydrogen Chart</div>
+        <div class="tile-desc">
+          图表生成、指标可视化与研究表达能力的统一承载区，将数据洞察转化为清晰直观的可视化输出。
+        </div>
+      </div>
+      <div class="tile-footer">
+        <span class="tile-tag tile-tag--soon">Coming Soon</span>
+        <div class="tile-arrow"><i class="bi bi-arrow-right"></i></div>
+      </div>
+    </div>
+
+    <!-- Hydrogen Research -->
+    <div class="module-tile module-tile--research">
+      <div>
+        <div class="tile-num">Module 03</div>
+        <div class="tile-icon tile-icon--research">
+          <i class="bi bi-journal-text"></i>
+        </div>
+        <div class="tile-title">Hydrogen Research</div>
+        <div class="tile-desc">
+          聚合研究任务、资料整理、洞察沉淀与工作流管理，为氢能科研团队提供系统化的知识管理平台。
+        </div>
+      </div>
+      <div class="tile-footer">
+        <span class="tile-tag tile-tag--soon">Coming Soon</span>
+        <div class="tile-arrow"><i class="bi bi-arrow-right"></i></div>
+      </div>
+    </div>
+
+    <!-- Hydrogen Assistant -->
+    <div class="module-tile module-tile--assistant" onclick="location.href='{{ url_for('auth.login') }}'">
+      <div>
+        <div class="tile-num">Module 04</div>
+        <div class="tile-icon tile-icon--assistant">
+          <i class="bi bi-stars"></i>
+        </div>
+        <div class="tile-title">Hydrogen Assistant</div>
+        <div class="tile-desc">
+          基于 OpenClaw 的氢能科研助手，支持 Prompt 提交、任务队列、历史记录与响应查看，深度融合科研工作流。
+        </div>
+      </div>
+      <div class="tile-footer">
+        <span class="tile-tag tile-tag--live">Live</span>
+        <div class="tile-arrow"><i class="bi bi-arrow-right"></i></div>
       </div>
     </div>
   </div>
-</section>
+</div>
 {% endblock %}

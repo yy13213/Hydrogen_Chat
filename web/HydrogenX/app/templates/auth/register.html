@@ -1,53 +1,135 @@
 {% extends "base.html" %}
 {% block title %}注册 · HydrogenX{% endblock %}
 {% block content %}
-<section class="container auth-shell">
-  <div class="row justify-content-center">
-    <div class="col-lg-10">
-      <div class="auth-layout">
-        <div class="auth-layout__intro">
-          <span class="eyebrow">Create Workspace Access</span>
-          <h1>创建 HydrogenX 账号</h1>
-          <p>注册完成后可进入统一工作台，并在其中访问 Hydrogen Chat、Hydrogen Chart、Hydrogen Research 与 Hydrogen Assistant。</p>
-          <div class="auth-badges">
-            <span>统一账号体系</span>
-            <span>极简现代界面</span>
-            <span>科研场景优先</span>
+<div class="auth-page">
+  <div class="auth-wrap">
+    <!-- 左侧介绍 -->
+    <div class="auth-intro">
+      <div>
+        <div class="auth-intro-badge">
+          <i class="bi bi-hexagon-half"></i>
+          Create Account
+        </div>
+        <h1>创建 HydrogenX 账号</h1>
+        <p>注册后即可进入统一工作台，访问四大功能模块，开启氢能科研智能协作。</p>
+      </div>
+
+      <div class="auth-module-list">
+        <div class="auth-module-item">
+          <div class="auth-module-icon" style="background:rgba(52,211,153,0.12);color:#34d399;">
+            <i class="bi bi-person-check"></i>
+          </div>
+          <div>
+            <div class="auth-module-name">统一账号体系</div>
+            <div class="auth-module-desc">一个账号，访问所有模块</div>
           </div>
         </div>
-
-        <div class="auth-card">
-          <h2>新建账号</h2>
-          <p class="text-secondary mb-4">填写以下信息，开启 HydrogenX 使用权限。</p>
-
-          <form method="post" novalidate>
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div class="mb-3">
-              <label class="form-label">用户名</label>
-              <input type="text" name="username" class="form-control form-control-lg" placeholder="至少 3 个字符" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">邮箱</label>
-              <input type="email" name="email" class="form-control form-control-lg" placeholder="you@example.com" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">密码</label>
-              <input type="password" name="password" class="form-control form-control-lg" placeholder="至少 8 个字符" required>
-            </div>
-            <div class="mb-4">
-              <label class="form-label">确认密码</label>
-              <input type="password" name="confirm_password" class="form-control form-control-lg" placeholder="再次输入密码" required>
-            </div>
-            <button class="btn btn-dark btn-lg w-100" type="submit">注册 HydrogenX</button>
-          </form>
-
-          <p class="text-secondary small mt-4 mb-0">
-            已有账号？
-            <a href="{{ url_for('auth.login') }}" class="link-dark fw-semibold">去登录</a>
-          </p>
+        <div class="auth-module-item">
+          <div class="auth-module-icon" style="background:rgba(79,142,247,0.12);color:#4f8ef7;">
+            <i class="bi bi-shield-lock"></i>
+          </div>
+          <div>
+            <div class="auth-module-name">安全可靠</div>
+            <div class="auth-module-desc">数据加密存储，隐私保护</div>
+          </div>
+        </div>
+        <div class="auth-module-item">
+          <div class="auth-module-icon" style="background:rgba(167,139,250,0.12);color:#a78bfa;">
+            <i class="bi bi-lightning-charge"></i>
+          </div>
+          <div>
+            <div class="auth-module-name">即刻可用</div>
+            <div class="auth-module-desc">注册完成立即进入工作台</div>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- 右侧表单 -->
+    <div class="auth-form-panel">
+      <h2>新建账号</h2>
+      <p class="auth-sub">填写以下信息，开启 HydrogenX 使用权限</p>
+
+      <form method="post" novalidate id="reg-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-group">
+          <label class="form-label-dark">用户名</label>
+          <div class="input-wrap">
+            <i class="bi bi-person input-icon"></i>
+            <input type="text" name="username" class="form-input-dark"
+                   placeholder="至少 3 个字符" required autocomplete="username">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label-dark">邮箱</label>
+          <div class="input-wrap">
+            <i class="bi bi-envelope input-icon"></i>
+            <input type="email" name="email" class="form-input-dark"
+                   placeholder="you@example.com" required autocomplete="email">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label-dark">密码</label>
+          <div class="input-wrap">
+            <i class="bi bi-lock input-icon"></i>
+            <input type="password" name="password" id="pw1" class="form-input-dark"
+                   placeholder="至少 8 个字符" required autocomplete="new-password">
+            <button type="button" class="input-toggle" id="toggle-pw1">
+              <i class="bi bi-eye" id="toggle-pw1-icon"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label-dark">确认密码</label>
+          <div class="input-wrap">
+            <i class="bi bi-lock-fill input-icon"></i>
+            <input type="password" name="confirm_password" id="pw2" class="form-input-dark"
+                   placeholder="再次输入密码" required autocomplete="new-password">
+          </div>
+        </div>
+
+        <button class="btn-submit-dark" type="submit" id="reg-btn">
+          <i class="bi bi-person-plus"></i>
+          <span id="reg-btn-text">注册 HydrogenX</span>
+        </button>
+      </form>
+
+      <p class="auth-footer-link">
+        已有账号？<a href="{{ url_for('auth.login') }}">去登录</a>
+      </p>
+    </div>
   </div>
-</section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const pw1 = document.getElementById('pw1');
+const toggle1 = document.getElementById('toggle-pw1');
+const icon1 = document.getElementById('toggle-pw1-icon');
+if (toggle1) {
+  toggle1.addEventListener('click', () => {
+    const isText = pw1.type === 'text';
+    pw1.type = isText ? 'password' : 'text';
+    icon1.className = isText ? 'bi bi-eye' : 'bi bi-eye-slash';
+  });
+}
+
+const regForm = document.getElementById('reg-form');
+const regBtn = document.getElementById('reg-btn');
+if (regForm) {
+  regForm.addEventListener('submit', () => {
+    regBtn.disabled = true;
+    regBtn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i><span>注册中...</span>';
+  });
+}
+</script>
+<style>
+.spin { animation: spin 1s linear infinite; display: inline-block; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+</style>
 {% endblock %}

@@ -30,3 +30,21 @@ class Config:
     OPENCLAW_RETRY_BACKOFF = float(os.getenv("OPENCLAW_RETRY_BACKOFF", "1.0"))
 
     OPENCLAW_ARTIFACTS_DIR = os.getenv("OPENCLAW_ARTIFACTS_DIR", "instance/artifacts")
+
+    HYDROGEN_UPLOADS_DIR = os.getenv("HYDROGEN_UPLOADS_DIR", "instance/uploads")
+    HYDROGEN_MAX_UPLOAD_SIZE_BYTES = int(os.getenv("HYDROGEN_MAX_UPLOAD_SIZE_BYTES", str(10 * 1024 * 1024)))
+    HYDROGEN_MAX_FILE_TEXT_CHARS = int(os.getenv("HYDROGEN_MAX_FILE_TEXT_CHARS", "12000"))
+    HYDROGEN_MAX_TOTAL_CONTEXT_CHARS = int(os.getenv("HYDROGEN_MAX_TOTAL_CONTEXT_CHARS", "40000"))
+    HYDROGEN_MAX_FILES_PER_TASK = int(os.getenv("HYDROGEN_MAX_FILES_PER_TASK", "5"))
+    HYDROGEN_XLSX_MAX_ROWS_PER_SHEET = int(os.getenv("HYDROGEN_XLSX_MAX_ROWS_PER_SHEET", "200"))
+    HYDROGEN_XLSX_MAX_COLS_PER_ROW = int(os.getenv("HYDROGEN_XLSX_MAX_COLS_PER_ROW", "20"))
+    HYDROGEN_ALLOWED_UPLOAD_EXTENSIONS = {
+        extension.strip().lower()
+        for extension in os.getenv(
+            "HYDROGEN_ALLOWED_UPLOAD_EXTENSIONS",
+            ".txt,.md,.markdown,.json,.csv,.tsv,.pdf,.docx,.xlsx,.pptx,.py,.js,.ts,.html,.css,.xml,.yaml,.yml,.ini,.log,.sql",
+        ).split(",")
+        if extension.strip()
+    }
+
+    MAX_CONTENT_LENGTH = int(os.getenv("MAX_CONTENT_LENGTH", str(25 * 1024 * 1024)))

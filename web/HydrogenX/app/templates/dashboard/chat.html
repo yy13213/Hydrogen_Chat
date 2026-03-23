@@ -1,0 +1,620 @@
+{% extends "base.html" %}
+{% block title %}Hydrogen Chat · HydrogenX{% endblock %}
+
+{% block navbar %}
+{# Chat 页面使用精简导航 #}
+<nav class="app-navbar">
+  <div class="nav-inner">
+    <a class="brand-mark" href="{{ url_for('dashboard.workspace') }}">
+      <span class="brand-mark__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5"/>
+          <line x1="12" y1="2" x2="12" y2="22"/>
+          <line x1="2" y1="8.5" x2="22" y2="8.5"/>
+          <line x1="2" y1="15.5" x2="22" y2="15.5"/>
+        </svg>
+      </span>
+      <span class="brand-mark__text">
+        <span class="brand-mark__title">Hydrogen Chat</span>
+        <span class="brand-mark__sub">AI Assistant</span>
+      </span>
+    </a>
+    <div class="nav-actions">
+      <a class="nav-link-item" href="{{ url_for('dashboard.workspace') }}">
+        <i class="bi bi-grid"></i> 工作台
+      </a>
+      <span class="user-pill">
+        <i class="bi bi-person-circle"></i>
+        {{ current_user.username }}
+      </span>
+    </div>
+  </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="chat-page" id="chat-app">
+  <!-- 拖拽上传遮罩 -->
+  <div class="drop-overlay" id="drop-overlay">
+    <div class="drop-overlay-icon"><i class="bi bi-cloud-upload"></i></div>
+    <div class="drop-overlay-text">松开鼠标上传文件</div>
+  </div>
+
+  <!-- 隐藏文件输入 -->
+  <input type="file" id="file-input" multiple
+    accept=".png,.jpg,.jpeg,.gif,.webp,.pdf,.txt,.csv,.json,.py,.md,.docx,.xlsx"
+    style="display:none">
+
+  <!-- ── 侧边栏 ── -->
+  <aside class="chat-sidebar" id="chat-sidebar">
+    <div class="sidebar-head">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-icon">⚡</div>
+        <span>Hydrogen Chat</span>
+      </div>
+      <button class="btn-new-chat" id="btn-new-chat" title="新建对话">
+        <i class="bi bi-plus-lg"></i>
+      </button>
+    </div>
+
+    <div class="sidebar-sessions" id="sidebar-sessions">
+      <div class="sidebar-section-label">历史对话</div>
+      <div id="session-list">
+        <div class="sidebar-empty">加载中...</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── 主聊天区 ── -->
+  <div class="chat-main">
+    <div class="chat-header">
+      <div>
+        <div class="chat-header-title" id="chat-title">新对话</div>
+        <div class="chat-header-sub">支持网络搜索 · 知识库查询 · 数据库查询 · 文件上传</div>
+      </div>
+    </div>
+
+    <!-- 消息列表 -->
+    <div class="chat-messages" id="chat-messages">
+      <div class="chat-messages-inner" id="messages-inner">
+        <!-- 欢迎界面 -->
+        <div class="chat-welcome" id="chat-welcome">
+          <div class="chat-welcome-icon">⚡</div>
+          <h2>Hydrogen Chat</h2>
+          <p>你好！我是 Hydrogen Chat 智能助手，可以帮你搜索网络、查询知识库和数据库，也支持上传文件进行分析。</p>
+          <div class="chat-welcome-hints">
+            <span class="hint-chip" data-text="帮我搜索最新的氢能行业动态">🔍 搜索氢能动态</span>
+            <span class="hint-chip" data-text="查询知识库中关于氢燃料电池的资料">📚 查询知识库</span>
+            <span class="hint-chip" data-text="帮我分析数据库中的最新数据">🗄️ 查询数据库</span>
+            <span class="hint-chip" data-text="你好，请介绍一下你的功能">👋 了解功能</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 输入区 -->
+    <div class="chat-input-area">
+      <div class="chat-input-inner">
+        <!-- 待上传文件预览 -->
+        <div class="pending-files-bar" id="pending-files-bar" style="display:none"></div>
+
+        <div class="chat-input-box" id="chat-input-box">
+          <button class="btn-attach" id="btn-attach" title="上传文件">
+            <i class="bi bi-plus-lg"></i>
+          </button>
+          <textarea class="chat-textarea" id="chat-textarea"
+            placeholder="发送消息…（Shift+Enter 换行，Enter 发送）"
+            rows="1"></textarea>
+          <button class="btn-send" id="btn-send" disabled>
+            <i class="bi bi-arrow-up"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- marked.js for markdown rendering -->
+<script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
+<script>
+(() => {
+  // ── Config ──────────────────────────────────────────────
+  const CSRF = document.querySelector('meta[name="csrf-token"]').content;
+  const TOKENS_PER_SEC = 100; // 模拟流式输出速度（字符/秒）
+  const USER_INITIAL = '{{ current_user.username[0].upper() }}';
+
+  // ── DOM refs ────────────────────────────────────────────
+  const sessionList    = document.getElementById('session-list');
+  const btnNewChat     = document.getElementById('btn-new-chat');
+  const messagesInner  = document.getElementById('messages-inner');
+  const chatWelcome    = document.getElementById('chat-welcome');
+  const chatMessages   = document.getElementById('chat-messages');
+  const chatTitle      = document.getElementById('chat-title');
+  const textarea       = document.getElementById('chat-textarea');
+  const btnSend        = document.getElementById('btn-send');
+  const btnAttach      = document.getElementById('btn-attach');
+  const fileInput      = document.getElementById('file-input');
+  const pendingBar     = document.getElementById('pending-files-bar');
+  const dropOverlay    = document.getElementById('drop-overlay');
+
+  // ── State ────────────────────────────────────────────────
+  let currentSessionId = null;
+  let pendingFiles = [];
+  let isGenerating = false;
+
+  // ── marked config ────────────────────────────────────────
+  marked.setOptions({
+    breaks: true,
+    gfm: true,
+  });
+
+  // ── Helpers ──────────────────────────────────────────────
+  async function api(url, opts = {}) {
+    const headers = {
+      'Accept': 'application/json',
+      'X-CSRFToken': CSRF,
+      ...(opts.headers || {})
+    };
+    if (!(opts.body instanceof FormData) && !headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
+    }
+    const res = await fetch(url, { credentials: 'same-origin', headers, ...opts });
+    const text = await res.text();
+    let data = {};
+    try { data = text ? JSON.parse(text) : {}; } catch (_) {}
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+    return data;
+  }
+
+  function escHtml(s) {
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function fileIcon(name) {
+    const ext = (name.split('.').pop() || '').toLowerCase();
+    const map = {
+      pdf:'bi-file-pdf', png:'bi-file-image', jpg:'bi-file-image',
+      jpeg:'bi-file-image', gif:'bi-file-image', webp:'bi-file-image',
+      txt:'bi-file-text', md:'bi-file-text', csv:'bi-file-spreadsheet',
+      json:'bi-file-code', py:'bi-file-code', docx:'bi-file-word',
+      xlsx:'bi-file-excel',
+    };
+    return map[ext] || 'bi-file-earmark';
+  }
+
+  // ── Session list ─────────────────────────────────────────
+  async function loadSessions() {
+    try {
+      const sessions = await api('/api/chat/sessions');
+      renderSessionList(sessions);
+      // 同步更新当前会话标题
+      if (currentSessionId) {
+        const cur = sessions.find(s => s.id === currentSessionId);
+        if (cur && cur.title && cur.title !== '新对话') {
+          chatTitle.textContent = cur.title;
+        }
+      }
+    } catch (e) {
+      sessionList.innerHTML = `<div class="sidebar-empty">加载失败</div>`;
+    }
+  }
+
+  function renderSessionList(sessions) {
+    if (!sessions.length) {
+      sessionList.innerHTML = `<div class="sidebar-empty">暂无历史对话</div>`;
+      return;
+    }
+    sessionList.innerHTML = sessions.map(s => `
+      <div class="session-item ${s.id === currentSessionId ? 'active' : ''}"
+           data-sid="${escHtml(s.id)}">
+        <span class="session-item-title" title="${escHtml(s.title)}">${escHtml(s.title)}</span>
+        <button class="session-item-del" data-sid="${escHtml(s.id)}" title="删除">
+          <i class="bi bi-trash3"></i>
+        </button>
+      </div>
+    `).join('');
+  }
+
+  sessionList.addEventListener('click', async (e) => {
+    const delBtn = e.target.closest('.session-item-del');
+    if (delBtn) {
+      e.stopPropagation();
+      const sid = delBtn.dataset.sid;
+      try {
+        await api(`/api/chat/sessions/${sid}`, { method: 'DELETE' });
+        if (currentSessionId === sid) {
+          currentSessionId = null;
+          clearMessages();
+        }
+        await loadSessions();
+      } catch (err) { console.error(err); }
+      return;
+    }
+    const item = e.target.closest('.session-item');
+    if (item) {
+      const sid = item.dataset.sid;
+      await switchSession(sid);
+    }
+  });
+
+  async function switchSession(sid) {
+    currentSessionId = sid;
+    clearMessages();
+    try {
+      const data = await api(`/api/chat/sessions/${sid}/messages`);
+      chatTitle.textContent = data.title || '对话';
+      if (data.messages && data.messages.length) {
+        chatWelcome.style.display = 'none';
+        data.messages.forEach(m => appendMessage(m.role, m.content, m.tool_calls || [], m.files || [], false));
+      }
+      await loadSessions();
+      scrollToBottom();
+    } catch (e) { console.error(e); }
+  }
+
+  // ── New chat ──────────────────────────────────────────────
+  btnNewChat.addEventListener('click', async () => {
+    try {
+      const data = await api('/api/chat/sessions', { method: 'POST' });
+      currentSessionId = data.id;
+      clearMessages();
+      chatTitle.textContent = '新对话';
+      await loadSessions();
+    } catch (e) { console.error(e); }
+  });
+
+  function clearMessages() {
+    messagesInner.innerHTML = '';
+    messagesInner.appendChild(chatWelcome);
+    chatWelcome.style.display = 'flex';
+  }
+
+  // ── Hint chips ────────────────────────────────────────────
+  document.querySelectorAll('.hint-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      textarea.value = chip.dataset.text;
+      textarea.dispatchEvent(new Event('input'));
+      textarea.focus();
+    });
+  });
+
+  // ── File handling ─────────────────────────────────────────
+  btnAttach.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', () => {
+    addPendingFiles(Array.from(fileInput.files));
+    fileInput.value = '';
+  });
+
+  function addPendingFiles(files) {
+    files.forEach(f => {
+      if (!pendingFiles.find(p => p.name === f.name && p.size === f.size)) {
+        pendingFiles.push(f);
+      }
+    });
+    renderPendingFiles();
+  }
+
+  function renderPendingFiles() {
+    if (!pendingFiles.length) {
+      pendingBar.style.display = 'none';
+      pendingBar.innerHTML = '';
+      return;
+    }
+    pendingBar.style.display = 'flex';
+    pendingBar.innerHTML = pendingFiles.map((f, i) => `
+      <div class="pending-file-chip">
+        <i class="bi ${fileIcon(f.name)}"></i>
+        <span>${escHtml(f.name)}</span>
+        <button data-idx="${i}" title="移除">×</button>
+      </div>
+    `).join('');
+  }
+
+  pendingBar.addEventListener('click', e => {
+    const btn = e.target.closest('button[data-idx]');
+    if (btn) {
+      pendingFiles.splice(Number(btn.dataset.idx), 1);
+      renderPendingFiles();
+    }
+  });
+
+  // ── Drag & drop ───────────────────────────────────────────
+  let dragCounter = 0;
+  document.addEventListener('dragenter', e => {
+    if (e.dataTransfer.types.includes('Files')) {
+      dragCounter++;
+      dropOverlay.classList.add('active');
+    }
+  });
+  document.addEventListener('dragleave', () => {
+    dragCounter--;
+    if (dragCounter <= 0) { dragCounter = 0; dropOverlay.classList.remove('active'); }
+  });
+  document.addEventListener('dragover', e => e.preventDefault());
+  document.addEventListener('drop', e => {
+    e.preventDefault();
+    dragCounter = 0;
+    dropOverlay.classList.remove('active');
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length) addPendingFiles(files);
+  });
+
+  // ── Textarea auto-resize ──────────────────────────────────
+  textarea.addEventListener('input', () => {
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 160) + 'px';
+    btnSend.disabled = !textarea.value.trim() || isGenerating;
+  });
+
+  textarea.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (!btnSend.disabled) sendMessage();
+    }
+  });
+
+  // ── Append message ────────────────────────────────────────
+  function appendMessage(role, content, toolCalls = [], files = [], animate = true) {
+    chatWelcome.style.display = 'none';
+
+    const row = document.createElement('div');
+    row.className = `msg-row msg-row--${role === 'user' ? 'user' : 'ai'}`;
+    if (!animate) row.style.animation = 'none';
+
+    const avatarHtml = role === 'user'
+      ? `<div class="msg-avatar msg-avatar--user">${USER_INITIAL}</div>`
+      : `<div class="msg-avatar msg-avatar--ai">⚡</div>`;
+
+    // Tool call badges
+    const toolHtml = toolCalls.map(tc => {
+      const icons = { search_web:'🔍', query_knowledge_base:'📚', query_database:'🗄️' };
+      const icon = icons[tc] || '🔧';
+      return `<div class="tool-badge tool-badge--done">
+        <span class="tool-badge-icon">${icon}</span>
+        已调用: <strong>${escHtml(tc)}</strong>
+      </div>`;
+    }).join('');
+
+    // File chips
+    const filesHtml = files.length ? `
+      <div class="file-attach-preview">
+        ${files.map(f => `
+          <div class="file-chip">
+            <i class="bi ${fileIcon(f)}"></i>
+            <span>${escHtml(f)}</span>
+          </div>
+        `).join('')}
+      </div>
+    ` : '';
+
+    // Content
+    const contentHtml = role === 'user'
+      ? `<div class="msg-bubble msg-bubble--user">${escHtml(content).replace(/\n/g,'<br>')}</div>`
+      : `<div class="msg-bubble msg-bubble--ai" id="bubble-${Date.now()}">${marked.parse(content)}</div>`;
+
+    row.innerHTML = `
+      ${avatarHtml}
+      <div class="msg-body">
+        ${toolHtml}
+        ${filesHtml}
+        ${contentHtml}
+      </div>
+    `;
+
+    messagesInner.appendChild(row);
+    scrollToBottom();
+    return row;
+  }
+
+  // ── Thinking indicator ────────────────────────────────────
+  function showThinking() {
+    const row = document.createElement('div');
+    row.className = 'msg-row msg-row--ai';
+    row.id = 'thinking-row';
+    row.innerHTML = `
+      <div class="msg-avatar msg-avatar--ai">⚡</div>
+      <div class="msg-body">
+        <div class="thinking-dots">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    `;
+    messagesInner.appendChild(row);
+    scrollToBottom();
+    return row;
+  }
+
+  function removeThinking() {
+    const el = document.getElementById('thinking-row');
+    if (el) el.remove();
+  }
+
+  // ── Tool call badge (live) ────────────────────────────────
+  function showToolBadge(toolName) {
+    removeThinking();
+    const icons = { search_web:'🔍', query_knowledge_base:'📚', query_database:'🗄️' };
+    const icon = icons[toolName] || '🔧';
+    const row = document.createElement('div');
+    row.className = 'msg-row msg-row--ai';
+    row.id = 'tool-badge-row';
+    row.innerHTML = `
+      <div class="msg-avatar msg-avatar--ai">⚡</div>
+      <div class="msg-body">
+        <div class="tool-badge">
+          <span class="tool-badge-icon">${icon}</span>
+          正在调用: <strong>${escHtml(toolName)}</strong>...
+        </div>
+      </div>
+    `;
+    messagesInner.appendChild(row);
+    scrollToBottom();
+  }
+
+  function removeToolBadge() {
+    const el = document.getElementById('tool-badge-row');
+    if (el) el.remove();
+  }
+
+  // ── Simulated streaming output ────────────────────────────
+  // 100 tokens/s → 每帧(~16ms)渲染约 1.6 个字符，取整为 2
+  function streamText(bubble, text, onDone) {
+    if (!text) {
+      bubble.innerHTML = marked.parse('');
+      if (onDone) onDone();
+      return;
+    }
+    const chars = Array.from(text); // 正确处理多字节字符
+    let idx = 0;
+    let displayed = '';
+    // 每帧渲染的字符数：TOKENS_PER_SEC / 60fps
+    const CHARS_PER_FRAME = Math.max(1, Math.ceil(TOKENS_PER_SEC / 60));
+
+    const tick = () => {
+      if (idx >= chars.length) {
+        bubble.innerHTML = marked.parse(text);
+        if (onDone) onDone();
+        return;
+      }
+      const end = Math.min(idx + CHARS_PER_FRAME, chars.length);
+      for (; idx < end; idx++) {
+        displayed += chars[idx];
+      }
+      bubble.innerHTML = marked.parse(displayed) + '<span class="typing-cursor"></span>';
+      scrollToBottom();
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  // ── Send message ──────────────────────────────────────────
+  async function sendMessage() {
+    const text = textarea.value.trim();
+    if (!text || isGenerating) return;
+
+    isGenerating = true;
+    btnSend.disabled = true;
+    textarea.value = '';
+    textarea.style.height = 'auto';
+
+    // 确保有会话
+    if (!currentSessionId) {
+      try {
+        const data = await api('/api/chat/sessions', { method: 'POST' });
+        currentSessionId = data.id;
+        await loadSessions();
+      } catch (e) {
+        isGenerating = false;
+        return;
+      }
+    }
+
+    // 上传文件
+    const filesToSend = [...pendingFiles];
+    pendingFiles = [];
+    renderPendingFiles();
+    const fileNames = filesToSend.map(f => f.name);
+
+    // 显示用户消息
+    appendMessage('user', text, [], fileNames, true);
+
+    // 发送请求
+    showThinking();
+
+    try {
+      const formData = new FormData();
+      formData.append('csrf_token', CSRF);
+      formData.append('message', text);
+      formData.append('session_id', currentSessionId);
+      filesToSend.forEach(f => formData.append('files', f));
+
+      const data = await api('/api/chat/send', {
+        method: 'POST',
+        body: formData,
+        headers: {}
+      });
+
+      removeThinking();
+      removeToolBadge();
+
+      // 显示工具调用（已完成）
+      const usedTools = data.tool_calls || [];
+
+      // 创建 AI 消息行
+      chatWelcome.style.display = 'none';
+      const row = document.createElement('div');
+      row.className = 'msg-row msg-row--ai';
+
+      const toolHtml = usedTools.map(tc => {
+        const icons = { search_web:'🔍', query_knowledge_base:'📚', query_database:'🗄️' };
+        const icon = icons[tc] || '🔧';
+        return `<div class="tool-badge tool-badge--done">
+          <span class="tool-badge-icon">${icon}</span>
+          已调用: <strong>${escHtml(tc)}</strong>
+        </div>`;
+      }).join('');
+
+      const bubbleId = 'bubble-' + Date.now();
+      row.innerHTML = `
+        <div class="msg-avatar msg-avatar--ai">⚡</div>
+        <div class="msg-body">
+          ${toolHtml}
+          <div class="msg-bubble msg-bubble--ai" id="${bubbleId}"></div>
+        </div>
+      `;
+      messagesInner.appendChild(row);
+      scrollToBottom();
+
+      const bubble = document.getElementById(bubbleId);
+      streamText(bubble, data.response || '', () => {
+        isGenerating = false;
+        btnSend.disabled = !textarea.value.trim();
+        // 立即更新标题（若后端已同步返回）
+        if (data.title) chatTitle.textContent = data.title;
+        // 刷新会话列表
+        loadSessions();
+        // 延迟再次刷新，等待异步标题生成完成
+        setTimeout(() => loadSessions(), 3000);
+      });
+
+    } catch (e) {
+      removeThinking();
+      removeToolBadge();
+      // 错误消息用 AI 气泡展示，直接渲染 markdown
+      const errRow = document.createElement('div');
+      errRow.className = 'msg-row msg-row--ai';
+      const errBubbleId = 'bubble-err-' + Date.now();
+      errRow.innerHTML = `
+        <div class="msg-avatar msg-avatar--ai">⚡</div>
+        <div class="msg-body">
+          <div class="msg-bubble msg-bubble--ai" id="${errBubbleId}"></div>
+        </div>`;
+      chatWelcome.style.display = 'none';
+      messagesInner.appendChild(errRow);
+      const errBubble = document.getElementById(errBubbleId);
+      errBubble.innerHTML = marked.parse(`❌ **请求失败**\n\n${e.message}`);
+      scrollToBottom();
+      isGenerating = false;
+      btnSend.disabled = !textarea.value.trim();
+    }
+  }
+
+  btnSend.addEventListener('click', sendMessage);
+
+  function scrollToBottom() {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  // ── Init ──────────────────────────────────────────────────
+  (async () => {
+    await loadSessions();
+    // 不自动创建空会话，等用户发消息时再创建
+  })();
+
+})();
+</script>
+{% endblock %}

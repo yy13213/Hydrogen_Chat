@@ -1,67 +1,90 @@
 {% extends "base.html" %}
 {% block title %}HydrogenX 工作台{% endblock %}
 {% block content %}
-<section class="container workspace-shell">
-  <div class="workspace-hero mb-4">
+<div class="workspace-page">
+  <div class="workspace-header">
     <div>
-      <span class="eyebrow">HydrogenX Workspace</span>
-      <h1 class="mb-2">四大模块，一体化入口</h1>
-      <p class="text-secondary mb-0">选择一个模块开始工作。Hydrogen Assistant 已接入你当前的 OpenClaw 氢能科研助手项目。</p>
+      <h1>HydrogenX 工作台</h1>
+      <p>选择一个模块开始工作。四大功能模块，统一入口。</p>
     </div>
-    <div class="workspace-badge">
-      <span>当前用户</span>
-      <strong>{{ current_user.username }}</strong>
+    <div class="workspace-user-badge">
+      <div class="avatar">{{ current_user.username[0].upper() }}</div>
+      <span class="uname">{{ current_user.username }}</span>
     </div>
   </div>
 
-  <div class="module-grid">
-    <article class="module-card">
-      <div class="module-card__icon"><i class="bi bi-chat-dots"></i></div>
-      <div class="module-card__body">
-        <div class="module-card__meta">Module 01</div>
-        <h2>Hydrogen Chat</h2>
-        <p>面向氢能团队的多场景智能对话与问答入口，承载后续聊天能力扩展。</p>
+  <div class="workspace-grid">
+    <!-- Hydrogen Chat -->
+    <div class="workspace-tile workspace-tile--chat" onclick="location.href='{{ url_for('dashboard.chat') }}'">
+      <div class="wtile-header">
+        <span class="wtile-num">Module 01</span>
+        <span class="wtile-status wtile-status--live">Live</span>
       </div>
-      <div class="module-card__footer">
-        <span class="pill-muted">Coming Soon</span>
+      <div class="wtile-icon wtile-icon--chat">
+        <i class="bi bi-chat-dots"></i>
       </div>
-    </article>
+      <div class="wtile-title">Hydrogen Chat</div>
+      <div class="wtile-desc">
+        多场景智能对话与知识辅助入口，支持网络搜索、知识库查询、数据库查询与文件上传，提供流畅的 AI 对话体验。
+      </div>
+      <a href="{{ url_for('dashboard.chat') }}" class="wtile-enter" onclick="event.stopPropagation()">
+        进入 Chat <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
 
-    <article class="module-card">
-      <div class="module-card__icon"><i class="bi bi-bar-chart"></i></div>
-      <div class="module-card__body">
-        <div class="module-card__meta">Module 02</div>
-        <h2>Hydrogen Chart</h2>
-        <p>图表生成、指标可视化与研究表达能力的统一承载区。</p>
+    <!-- Hydrogen Chart -->
+    <div class="workspace-tile workspace-tile--chart">
+      <div class="wtile-header">
+        <span class="wtile-num">Module 02</span>
+        <span class="wtile-status wtile-status--soon">Coming Soon</span>
       </div>
-      <div class="module-card__footer">
-        <span class="pill-muted">Coming Soon</span>
+      <div class="wtile-icon wtile-icon--chart">
+        <i class="bi bi-bar-chart-line"></i>
       </div>
-    </article>
+      <div class="wtile-title">Hydrogen Chart</div>
+      <div class="wtile-desc">
+        图表生成、指标可视化与研究表达能力的统一承载区，将数据洞察转化为清晰直观的可视化输出。
+      </div>
+      <span class="wtile-enter" style="cursor:default;">
+        敬请期待 <i class="bi bi-clock"></i>
+      </span>
+    </div>
 
-    <article class="module-card">
-      <div class="module-card__icon"><i class="bi bi-search"></i></div>
-      <div class="module-card__body">
-        <div class="module-card__meta">Module 03</div>
-        <h2>Hydrogen Research</h2>
-        <p>聚合研究任务、资料整理、洞察沉淀与工作流管理。</p>
+    <!-- Hydrogen Research -->
+    <div class="workspace-tile workspace-tile--research">
+      <div class="wtile-header">
+        <span class="wtile-num">Module 03</span>
+        <span class="wtile-status wtile-status--soon">Coming Soon</span>
       </div>
-      <div class="module-card__footer">
-        <span class="pill-muted">Coming Soon</span>
+      <div class="wtile-icon wtile-icon--research">
+        <i class="bi bi-journal-text"></i>
       </div>
-    </article>
+      <div class="wtile-title">Hydrogen Research</div>
+      <div class="wtile-desc">
+        聚合研究任务、资料整理、洞察沉淀与工作流管理，为氢能科研团队提供系统化的知识管理平台。
+      </div>
+      <span class="wtile-enter" style="cursor:default;">
+        敬请期待 <i class="bi bi-clock"></i>
+      </span>
+    </div>
 
-    <article class="module-card module-card--highlight">
-      <div class="module-card__icon"><i class="bi bi-stars"></i></div>
-      <div class="module-card__body">
-        <div class="module-card__meta">Module 04</div>
-        <h2>Hydrogen Assistant</h2>
-        <p>基于 OpenClaw 的氢能科研助手，支持 Prompt 提交、任务队列、历史记录与响应查看。</p>
+    <!-- Hydrogen Assistant -->
+    <div class="workspace-tile workspace-tile--assistant" onclick="location.href='{{ url_for('dashboard.assistant') }}'">
+      <div class="wtile-header">
+        <span class="wtile-num">Module 04</span>
+        <span class="wtile-status wtile-status--live">Live</span>
       </div>
-      <div class="module-card__footer">
-        <a href="{{ url_for('dashboard.assistant') }}" class="btn btn-dark">进入模块</a>
+      <div class="wtile-icon wtile-icon--assistant">
+        <i class="bi bi-stars"></i>
       </div>
-    </article>
+      <div class="wtile-title">Hydrogen Assistant</div>
+      <div class="wtile-desc">
+        基于 OpenClaw 的氢能科研助手，支持 Prompt 提交、任务队列、历史记录与响应查看，深度融合科研工作流。
+      </div>
+      <a href="{{ url_for('dashboard.assistant') }}" class="wtile-enter" onclick="event.stopPropagation()">
+        进入 Assistant <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
   </div>
-</section>
+</div>
 {% endblock %}

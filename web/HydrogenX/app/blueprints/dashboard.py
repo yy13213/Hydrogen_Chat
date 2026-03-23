@@ -17,6 +17,12 @@ def workspace():
     return render_template("dashboard/workspace.html")
 
 
+@dashboard_bp.get("/chat")
+@login_required
+def chat():
+    return render_template("dashboard/chat.html")
+
+
 @dashboard_bp.get("/assistant")
 @login_required
 def assistant():

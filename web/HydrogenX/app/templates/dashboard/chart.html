@@ -383,12 +383,28 @@
       setStatus('正在分析请求…', 'running');
       // 多轮场景下可提前轮询状态
       if (currentProject) startProgressPolling(currentProject, aiBubble);
-      const data = await api('/api/chart/chat', {
-        method: 'POST',
-        body: formData,
-      });
+      let data = null;
 
-      currentProject = data.project_name || currentProject;
+      // 1) 优先异步提交，避免外网 502
+      try {
+        const kickoff = await api('/api/chart/chat_async', {
+          method: 'POST',
+          body: formData,
+        });
+        data = await pollChartJob(kickoff?.job_id);
+      } catch (err) {
+        // 兼容旧后端：若无异步接口，降级到同步 /chat
+        if (String(err.message).includes('HTTP 404')) {
+          data = await api('/api/chart/chat', {
+            method: 'POST',
+            body: formData,
+          });
+        } else {
+          throw err;
+        }
+      }
+
+      currentProject = data?.project_name || currentProject;
       loadSessions();
       await fetchAndRenderProgress(currentProject, aiBubble, true);
       stopPolling();
@@ -556,6 +572,33 @@
       }
       pollTimer = setTimeout(loop, POLL_INTERVAL);
     })();
+  }
+
+  async function pollChartJob(jobId) {
+    if (!jobId) throw new Error('未获得 job_id');
+    const started = Date.now();
+    let fails = 0;
+    while (Date.now() - started <= MAX_POLL_MS) {
+      try {
+        const job = await api(`/api/chart/jobs/${jobId}`);
+        if (job.status === 'completed') {
+          return job.data || {};
+        }
+        if (job.status === 'failed') {
+          throw new Error(job.error || '任务失败');
+        }
+        await sleep(POLL_INTERVAL);
+      } catch (e) {
+        const transient = /HTTP 502|HTTP 504|HTTP 429/i.test(String(e.message || ''));
+        if (!transient) throw e;
+        fails += 1;
+        if (fails >= MAX_POLL_FAIL) {
+          throw new Error('任务轮询失败次数过多，请稍后重试');
+        }
+        await sleep(POLL_INTERVAL);
+      }
+    }
+    throw new Error('任务轮询超时，请稍后重试');
   }
 
   async function fetchAndRenderProgress(projectName, bubble, forceStopLast) {

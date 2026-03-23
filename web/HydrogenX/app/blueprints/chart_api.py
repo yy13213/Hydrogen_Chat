@@ -7,8 +7,11 @@ Hydrogen Chart API Blueprint
 import json
 import os
 import re
+import threading
+import uuid
 from datetime import datetime
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 
 import requests
 from flask import Blueprint, jsonify, request, current_app
@@ -19,6 +22,7 @@ chart_api_bp = Blueprint("chart_api", __name__, url_prefix="/api/chart")
 # ── chart_agent 服务地址 ──────────────────────────────────────
 _CA_BASE    = os.getenv("CHART_AGENT_BASE_URL", "http://localhost:9621")
 _CA_TIMEOUT = int(os.getenv("CHART_AGENT_TIMEOUT", "180"))   # AI 生成可能较慢
+_CHART_REQUEST_TIMEOUT_SECONDS = int(os.getenv("HYDROGEN_CHART_REQUEST_TIMEOUT_SECONDS", "240"))
 
 # ── Cloudinary 配置 ───────────────────────────────────────────
 _CLOUDINARY_URL = os.getenv(
@@ -34,6 +38,11 @@ def _parse_cloudinary_url(url: str):
     return m.group(1), m.group(2), m.group(3)
 
 _CL_API_KEY, _CL_API_SECRET, _CL_CLOUD_NAME = _parse_cloudinary_url(_CLOUDINARY_URL)
+
+# ── 异步任务表（内存） ─────────────────────────────────────────
+_JOBS = {}
+_JOBS_LOCK = threading.Lock()
+_EXECUTOR = ThreadPoolExecutor(max_workers=4)
 
 
 def _upload_to_cloudinary(image_url_on_agent: str) -> str:
@@ -203,6 +212,85 @@ def _proxy_post_form(path: str, data: dict, files=None):
         return None
 
 
+def _prepare_forwarded_files():
+    """从当前请求读取上传文件并转为 requests 可转发格式（bytes）。"""
+    forwarded_files = []
+    for key in request.files:
+        for fobj in request.files.getlist(key):
+            if fobj and fobj.filename:
+                forwarded_files.append(
+                    ("files", (fobj.filename, fobj.read(), fobj.mimetype or "application/octet-stream"))
+                )
+    return forwarded_files
+
+
+def _process_chat_response(user_id: int, user_input: str, resp_json: dict) -> dict:
+    """统一处理 chart_agent 返回，补齐用户历史与 Cloudinary 图片。"""
+    data = dict(resp_json or {})
+    returned_project = data.get("project_name", "")
+
+    # 维护用户历史
+    if returned_project:
+        existing = _load_history(user_id)
+        if returned_project not in existing:
+            _add_project(user_id, returned_project, user_input)
+        else:
+            _touch_project(user_id, returned_project)
+
+    # 将图片上传到 Cloudinary，替换为 CDN URL
+    raw_image_urls = data.get("image_urls") or []
+    cdn_image_urls = []
+    for img_url in raw_image_urls:
+        cdn_url = _upload_to_cloudinary(img_url)
+        cdn_image_urls.append(cdn_url)
+    data["image_urls"] = cdn_image_urls
+    return data
+
+
+def _run_chart_job(job_id: str, user_id: int, user_input: str, project_name: str, forwarded_files: list):
+    """后台执行 chart_agent 请求，完成后写入任务表。"""
+    form_data = {"user_input": user_input}
+    if project_name:
+        form_data["project_name"] = project_name
+
+    with _JOBS_LOCK:
+        _JOBS[job_id] = {
+            "status": "running",
+            "created_at": datetime.now().isoformat(),
+            "updated_at": datetime.now().isoformat(),
+            "error": None,
+            "data": None,
+        }
+
+    try:
+        future = _EXECUTOR.submit(_proxy_post_form, "/chat", form_data, forwarded_files if forwarded_files else None)
+        resp = future.result(timeout=_CHART_REQUEST_TIMEOUT_SECONDS)
+        if resp is None:
+            raise RuntimeError("无法连接到 Chart Agent 服务")
+        if resp.status_code != 200:
+            try:
+                detail = resp.json().get("detail", resp.text[:400])
+            except Exception:
+                detail = resp.text[:400]
+            raise RuntimeError(f"Chart Agent 服务错误：{detail}")
+
+        payload = _process_chat_response(user_id, user_input, resp.json())
+        with _JOBS_LOCK:
+            _JOBS[job_id]["status"] = "completed"
+            _JOBS[job_id]["updated_at"] = datetime.now().isoformat()
+            _JOBS[job_id]["data"] = payload
+    except FuturesTimeoutError:
+        with _JOBS_LOCK:
+            _JOBS[job_id]["status"] = "failed"
+            _JOBS[job_id]["updated_at"] = datetime.now().isoformat()
+            _JOBS[job_id]["error"] = f"处理超时（>{_CHART_REQUEST_TIMEOUT_SECONDS}s）"
+    except Exception as e:
+        with _JOBS_LOCK:
+            _JOBS[job_id]["status"] = "failed"
+            _JOBS[job_id]["updated_at"] = datetime.now().isoformat()
+            _JOBS[job_id]["error"] = str(e)
+
+
 # ── API 路由 ──────────────────────────────────────────────────
 
 @chart_api_bp.route("/projects", methods=["GET"])
@@ -227,14 +315,7 @@ def chat():
     if not user_input:
         return jsonify({"error": "消息不能为空"}), 400
 
-    # 转发文件
-    forwarded_files = []
-    for key in request.files:
-        for fobj in request.files.getlist(key):
-            if fobj.filename:
-                forwarded_files.append(
-                    ("files", (fobj.filename, fobj.stream, fobj.mimetype))
-                )
+    forwarded_files = _prepare_forwarded_files()
 
     form_data = {"user_input": user_input}
     if project_name:
@@ -256,23 +337,50 @@ def chat():
     data = resp.json()
     returned_project = data.get("project_name", "")
 
-    # 维护用户历史
-    if returned_project:
-        existing = _load_history(current_user.id)
-        if returned_project not in existing:
-            _add_project(current_user.id, returned_project, user_input)
-        else:
-            _touch_project(current_user.id, returned_project)
-
-    # 将图片上传到 Cloudinary，替换为 CDN URL
-    raw_image_urls = data.get("image_urls") or []
-    cdn_image_urls = []
-    for img_url in raw_image_urls:
-        cdn_url = _upload_to_cloudinary(img_url)
-        cdn_image_urls.append(cdn_url)
-
-    data["image_urls"] = cdn_image_urls
+    data = _process_chat_response(current_user.id, user_input, data)
     return jsonify(data)
+
+
+@chart_api_bp.route("/chat_async", methods=["POST"])
+@login_required
+def chat_async():
+    """
+    异步提交图表任务，立即返回 job_id，前端轮询 /api/chart/jobs/<job_id> 获取结果。
+    避免外网网关对长请求返回 502。
+    """
+    user_input = (request.form.get("user_input") or "").strip()
+    project_name = (request.form.get("project_name") or "").strip() or None
+    if not user_input:
+        return jsonify({"error": "消息不能为空"}), 400
+
+    forwarded_files = _prepare_forwarded_files()
+    job_id = uuid.uuid4().hex[:16]
+    threading.Thread(
+        target=_run_chart_job,
+        args=(job_id, int(current_user.id), user_input, project_name, forwarded_files),
+        daemon=True,
+    ).start()
+    return jsonify({"job_id": job_id, "project_name": project_name})
+
+
+@chart_api_bp.route("/jobs/<job_id>", methods=["GET"])
+@login_required
+def get_job(job_id):
+    with _JOBS_LOCK:
+        job = _JOBS.get(job_id)
+        if not job:
+            return jsonify({"error": "任务不存在或已过期"}), 404
+        status = job.get("status")
+        payload = {
+            "job_id": job_id,
+            "status": status,
+            "created_at": job.get("created_at"),
+            "updated_at": job.get("updated_at"),
+            "error": job.get("error"),
+        }
+        if status == "completed":
+            payload["data"] = job.get("data")
+        return jsonify(payload)
 
 
 @chart_api_bp.route("/progress/<project_name>", methods=["GET"])

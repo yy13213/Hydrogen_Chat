@@ -125,13 +125,13 @@
 <script>
 (() => {
   // ── Config ──────────────────────────────────────────────
-  const CSRF          = document.querySelector('meta[name="csrf-token"]').content;
+  const CSRF           = document.querySelector('meta[name="csrf-token"]').content;
   const TOKENS_PER_SEC = 80;
-  const POLL_INTERVAL  = 2500;
+  const POLL_INTERVAL  = 2000;   // 进度轮询间隔 ms
+  const JOB_POLL_INTERVAL = 2500; // 任务完成轮询间隔 ms
   const MAX_POLL_FAIL  = 15;
   const MAX_POLL_MS    = 240000;
   const USER_INITIAL   = '{{ current_user.username[0].upper() }}';
-  const ORIGIN         = window.location.origin;
 
   // ── DOM refs ────────────────────────────────────────────
   const sessionList   = document.getElementById('session-list');
@@ -154,18 +154,15 @@
   let currentProject  = null;
   let pendingFiles    = [];
   let isGenerating    = false;
-  let pollTimer       = null;
-  let pollFailures    = 0;
-  let pollStartTime   = 0;
-  let lastStatusSig   = '';
-  let activeAiBubble  = null;
+  let progressTimer   = null;   // 进度轮询定时器
+  let progressFails   = 0;
+  let progressStart   = 0;
 
   // ── marked config ────────────────────────────────────────
   marked.setOptions({ breaks: true, gfm: true });
 
   // ── API helper ───────────────────────────────────────────
   async function api(url, opts = {}) {
-    const finalUrl = /^https?:\/\//i.test(url) ? url : `${ORIGIN}${url.startsWith('/') ? url : '/' + url}`;
     const headers = {
       'Accept': 'application/json',
       'X-CSRFToken': CSRF,
@@ -174,7 +171,7 @@
     if (!(opts.body instanceof FormData) && !headers['Content-Type']) {
       headers['Content-Type'] = 'application/json';
     }
-    const res = await fetch(finalUrl, { credentials: 'same-origin', headers, ...opts });
+    const res = await fetch(url, { credentials: 'same-origin', headers, ...opts });
     const text = await res.text();
     let data = {};
     try { data = text ? JSON.parse(text) : {}; } catch (_) {}
@@ -197,6 +194,8 @@
                   txt:'bi-file-text', csv:'bi-file-spreadsheet' };
     return map[ext] || 'bi-file-earmark';
   }
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
   // ── 侧边栏 ───────────────────────────────────────────────
   async function loadSessions() {
@@ -243,14 +242,16 @@
         messagesInner.innerHTML = '';
         chatWelcome.style.display = 'none';
 
-        // 重建对话
+        // 按 user_turn / model_turn 配对重建对话
         let firstQuestion = '';
         for (const r of records) {
           if (r.status === 'user_turn') {
             if (!firstQuestion) firstQuestion = r.text || '';
             appendUserBubble(r.text || '', r.files || []);
           } else if (r.status === 'model_turn') {
-            appendAiBubble(r.text || '', r.render_files || r.files || [], true);
+            // render_files 已经是 CDN URL（后端保证只有最后一张）
+            const imgs = r.render_files || [];
+            appendAiBubble(r.text || '', imgs, true, records);
           }
         }
         chatTitle.textContent = firstQuestion.slice(0, 40) + (firstQuestion.length > 40 ? '…' : '') || '历史对话';
@@ -267,7 +268,7 @@
 
   // ── 新建对话 ─────────────────────────────────────────────
   btnNew.addEventListener('click', () => {
-    stopPolling();
+    stopProgressPolling();
     currentProject = null;
     messagesInner.innerHTML = '';
     messagesInner.appendChild(chatWelcome);
@@ -286,7 +287,6 @@
     fileInput.value = '';
   });
 
-  // 拖拽
   const chatPage = document.getElementById('chart-app');
   chatPage.addEventListener('dragover', e => { e.preventDefault(); dropOverlay.style.display = 'flex'; });
   chatPage.addEventListener('dragleave', e => { if (!chatPage.contains(e.relatedTarget)) dropOverlay.style.display = 'none'; });
@@ -297,7 +297,6 @@
   });
 
   function addFiles(files) {
-    const allowed = ['image/png','image/jpeg','image/gif','image/webp','text/plain','text/csv','application/octet-stream'];
     files.forEach(f => {
       if (pendingFiles.length >= 5) return;
       pendingFiles.push(f);
@@ -336,7 +335,6 @@
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   });
 
-  // 提示词快捷填充
   document.querySelectorAll('.hint-chip[data-text]').forEach(chip => {
     chip.addEventListener('click', () => {
       textarea.value = chip.dataset.text;
@@ -358,24 +356,18 @@
     btnSend.disabled = true;
     setGenerating(true);
 
-    // 隐藏欢迎界面
     chatWelcome.style.display = 'none';
-
-    // 渲染用户消息
     appendUserBubble(text, files.map(f => f.name));
 
-    // 渲染 AI 占位
-    const aiBubble = appendAiBubble('', [], false);
-    activeAiBubble = aiBubble;
+    // AI 占位气泡
+    const aiBubble = appendAiBubble('', [], false, []);
     const aiBubbleBody = aiBubble.querySelector('.msg-body');
     aiBubbleBody.innerHTML = `<span class="typing-cursor"></span>`;
 
-    // 更新标题
     if (!currentProject) {
       chatTitle.textContent = text.slice(0, 40) + (text.length > 40 ? '…' : '');
     }
 
-    // 构建 FormData
     const formData = new FormData();
     formData.append('user_input', text);
     if (currentProject) formData.append('project_name', currentProject);
@@ -383,78 +375,92 @@
 
     try {
       setStatus('正在分析请求…', 'running');
-      // 多轮场景下可提前轮询状态
-      if (currentProject) startProgressPolling(currentProject, aiBubble);
-      let data = null;
 
-      // 1) 优先异步提交，避免外网 502
+      // 异步提交
+      let kickoff;
       try {
-        const kickoff = await api('/api/chart/chat_async', {
-          method: 'POST',
-          body: formData,
-        });
-        if (kickoff?.project_name) {
-          currentProject = kickoff.project_name;
-          startProgressPolling(currentProject, aiBubble);
-        }
-        data = await pollChartJob(kickoff?.job_id);
+        kickoff = await api('/api/chart/chat_async', { method: 'POST', body: formData });
       } catch (err) {
-        // 兼容旧后端：若无异步接口，降级到同步 /chat
         if (String(err.message).includes('HTTP 404')) {
-          data = await api('/api/chart/chat', {
-            method: 'POST',
-            body: formData,
-          });
-        } else {
-          throw err;
+          // 降级同步
+          const data = await api('/api/chart/chat', { method: 'POST', body: formData });
+          await handleChatResult(data, aiBubble, aiBubbleBody);
+          return;
         }
+        throw err;
       }
 
-      currentProject = data?.project_name || currentProject;
-      loadSessions();
-      await fetchAndRenderProgress(currentProject, aiBubble, true);
-      stopPolling();
+      const jobId = kickoff?.job_id;
+      // 获取 project_name（可能来自 kickoff 或后续轮询）
+      let projectForPolling = kickoff?.project_name || currentProject;
 
-      // 渲染回复
-      const replyText = data.reply_text || '';
-      const imageUrls = data.image_urls || [];
+      // 立即开始进度轮询（即使 project_name 暂时未知，稍后会更新）
+      startProgressPolling(projectForPolling, aiBubble);
 
-      aiBubbleBody.innerHTML = '';
-      if (replyText) {
-        const mdDiv = document.createElement('div');
-        mdDiv.className = 'msg-md';
-        aiBubbleBody.appendChild(mdDiv);
-        streamText(mdDiv, replyText, () => {});
-      }
-      // 渲染图片
-      const onlyLastImage = imageUrls.length ? [imageUrls[imageUrls.length - 1]] : [];
-      if (onlyLastImage.length) {
-        const imgWrap = document.createElement('div');
-        imgWrap.className = 'chart-images';
-        onlyLastImage.forEach(url => {
-          const img = document.createElement('img');
-          img.src = url;
-          img.className = 'chart-img';
-          img.alt = '生成的图表';
-          img.addEventListener('click', () => openLightbox(url));
-          imgWrap.appendChild(img);
-        });
-        aiBubbleBody.appendChild(imgWrap);
+      // 轮询任务完成
+      const data = await pollChartJob(jobId, (updatedProject) => {
+        // 任务运行中获得了 project_name，更新轮询目标
+        if (updatedProject && updatedProject !== projectForPolling) {
+          projectForPolling = updatedProject;
+          currentProject = updatedProject;
+          restartProgressPolling(projectForPolling, aiBubble);
+        }
+      });
+
+      // 任务完成，停止进度轮询，做最后一次刷新
+      stopProgressPolling();
+      if (data?.project_name || projectForPolling) {
+        const finalProject = data?.project_name || projectForPolling;
+        await fetchAndRenderProgress(finalProject, aiBubble, true);
       }
 
-      if (!replyText && !imageUrls.length) {
-        aiBubbleBody.innerHTML = `<span style="color:var(--text-3)">（无回复内容）</span>`;
-      }
-
-      setStatus('完成', 'done');
-      setTimeout(() => hideStatus(), 2000);
+      await handleChatResult(data, aiBubble, aiBubbleBody);
 
     } catch (e) {
+      stopProgressPolling();
       aiBubbleBody.innerHTML = `<span style="color:var(--red)">❌ 请求失败：${escHtml(e.message)}</span>`;
       setStatus('失败', 'error');
       setTimeout(() => hideStatus(), 3000);
+      setGenerating(false);
     }
 
+    scrollToBottom();
+  }
+
+  async function handleChatResult(data, aiBubble, aiBubbleBody) {
+    currentProject = data?.project_name || currentProject;
+    loadSessions();
+
+    const replyText  = data?.reply_text || '';
+    const imageUrls  = data?.image_urls || [];
+
+    aiBubbleBody.innerHTML = '';
+    if (replyText) {
+      const mdDiv = document.createElement('div');
+      mdDiv.className = 'msg-md';
+      aiBubbleBody.appendChild(mdDiv);
+      streamText(mdDiv, replyText, () => {});
+    }
+    // 只展示最后一张图（后端已保证只返回一张，但做防御）
+    const lastImg = imageUrls[imageUrls.length - 1];
+    if (lastImg) {
+      const imgWrap = document.createElement('div');
+      imgWrap.className = 'chart-images';
+      const img = document.createElement('img');
+      img.src = lastImg;
+      img.className = 'chart-img';
+      img.alt = '生成的图表';
+      img.addEventListener('click', () => openLightbox(lastImg));
+      imgWrap.appendChild(img);
+      aiBubbleBody.appendChild(imgWrap);
+    }
+
+    if (!replyText && !lastImg) {
+      aiBubbleBody.innerHTML = `<span style="color:var(--text-3)">（无回复内容）</span>`;
+    }
+
+    setStatus('完成', 'done');
+    setTimeout(() => hideStatus(), 2000);
     setGenerating(false);
     scrollToBottom();
   }
@@ -479,7 +485,14 @@
     return row;
   }
 
-  function appendAiBubble(text, imageUrls, immediate) {
+  /**
+   * appendAiBubble
+   * @param {string} text       - 文本内容
+   * @param {string[]} imageUrls - CDN 图片 URL 列表（只取最后一张）
+   * @param {boolean} immediate  - 是否立即渲染（历史加载）
+   * @param {object[]} allRecords - 该轮所有 records（用于渲染状态链）
+   */
+  function appendAiBubble(text, imageUrls, immediate, allRecords) {
     const row = document.createElement('div');
     row.className = 'msg-row msg-row--ai';
     row.innerHTML = `
@@ -490,6 +503,12 @@
       </div>`;
     messagesInner.appendChild(row);
     const body = row.querySelector('.msg-body');
+
+    // 渲染历史状态链（立即模式）
+    if (immediate && allRecords && allRecords.length) {
+      const flow = row.querySelector('.status-flow');
+      renderStatusFlow(flow, allRecords, true);
+    }
 
     if (text || imageUrls.length) {
       if (text) {
@@ -502,17 +521,17 @@
         }
         body.appendChild(mdDiv);
       }
-      if (imageUrls.length) {
+      // 只展示最后一张
+      const lastImg = imageUrls[imageUrls.length - 1];
+      if (lastImg) {
         const imgWrap = document.createElement('div');
         imgWrap.className = 'chart-images';
-        imageUrls.forEach(url => {
-          const img = document.createElement('img');
-          img.src = url;
-          img.className = 'chart-img';
-          img.alt = '生成的图表';
-          img.addEventListener('click', () => openLightbox(url));
-          imgWrap.appendChild(img);
-        });
+        const img = document.createElement('img');
+        img.src = lastImg;
+        img.className = 'chart-img';
+        img.alt = '生成的图表';
+        img.addEventListener('click', () => openLightbox(lastImg));
+        imgWrap.appendChild(img);
         body.appendChild(imgWrap);
       }
     }
@@ -553,7 +572,6 @@
   }
   function hideStatus() { statusBar.style.display = 'none'; }
 
-  // ── 生成中状态 ───────────────────────────────────────────
   function setGenerating(v) {
     isGenerating = v;
     btnSend.disabled = v || (!textarea.value.trim() && !pendingFiles.length);
@@ -561,79 +579,126 @@
     textarea.disabled = v;
   }
 
-  // ── 进度轮询与状态链渲染 ───────────────────────────────
+  // ═══════════════════════════════════════════════════════
+  // 进度轮询与状态链渲染
+  // ═══════════════════════════════════════════════════════
+
   function startProgressPolling(projectName, bubble) {
-    stopPolling();
-    pollFailures = 0;
-    pollStartTime = Date.now();
-    (async function loop() {
-      if (!currentProject || projectName !== currentProject) return;
-      const elapsed = Date.now() - pollStartTime;
-      if (elapsed > MAX_POLL_MS) return;
-      try {
-        await fetchAndRenderProgress(projectName, bubble, false);
-        pollFailures = 0;
-      } catch (_) {
-        pollFailures += 1;
-        if (pollFailures >= MAX_POLL_FAIL) return;
-      }
-      pollTimer = setTimeout(loop, POLL_INTERVAL);
-    })();
+    stopProgressPolling();
+    if (!projectName) return;
+    progressFails = 0;
+    progressStart = Date.now();
+    _doProgressPoll(projectName, bubble);
   }
 
-  async function pollChartJob(jobId) {
+  function restartProgressPolling(projectName, bubble) {
+    stopProgressPolling();
+    startProgressPolling(projectName, bubble);
+  }
+
+  function stopProgressPolling() {
+    if (progressTimer) { clearTimeout(progressTimer); progressTimer = null; }
+  }
+
+  function _doProgressPoll(projectName, bubble) {
+    if (!projectName) return;
+    if (Date.now() - progressStart > MAX_POLL_MS) return;
+
+    fetchAndRenderProgress(projectName, bubble, false)
+      .then(() => { progressFails = 0; })
+      .catch(() => {
+        progressFails++;
+        if (progressFails >= MAX_POLL_FAIL) return;
+      })
+      .finally(() => {
+        // 仍在生成中则继续轮询
+        if (isGenerating && progressFails < MAX_POLL_FAIL) {
+          progressTimer = setTimeout(() => _doProgressPoll(projectName, bubble), POLL_INTERVAL);
+        }
+      });
+  }
+
+  async function fetchAndRenderProgress(projectName, bubble, forceStopLast) {
+    if (!projectName || !bubble) return;
+    const data = await api(`/api/chart/progress/${projectName}`);
+    const records = data.records || [];
+    const flow = bubble.querySelector('.status-flow');
+    if (!flow) return;
+    renderStatusFlow(flow, records, !!forceStopLast);
+  }
+
+  /**
+   * 渲染状态链：从 records 中提取非 user_turn/model_turn 的状态，
+   * 按顺序排列，已完成的状态（后面还有其他状态）显示为完成态，
+   * 最后一个状态：forceStopLast=false 时显示扫描动画，true 时显示完成。
+   */
+  function renderStatusFlow(flowEl, records, forceStopLast) {
+    // 提取所有工具状态（去重连续重复）
+    const statuses = [];
+    for (const r of records) {
+      const s = (r.status || '').trim();
+      if (!s || s === 'user_turn' || s === 'model_turn') continue;
+      if (!statuses.length || statuses[statuses.length - 1] !== s) {
+        statuses.push(s);
+      }
+    }
+    if (!statuses.length) {
+      flowEl.style.display = 'none';
+      return;
+    }
+
+    flowEl.style.display = 'flex';
+    flowEl.innerHTML = statuses.map((s, i) => {
+      const isLast = i === statuses.length - 1;
+      // 最后一个：forceStopLast 时完成，否则扫描动画
+      // 非最后一个：始终显示为完成态
+      const running = isLast && !forceStopLast;
+      const cls = running ? 'tool-badge tool-badge--running' : 'tool-badge';
+      const arrow = i < statuses.length - 1
+        ? '<span class="status-arrow">→</span>'
+        : '';
+      return `<span class="${cls}" data-tool="status">${escHtml(s)}</span>${arrow}`;
+    }).join('');
+  }
+
+  // ── 任务完成轮询 ─────────────────────────────────────────
+  /**
+   * 轮询 /api/chart/jobs/<jobId> 直到完成或失败。
+   * onProjectKnown 回调：当从 job 中获得 project_name 时调用。
+   */
+  async function pollChartJob(jobId, onProjectKnown) {
     if (!jobId) throw new Error('未获得 job_id');
     const started = Date.now();
     let fails = 0;
+    let reportedProject = null;
+
     while (Date.now() - started <= MAX_POLL_MS) {
       try {
         const job = await api(`/api/chart/jobs/${jobId}`);
+
+        // 一旦获得 project_name，通知外层更新进度轮询目标
+        const jp = job.project_name || (job.data && job.data.project_name);
+        if (jp && jp !== reportedProject) {
+          reportedProject = jp;
+          onProjectKnown && onProjectKnown(jp);
+        }
+
         if (job.status === 'completed') {
           return job.data || {};
         }
         if (job.status === 'failed') {
           throw new Error(job.error || '任务失败');
         }
-        await sleep(POLL_INTERVAL);
+        await sleep(JOB_POLL_INTERVAL);
       } catch (e) {
         const transient = /HTTP 502|HTTP 504|HTTP 429/i.test(String(e.message || ''));
         if (!transient) throw e;
-        fails += 1;
-        if (fails >= MAX_POLL_FAIL) {
-          throw new Error('任务轮询失败次数过多，请稍后重试');
-        }
-        await sleep(POLL_INTERVAL);
+        fails++;
+        if (fails >= MAX_POLL_FAIL) throw new Error('任务轮询失败次数过多，请稍后重试');
+        await sleep(JOB_POLL_INTERVAL);
       }
     }
     throw new Error('任务轮询超时，请稍后重试');
-  }
-
-  async function fetchAndRenderProgress(projectName, bubble, forceStopLast) {
-    if (!projectName || !bubble) return;
-    const data = await api(`/api/chart/live/${projectName}`);
-    const flow = bubble.querySelector('.status-flow');
-    if (!flow) return;
-    renderStatusFlow(flow, data.statuses || [], !!forceStopLast || !!data.is_done);
-  }
-
-  function renderStatusFlow(flowEl, statuses, forceStopLast) {
-    if (!statuses.length) {
-      flowEl.style.display = 'none';
-      return;
-    }
-
-    const sig = statuses.map(s => `${s.label}:${s.state}`).join('|') + '|' + (forceStopLast ? 'done' : 'run');
-    if (sig === lastStatusSig && flowEl.dataset.rendered === '1') return;
-    lastStatusSig = sig;
-
-    flowEl.style.display = 'flex';
-    flowEl.dataset.rendered = '1';
-    flowEl.innerHTML = statuses.map((s, i) => {
-      const running = s.state === 'running' && !forceStopLast;
-      const cls = running ? 'tool-badge tool-badge--running' : 'tool-badge';
-      const arrow = i < statuses.length - 1 ? '<span class=\"status-arrow\">→</span>' : '';
-      return `<span class=\"${cls}\" data-tool=\"status\">${escHtml(s.label || '')}</span>${arrow}`;
-    }).join('');
   }
 
   // ── 灯箱 ─────────────────────────────────────────────────
@@ -653,18 +718,9 @@
     });
   }
 
-  // ── 轮询（用于展示进度状态，可选） ──────────────────────
-  function stopPolling() {
-    if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
-  }
-
   // ── 工具 ─────────────────────────────────────────────────
   function scrollToBottom() {
     chatMessages.scrollTop = chatMessages.scrollHeight;
-  }
-
-  function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   function showError(msg) {

@@ -3,6 +3,7 @@ Hydrogen Chart API Blueprint
 代理转发 chart_agent/main.py 的 FastAPI 服务（端口 9621）。
 维护用户-项目历史 JSON 表：instance/chart_histories/user_{id}.json
 图片通过 Cloudinary 图床中转，前端直接使用 CDN URL 渲染。
+CDN URL 持久化回写到 chart_agent 的 session.jsonl，保证历史记录可用。
 """
 import json
 import os
@@ -21,7 +22,7 @@ chart_api_bp = Blueprint("chart_api", __name__, url_prefix="/api/chart")
 
 # ── chart_agent 服务地址 ──────────────────────────────────────
 _CA_BASE    = os.getenv("CHART_AGENT_BASE_URL", "http://localhost:9621")
-_CA_TIMEOUT = int(os.getenv("CHART_AGENT_TIMEOUT", "180"))   # AI 生成可能较慢
+_CA_TIMEOUT = int(os.getenv("CHART_AGENT_TIMEOUT", "180"))
 _CHART_REQUEST_TIMEOUT_SECONDS = int(os.getenv("HYDROGEN_CHART_REQUEST_TIMEOUT_SECONDS", "240"))
 
 # ── Cloudinary 配置 ───────────────────────────────────────────
@@ -31,7 +32,6 @@ _CLOUDINARY_URL = os.getenv(
 )
 
 def _parse_cloudinary_url(url: str):
-    """解析 cloudinary://api_key:api_secret@cloud_name"""
     m = re.match(r"cloudinary://([^:]+):([^@]+)@(.+)", url or "")
     if not m:
         return None, None, None
@@ -44,124 +44,201 @@ _JOBS = {}
 _JOBS_LOCK = threading.Lock()
 _EXECUTOR = ThreadPoolExecutor(max_workers=4)
 
+# ── chart_agent projects 目录（用于回写 jsonl） ───────────────
+def _find_chart_agent_projects_dir() -> Path:
+    """定位 chart_agent/projects 目录（相对于本文件向上查找）"""
+    for p in Path(__file__).resolve().parents:
+        cand = p / "chart_agent" / "projects"
+        if cand.exists():
+            return cand
+    return None
 
-def _new_project_name() -> str:
-    return datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+_CHART_PROJECTS_DIR = _find_chart_agent_projects_dir()
 
 
-def _upload_to_cloudinary(image_url_on_agent: str) -> str:
-    """
-    将 chart_agent 返回的相对图片 URL 下载后上传到 Cloudinary，
-    返回 Cloudinary CDN URL。失败时返回原始 URL。
-    """
-    if not _CL_CLOUD_NAME:
-        return image_url_on_agent
-
-    # 拼接 chart_agent 的完整图片地址
-    full_url = _CA_BASE.rstrip("/") + "/" + image_url_on_agent.lstrip("/")
-    try:
-        img_resp = requests.get(full_url, timeout=30)
-        if not img_resp.ok:
-            return image_url_on_agent
-        img_bytes = img_resp.content
-    except Exception:
-        return image_url_on_agent
-
-    # 上传到 Cloudinary（使用 Basic Auth）
-    upload_url = f"https://api.cloudinary.com/v1_1/{_CL_CLOUD_NAME}/image/upload"
-    try:
-        import base64 as _b64
-        resp = requests.post(
-            upload_url,
-            auth=(_CL_API_KEY, _CL_API_SECRET),
-            files={"file": ("chart.png", img_bytes, "image/png")},
-            data={"upload_preset": "ml_default"} if False else {},
-            timeout=30,
-        )
-        if resp.ok:
-            return resp.json().get("secure_url", image_url_on_agent)
-    except Exception:
-        pass
-
-    # 降级：直接返回 chart_agent 的完整 URL
-    return full_url
-
+# ═══════════════════════════════════════════════════════════
+# Cloudinary 图片上传
+# ═══════════════════════════════════════════════════════════
 
 def _build_agent_image_url(project_name: str, image_ref: str) -> str:
-    """
-    将 chart_agent 的图片引用（可能是绝对路径/相对路径/文件名）转换为可访问 URL。
-    """
+    """将 chart_agent 的图片引用转换为可访问 URL"""
     if not image_ref:
         return image_ref
     ref = str(image_ref).strip()
     if ref.startswith("http://") or ref.startswith("https://"):
         return ref
-
-    # 已经是 /projects/... 形式
     if ref.startswith("/projects/"):
         return _CA_BASE.rstrip("/") + ref
-
-    # 绝对路径里包含 /projects/<project_name>/...
     marker = f"/projects/{project_name}/"
     if marker in ref:
         tail = ref.split(marker, 1)[1].replace("\\", "/")
         return f"{_CA_BASE.rstrip('/')}/projects/{project_name}/{tail}"
-
-    # 最后降级：当成项目目录下文件名
     name = Path(ref).name
     return f"{_CA_BASE.rstrip('/')}/projects/{project_name}/{name}"
 
 
+def _upload_to_cloudinary(image_url_on_agent: str) -> str:
+    """
+    下载图片并上传到 Cloudinary，返回 CDN URL。
+    失败时返回原始完整 URL（确保外网可访问）。
+    """
+    if not image_url_on_agent:
+        return image_url_on_agent
+
+    # 已经是 CDN URL
+    if "cloudinary.com" in image_url_on_agent or "res.cloudinary.com" in image_url_on_agent:
+        return image_url_on_agent
+
+    # 确保是完整 URL
+    if image_url_on_agent.startswith("/"):
+        full_url = _CA_BASE.rstrip("/") + image_url_on_agent
+    elif not image_url_on_agent.startswith("http"):
+        full_url = _CA_BASE.rstrip("/") + "/" + image_url_on_agent.lstrip("/")
+    else:
+        full_url = image_url_on_agent
+
+    if not _CL_CLOUD_NAME:
+        return full_url
+
+    try:
+        img_resp = requests.get(full_url, timeout=30)
+        if not img_resp.ok:
+            return full_url
+        img_bytes = img_resp.content
+    except Exception:
+        return full_url
+
+    upload_url = f"https://api.cloudinary.com/v1_1/{_CL_CLOUD_NAME}/image/upload"
+    try:
+        resp = requests.post(
+            upload_url,
+            auth=(_CL_API_KEY, _CL_API_SECRET),
+            files={"file": ("chart.png", img_bytes, "image/png")},
+            timeout=30,
+        )
+        if resp.ok:
+            cdn = resp.json().get("secure_url", "")
+            if cdn:
+                return cdn
+    except Exception:
+        pass
+
+    return full_url
+
+
+def _convert_image_refs_to_cdn(project_name: str, image_refs: list) -> list:
+    """批量将图片引用转为 CDN URL"""
+    result = []
+    for ref in (image_refs or []):
+        agent_url = _build_agent_image_url(project_name, ref)
+        cdn_url = _upload_to_cloudinary(agent_url)
+        result.append(cdn_url)
+    return result
+
+
+# ═══════════════════════════════════════════════════════════
+# jsonl 回写（持久化 CDN URL）
+# ═══════════════════════════════════════════════════════════
+
+def _rewrite_jsonl_cdn_urls(project_name: str):
+    """
+    扫描 session.jsonl，将 model_turn / 图表生成完成 记录中的本地路径
+    替换为 Cloudinary CDN URL，并回写文件。
+    只处理尚未替换过的条目（不含 cloudinary.com 的路径）。
+    """
+    if not _CHART_PROJECTS_DIR:
+        return
+    jsonl_path = _CHART_PROJECTS_DIR / project_name / "session.jsonl"
+    if not jsonl_path.exists():
+        return
+
+    lines = jsonl_path.read_text(encoding="utf-8").splitlines()
+    changed = False
+    new_lines = []
+
+    for line in lines:
+        line = line.strip()
+        if not line:
+            new_lines.append(line)
+            continue
+        try:
+            record = json.loads(line)
+        except Exception:
+            new_lines.append(line)
+            continue
+
+        status = record.get("status", "")
+
+        # model_turn: files 字段
+        if status == "model_turn":
+            files = record.get("files") or []
+            needs_update = any(
+                f and "cloudinary.com" not in str(f)
+                for f in files
+            )
+            if needs_update:
+                cdn_files = _convert_image_refs_to_cdn(project_name, files)
+                # 只保留最后一张（用户要求每轮只展示最后一张）
+                record["files"] = cdn_files
+                record["render_file"] = cdn_files[-1] if cdn_files else ""
+                changed = True
+
+        # 图表生成完成: image_paths 字段
+        if status == "图表生成完成":
+            image_paths = record.get("image_paths") or []
+            needs_update = any(
+                p and "cloudinary.com" not in str(p)
+                for p in image_paths
+            )
+            if needs_update:
+                cdn_paths = _convert_image_refs_to_cdn(project_name, image_paths)
+                record["image_paths"] = cdn_paths
+                changed = True
+
+        new_lines.append(json.dumps(record, ensure_ascii=False))
+
+    if changed:
+        jsonl_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
+
+
+# ═══════════════════════════════════════════════════════════
+# 进度记录规范化（供 /progress 接口使用）
+# ═══════════════════════════════════════════════════════════
+
 def _normalize_progress_records(project_name: str, records: list) -> list:
     """
-    统一进度记录中的图片字段，确保前端拿到的是可访问 URL（优先 Cloudinary）。
+    规范化进度记录：
+    - model_turn: 只取最后一张图片，优先使用已持久化的 render_file
+    - 其他状态: 透传
     """
     normalized = []
-    for r in records or []:
+    for r in (records or []):
         item = dict(r)
-        src_files = item.get("files") or item.get("image_paths") or []
-        render_files = []
-        for f in src_files:
-            agent_url = _build_agent_image_url(project_name, f)
-            # 再上传/转换到 Cloudinary，保证外网可访问
-            cdn_url = _upload_to_cloudinary(agent_url)
-            render_files.append(cdn_url)
-        if render_files:
-            # 仅保留最后生成的一张图，避免单条回复堆叠多图
-            item["render_files"] = [render_files[-1]]
-            if item.get("status") == "model_turn":
-                # 历史记录渲染统一走图床链接
-                item["files"] = [render_files[-1]]
+        status = item.get("status", "")
+
+        if status == "model_turn":
+            # 优先用已回写的 render_file（CDN URL）
+            render_file = item.get("render_file", "")
+            if render_file and "cloudinary.com" in render_file:
+                item["render_files"] = [render_file]
+            else:
+                # 回退：取 files 最后一个并转 CDN
+                files = item.get("files") or []
+                if files:
+                    last = files[-1]
+                    agent_url = _build_agent_image_url(project_name, last)
+                    cdn_url = _upload_to_cloudinary(agent_url)
+                    item["render_files"] = [cdn_url]
+                else:
+                    item["render_files"] = []
+
         normalized.append(item)
     return normalized
 
 
-def _build_live_status_payload(project_name: str, records: list) -> dict:
-    """构建实时状态链：之前状态为 done，最后一个状态为 running（直到产出 model_turn）。"""
-    status_list = []
-    has_model_turn = any((r.get("status") == "model_turn") for r in records or [])
-    latest_model = None
-    for r in records or []:
-        st = (r.get("status") or "").strip()
-        if st and st not in ("user_turn", "model_turn"):
-            if not status_list or status_list[-1]["label"] != st:
-                status_list.append({"label": st, "state": "done"})
-        if r.get("status") == "model_turn":
-            latest_model = {
-                "text": r.get("text", ""),
-                "files": (r.get("render_files") or r.get("files") or [])[:1],
-            }
-    if status_list:
-        status_list[-1]["state"] = "done" if has_model_turn else "running"
-    return {
-        "project_name": project_name,
-        "statuses": status_list,
-        "is_done": bool(has_model_turn),
-        "latest_model": latest_model,
-    }
-
-
-# ── 用户历史记录文件 ──────────────────────────────────────────
+# ═══════════════════════════════════════════════════════════
+# 用户历史记录
+# ═══════════════════════════════════════════════════════════
 
 def _history_file(user_id: int) -> Path:
     base = Path(__file__).parent.parent.parent / "instance" / "chart_histories"
@@ -223,7 +300,9 @@ def _delete_project_history(user_id: int, project_name: str):
         _save_history(user_id, data)
 
 
-# ── 代理请求工具 ──────────────────────────────────────────────
+# ═══════════════════════════════════════════════════════════
+# 代理请求工具
+# ═══════════════════════════════════════════════════════════
 
 def _proxy_get(path: str, params: dict = None):
     try:
@@ -258,7 +337,7 @@ def _prepare_forwarded_files():
 
 
 def _process_chat_response(user_id: int, user_input: str, resp_json: dict) -> dict:
-    """统一处理 chart_agent 返回，补齐用户历史与 Cloudinary 图片。"""
+    """统一处理 chart_agent 返回：维护用户历史、转换图片为 CDN URL、回写 jsonl。"""
     data = dict(resp_json or {})
     returned_project = data.get("project_name", "")
 
@@ -270,15 +349,30 @@ def _process_chat_response(user_id: int, user_input: str, resp_json: dict) -> di
         else:
             _touch_project(user_id, returned_project)
 
-    # 将图片上传到 Cloudinary，替换为 CDN URL
+    # 将图片上传到 Cloudinary，只保留最后一张
     raw_image_urls = data.get("image_urls") or []
     cdn_image_urls = []
     for img_url in raw_image_urls:
         cdn_url = _upload_to_cloudinary(img_url)
         cdn_image_urls.append(cdn_url)
+
+    # 只保留最后一张
     data["image_urls"] = [cdn_image_urls[-1]] if cdn_image_urls else []
+
+    # 回写 jsonl，持久化 CDN URL（异步，不阻塞响应）
+    if returned_project:
+        threading.Thread(
+            target=_rewrite_jsonl_cdn_urls,
+            args=(returned_project,),
+            daemon=True,
+        ).start()
+
     return data
 
+
+# ═══════════════════════════════════════════════════════════
+# 异步任务执行
+# ═══════════════════════════════════════════════════════════
 
 def _run_chart_job(job_id: str, user_id: int, user_input: str, project_name: str, forwarded_files: list):
     """后台执行 chart_agent 请求，完成后写入任务表。"""
@@ -289,6 +383,7 @@ def _run_chart_job(job_id: str, user_id: int, user_input: str, project_name: str
     with _JOBS_LOCK:
         _JOBS[job_id] = {
             "status": "running",
+            "project_name": project_name,
             "created_at": datetime.now().isoformat(),
             "updated_at": datetime.now().isoformat(),
             "error": None,
@@ -311,6 +406,7 @@ def _run_chart_job(job_id: str, user_id: int, user_input: str, project_name: str
         with _JOBS_LOCK:
             _JOBS[job_id]["status"] = "completed"
             _JOBS[job_id]["updated_at"] = datetime.now().isoformat()
+            _JOBS[job_id]["project_name"] = payload.get("project_name", project_name)
             _JOBS[job_id]["data"] = payload
     except FuturesTimeoutError:
         with _JOBS_LOCK:
@@ -324,7 +420,9 @@ def _run_chart_job(job_id: str, user_id: int, user_input: str, project_name: str
             _JOBS[job_id]["error"] = str(e)
 
 
-# ── API 路由 ──────────────────────────────────────────────────
+# ═══════════════════════════════════════════════════════════
+# API 路由
+# ═══════════════════════════════════════════════════════════
 
 @chart_api_bp.route("/projects", methods=["GET"])
 @login_required
@@ -337,11 +435,7 @@ def list_projects():
 @chart_api_bp.route("/chat", methods=["POST"])
 @login_required
 def chat():
-    """
-    发送消息（支持文件上传）。
-    首次调用不传 project_name，服务端创建新项目并返回。
-    后续多轮对话传入 project_name。
-    """
+    """同步发送消息（兼容旧前端）"""
     user_input   = (request.form.get("user_input") or "").strip()
     project_name = (request.form.get("project_name") or "").strip() or None
 
@@ -349,7 +443,6 @@ def chat():
         return jsonify({"error": "消息不能为空"}), 400
 
     forwarded_files = _prepare_forwarded_files()
-
     form_data = {"user_input": user_input}
     if project_name:
         form_data["project_name"] = project_name
@@ -367,10 +460,7 @@ def chat():
             detail = resp.text[:400]
         return jsonify({"error": f"Chart Agent 服务错误：{detail}"}), resp.status_code
 
-    data = resp.json()
-    returned_project = data.get("project_name", "")
-
-    data = _process_chat_response(current_user.id, user_input, data)
+    data = _process_chat_response(current_user.id, user_input, resp.json())
     return jsonify(data)
 
 
@@ -378,16 +468,13 @@ def chat():
 @login_required
 def chat_async():
     """
-    异步提交图表任务，立即返回 job_id，前端轮询 /api/chart/jobs/<job_id> 获取结果。
-    避免外网网关对长请求返回 502。
+    异步提交图表任务，立即返回 job_id 和 project_name（已知时）。
+    前端轮询 /api/chart/jobs/<job_id> 获取结果。
     """
     user_input = (request.form.get("user_input") or "").strip()
     project_name = (request.form.get("project_name") or "").strip() or None
     if not user_input:
         return jsonify({"error": "消息不能为空"}), 400
-    if not project_name:
-        # 立即分配项目名，便于前端立刻轮询 jsonl 进度
-        project_name = _new_project_name()
 
     forwarded_files = _prepare_forwarded_files()
     job_id = uuid.uuid4().hex[:16]
@@ -402,6 +489,7 @@ def chat_async():
 @chart_api_bp.route("/jobs/<job_id>", methods=["GET"])
 @login_required
 def get_job(job_id):
+    """轮询任务状态"""
     with _JOBS_LOCK:
         job = _JOBS.get(job_id)
         if not job:
@@ -410,6 +498,7 @@ def get_job(job_id):
         payload = {
             "job_id": job_id,
             "status": status,
+            "project_name": job.get("project_name"),
             "created_at": job.get("created_at"),
             "updated_at": job.get("updated_at"),
             "error": job.get("error"),
@@ -422,14 +511,32 @@ def get_job(job_id):
 @chart_api_bp.route("/progress/<project_name>", methods=["GET"])
 @login_required
 def get_progress(project_name):
-    """轮询执行记录（jsonl 条目列表）"""
+    """
+    轮询执行记录（jsonl 条目列表）。
+    直接读取本地 jsonl 文件（比代理到 chart_agent 更快更稳定）。
+    """
+    # 优先直接读本地 jsonl，避免 502
+    if _CHART_PROJECTS_DIR:
+        jsonl_path = _CHART_PROJECTS_DIR / project_name / "session.jsonl"
+        if jsonl_path.exists():
+            records = []
+            for line in jsonl_path.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if line:
+                    try:
+                        records.append(json.loads(line))
+                    except Exception:
+                        pass
+            normalized = _normalize_progress_records(project_name, records)
+            return jsonify({"project_name": project_name, "records": normalized})
+
+    # 降级：代理到 chart_agent
     resp = _proxy_get(f"/progress/{project_name}")
     if resp is None:
         return jsonify({"error": "无法连接到 Chart Agent 服务"}), 503
     if resp.status_code == 404:
         return jsonify({"error": "项目不存在"}), 404
     if resp.status_code != 200:
-        # 将上游错误细节透传，便于前端定位问题
         try:
             detail = resp.json().get("detail", resp.text[:300])
         except Exception:
@@ -439,30 +546,6 @@ def get_progress(project_name):
     data = resp.json()
     data["records"] = _normalize_progress_records(project_name, data.get("records") or [])
     return jsonify(data)
-
-
-@chart_api_bp.route("/live/<project_name>", methods=["GET"])
-@login_required
-def get_live(project_name):
-    """
-    实时状态轮询接口（用于前端 status 链动画）。
-    返回绝对可渲染图片链接、状态链、是否完成、最新模型回复摘要。
-    """
-    resp = _proxy_get(f"/progress/{project_name}")
-    if resp is None:
-        return jsonify({"error": "无法连接到 Chart Agent 服务"}), 503
-    if resp.status_code == 404:
-        return jsonify({"error": "项目不存在"}), 404
-    if resp.status_code != 200:
-        try:
-            detail = resp.json().get("detail", resp.text[:300])
-        except Exception:
-            detail = resp.text[:300]
-        return jsonify({"error": f"获取实时状态失败：{detail}"}), resp.status_code
-
-    data = resp.json()
-    records = _normalize_progress_records(project_name, data.get("records") or [])
-    return jsonify(_build_live_status_payload(project_name, records))
 
 
 @chart_api_bp.route("/projects/<project_name>", methods=["DELETE"])

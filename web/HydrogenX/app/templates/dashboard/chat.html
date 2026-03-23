@@ -164,8 +164,20 @@
     const text = await res.text();
     let data = {};
     try { data = text ? JSON.parse(text) : {}; } catch (_) {}
-    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+    if (!res.ok) {
+      const err = new Error(data.error || `HTTP ${res.status}`);
+      err.status = res.status;
+      throw err;
+    }
     return data;
+  }
+
+  async function getSessionMessagesSafe(sid) {
+    try {
+      return await api(`/api/chat/sessions/${sid}/messages`, { method: 'GET' });
+    } catch (_) {
+      return null;
+    }
   }
 
   function escHtml(s) {
@@ -541,6 +553,7 @@
 
     // 显示用户消息
     appendMessage('user', text, [], fileNames, true);
+    const sentAtMs = Date.now();
 
     // 发送请求
     showThinking();
@@ -587,33 +600,103 @@
         }
         let lastEventCount = 0;
         const startedAt = Date.now();
-        const POLL_INTERVAL_MS = 600;
-        const POLL_TIMEOUT_MS = 120000;
+        const POLL_INTERVAL_MS = 700;
+        const POLL_TIMEOUT_MS = 240000;
+        let pollFailureCount = 0;
+        const MAX_POLL_FAILURES = 15;
 
         while (true) {
-          const job = await api(`/api/chat/jobs/${jobId}`, { method: 'GET' });
-          const events = job.tool_events || [];
-          if (events.length > lastEventCount) {
-            for (let i = lastEventCount; i < events.length; i++) {
-              const ev = events[i];
-              upsertToolBadge(ev.tool_name, ev.status);
+          let job = null;
+          try {
+            job = await api(`/api/chat/jobs/${jobId}`, { method: 'GET' });
+            pollFailureCount = 0;
+          } catch (pollErr) {
+            pollFailureCount += 1;
+            // 网关偶发 502 时不要立刻失败，先重试
+            if (pollErr.status === 502 || pollErr.status === 504) {
+              // 每隔几次尝试从会话消息兜底读取最终结果
+              if (pollFailureCount % 3 === 0) {
+                const fallback = await getSessionMessagesSafe(currentSessionId);
+                if (fallback?.messages?.length) {
+                  const msgs = fallback.messages;
+                  const lastAssistant = [...msgs].reverse().find(m => m.role === 'assistant' && (m.content || '').trim());
+                  if (lastAssistant) {
+                    const tsMs = lastAssistant.timestamp ? Date.parse(lastAssistant.timestamp) : NaN;
+                    // 仅接受当前这次发送之后生成的回复，避免拿到旧回复
+                    if (!Number.isNaN(tsMs) && tsMs >= (sentAtMs - 1500)) {
+                      data = {
+                        response: lastAssistant.content || '',
+                        tool_calls: lastAssistant.tool_calls || [],
+                        title: fallback.title || null,
+                      };
+                      break;
+                    }
+                  }
+                }
+              }
+              if (pollFailureCount > MAX_POLL_FAILURES) {
+                // 最后再尝试一次兜底拉取
+                const fallback = await getSessionMessagesSafe(currentSessionId);
+                if (fallback?.messages?.length) {
+                  const msgs = fallback.messages;
+                  const lastAssistant = [...msgs].reverse().find(m => m.role === 'assistant' && (m.content || '').trim());
+                  if (lastAssistant) {
+                    data = {
+                      response: lastAssistant.content || '',
+                      tool_calls: lastAssistant.tool_calls || [],
+                      title: fallback.title || null,
+                    };
+                    break;
+                  }
+                }
+                throw new Error('任务已提交，但轮询状态多次失败（网关波动）。请稍后刷新对话查看结果。');
+              }
+              await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
+              continue;
             }
-            lastEventCount = events.length;
+            // 非网关错误，直接抛出
+            throw pollErr;
           }
 
-          if (job.status === 'done') {
-            data = {
-              response: job.response || '',
-              tool_calls: job.tool_calls || [],
-              title: job.title || null,
-            };
-            break;
+          if (job) {
+            const events = job.tool_events || [];
+            if (events.length > lastEventCount) {
+              for (let i = lastEventCount; i < events.length; i++) {
+                const ev = events[i];
+                upsertToolBadge(ev.tool_name, ev.status);
+              }
+              lastEventCount = events.length;
+            }
+
+            if (job.status === 'done') {
+              data = {
+                response: job.response || '',
+                tool_calls: job.tool_calls || [],
+                title: job.title || null,
+              };
+              break;
+            }
+            if (job.status === 'error') {
+              throw new Error(job.error || '请求失败');
+            }
           }
-          if (job.status === 'error') {
-            throw new Error(job.error || '请求失败');
-          }
+
           if (Date.now() - startedAt > POLL_TIMEOUT_MS) {
-            throw new Error('请求轮询超时，请稍后重试');
+            // 超时前做一次兜底拉取，避免“实际成功但轮询失败”
+            const fallback = await getSessionMessagesSafe(currentSessionId);
+            if (fallback?.messages?.length) {
+              const msgs = fallback.messages;
+              const lastAssistant = [...msgs].reverse().find(m => m.role === 'assistant' && (m.content || '').trim());
+              if (lastAssistant) {
+                data = {
+                  response: lastAssistant.content || '',
+                  tool_calls: lastAssistant.tool_calls || [],
+                  title: fallback.title || null,
+                };
+                break;
+              }
+            }
+            throw new Error('请求轮询超时，请稍后刷新对话。');
           }
           await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
         }

@@ -10,6 +10,7 @@ import os
 import sys
 import threading
 import uuid
+from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -47,6 +48,7 @@ chat_api_bp = Blueprint("chat_api", __name__, url_prefix="/api/chat")
 GEMINI_BASE_URL = os.getenv("GEMINI_BASE_URL", "http://localhost:6773")
 GEMINI_API_KEY  = os.getenv("GEMINI_API_KEY", "placeholder")
 CHAT_MODEL      = os.getenv("CHAT_MODEL", "gemini-3.1-pro-preview-customtools")
+CHAT_REQUEST_TIMEOUT_SECONDS = int(os.getenv("HYDROGEN_CHAT_REQUEST_TIMEOUT_SECONDS", "180"))
 
 # ── 每用户历史文件路径 ────────────────────────────────────────
 def _history_file(user_id: int) -> Path:
@@ -400,6 +402,11 @@ def send_message():
             except Exception as e:
                 current_app.logger.warning("文件处理失败 %s: %s", uf.filename, e)
 
+    # 会话必须存在
+    sessions = _get_all_sessions(uid)
+    if not any(s["id"] == session_id for s in sessions):
+        return jsonify({"error": "会话不存在或已被删除，请新建会话后重试。"}), 404
+
     # 获取历史消息（不含本次）
     history = _get_session_messages(uid, session_id)
 
@@ -409,12 +416,33 @@ def send_message():
         "tool_calls": []
     })
 
-    # 生成回复
+    # 生成回复（增加超时保护，避免反向代理 502）
+    executor = ThreadPoolExecutor(max_workers=1)
     try:
-        result = _generate_response(message, history, file_parts)
+        future = executor.submit(_generate_response, message, history, file_parts)
+        result = future.result(timeout=CHAT_REQUEST_TIMEOUT_SECONDS)
+    except TimeoutError:
+        current_app.logger.warning(
+            "Hydrogen Chat timeout: session=%s user=%s timeout=%ss",
+            session_id,
+            uid,
+            CHAT_REQUEST_TIMEOUT_SECONDS,
+        )
+        executor.shutdown(wait=False, cancel_futures=True)
+        return jsonify(
+            {
+                "error": (
+                    f"请求处理超时（>{CHAT_REQUEST_TIMEOUT_SECONDS}s）。"
+                    "请精简问题或稍后重试。"
+                )
+            }
+        ), 504
     except Exception as e:
         current_app.logger.exception("生成回复失败")
+        executor.shutdown(wait=False, cancel_futures=True)
         return jsonify({"error": f"生成回复失败: {str(e)}"}), 500
+    finally:
+        executor.shutdown(wait=False, cancel_futures=True)
 
     full_response = result["response"]
     used_tools    = result["tool_calls"]

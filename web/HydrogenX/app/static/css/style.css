@@ -1400,6 +1400,19 @@ a { color: inherit; text-decoration: none; }
   font-size: 0.78rem;
   font-weight: 600;
   animation: toolPulse 1.5s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+.tool-badge--running::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -40%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  animation: toolScan 1.1s linear infinite;
 }
 
 .tool-badge--done {
@@ -1412,6 +1425,11 @@ a { color: inherit; text-decoration: none; }
 @keyframes toolPulse {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.65; }
+}
+
+@keyframes toolScan {
+  from { left: -40%; }
+  to { left: 120%; }
 }
 
 .tool-badge-icon { font-size: 0.85rem; }

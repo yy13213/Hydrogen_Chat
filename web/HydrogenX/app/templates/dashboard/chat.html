@@ -435,29 +435,49 @@
   }
 
   // ── Tool call badge (live) ────────────────────────────────
-  function showToolBadge(toolName) {
+  const renderedToolState = new Map();
+
+  function ensureToolBadgeRow() {
+    let row = document.getElementById('tool-badge-row');
+    if (!row) {
+      row = document.createElement('div');
+      row.className = 'msg-row msg-row--ai';
+      row.id = 'tool-badge-row';
+      row.innerHTML = `
+        <div class="msg-avatar msg-avatar--ai">⚡</div>
+        <div class="msg-body" id="tool-badge-body"></div>
+      `;
+      messagesInner.appendChild(row);
+    }
+    return row;
+  }
+
+  function upsertToolBadge(toolName, status) {
     removeThinking();
     const icons = { search_web:'🔍', query_knowledge_base:'📚', query_database:'🗄️' };
     const icon = icons[toolName] || '🔧';
-    const row = document.createElement('div');
-    row.className = 'msg-row msg-row--ai';
-    row.id = 'tool-badge-row';
-    row.innerHTML = `
-      <div class="msg-avatar msg-avatar--ai">⚡</div>
-      <div class="msg-body">
-        <div class="tool-badge">
-          <span class="tool-badge-icon">${icon}</span>
-          正在调用: <strong>${escHtml(toolName)}</strong>...
-        </div>
-      </div>
-    `;
-    messagesInner.appendChild(row);
+    const row = ensureToolBadgeRow();
+    const body = row.querySelector('#tool-badge-body');
+    const badgeId = `tool-badge-${toolName}`;
+    let badge = row.querySelector(`#${badgeId}`);
+    const isDone = status === 'done';
+    const text = isDone ? '已调用' : '正在调用';
+    const cls = isDone ? 'tool-badge tool-badge--done' : 'tool-badge tool-badge--running';
+    if (!badge) {
+      badge = document.createElement('div');
+      badge.id = badgeId;
+      body.appendChild(badge);
+    }
+    badge.className = cls;
+    badge.innerHTML = `<span class="tool-badge-icon">${icon}</span>${text}: <strong>${escHtml(toolName)}</strong>${isDone ? '' : '...'}`;
+    renderedToolState.set(toolName, status);
     scrollToBottom();
   }
 
   function removeToolBadge() {
     const el = document.getElementById('tool-badge-row');
     if (el) el.remove();
+    renderedToolState.clear();
   }
 
   // ── Simulated streaming output ────────────────────────────
@@ -532,14 +552,53 @@
       formData.append('session_id', currentSessionId);
       filesToSend.forEach(f => formData.append('files', f));
 
-      const data = await api('/api/chat/send', {
+      // 1) 创建异步任务
+      const kickoff = await api('/api/chat/send_async', {
         method: 'POST',
         body: formData,
         headers: {}
       });
+      const jobId = kickoff.job_id;
+      if (!jobId) {
+        throw new Error('未获取到任务ID');
+      }
+
+      // 2) 轮询任务进度，实时展示工具调用
+      let data = null;
+      let lastEventCount = 0;
+      const startedAt = Date.now();
+      const POLL_INTERVAL_MS = 600;
+      const POLL_TIMEOUT_MS = 120000;
+
+      while (true) {
+        const job = await api(`/api/chat/jobs/${jobId}`, { method: 'GET' });
+        const events = job.tool_events || [];
+        if (events.length > lastEventCount) {
+          for (let i = lastEventCount; i < events.length; i++) {
+            const ev = events[i];
+            upsertToolBadge(ev.tool_name, ev.status);
+          }
+          lastEventCount = events.length;
+        }
+
+        if (job.status === 'done') {
+          data = {
+            response: job.response || '',
+            tool_calls: job.tool_calls || [],
+            title: job.title || null,
+          };
+          break;
+        }
+        if (job.status === 'error') {
+          throw new Error(job.error || '请求失败');
+        }
+        if (Date.now() - startedAt > POLL_TIMEOUT_MS) {
+          throw new Error('请求轮询超时，请稍后重试');
+        }
+        await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
+      }
 
       removeThinking();
-      removeToolBadge();
 
       // 显示工具调用（已完成）
       const usedTools = data.tool_calls || [];
@@ -579,6 +638,7 @@
         loadSessions();
         // 延迟再次刷新，等待异步标题生成完成
         setTimeout(() => loadSessions(), 3000);
+        removeToolBadge();
       });
 
     } catch (e) {

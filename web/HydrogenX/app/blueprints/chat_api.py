@@ -10,6 +10,7 @@ import os
 import sys
 import threading
 import uuid
+import time
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from datetime import datetime
 from pathlib import Path
@@ -43,6 +44,10 @@ from tools import search_web, query_knowledge_base, query_database
 from history import generate_title as _generate_title_from_msgs
 
 chat_api_bp = Blueprint("chat_api", __name__, url_prefix="/api/chat")
+
+# 简单内存任务表：用于前端轮询工具调用进度
+_JOBS = {}
+_JOBS_LOCK = threading.Lock()
 
 # ── 环境变量 ────────────────────────────────────────────────
 GEMINI_BASE_URL = os.getenv("GEMINI_BASE_URL", "http://localhost:6773")
@@ -227,7 +232,13 @@ def _build_error_response(err: str) -> str:
     return f"❌ **请求失败**\n\n**错误详情：** `{err}`"
 
 
-def _generate_response(user_message: str, history: list, file_parts: list) -> dict:
+def _generate_response(
+    user_message: str,
+    history: list,
+    file_parts: list,
+    on_tool_start=None,
+    on_tool_end=None,
+) -> dict:
     """
     核心生成逻辑（同步）
     返回 {"response": str, "tool_calls": list[str]}
@@ -310,7 +321,11 @@ def _generate_response(user_message: str, history: list, file_parts: list) -> di
                 tool_args = dict(fc.args) if fc.args else {}
                 if tool_name not in used_tools:
                     used_tools.append(tool_name)
+                if on_tool_start:
+                    on_tool_start(tool_name)
                 tool_result = _call_tool_with_limit(tool_name, tool_args)
+                if on_tool_end:
+                    on_tool_end(tool_name)
                 function_response_parts.append(
                     types.Part.from_function_response(
                         name=tool_name,
@@ -326,6 +341,36 @@ def _generate_response(user_message: str, history: list, file_parts: list) -> di
 
 
 # ── Routes ──────────────────────────────────────────────────
+
+def _set_job(job_id: str, **kwargs):
+    with _JOBS_LOCK:
+        job = _JOBS.get(job_id, {})
+        job.update(kwargs)
+        _JOBS[job_id] = job
+
+
+def _append_job_tool(job_id: str, tool_name: str, status: str):
+    with _JOBS_LOCK:
+        job = _JOBS.get(job_id)
+        if not job:
+            return
+        events = job.setdefault("tool_events", [])
+        events.append(
+            {
+                "tool_name": tool_name,
+                "status": status,
+                "ts": datetime.now().isoformat(),
+            }
+        )
+        # 同时维护去重后的已调用列表（前端最终展示）
+        used = job.setdefault("tool_calls", [])
+        if tool_name not in used:
+            used.append(tool_name)
+
+
+def _get_job(job_id: str):
+    with _JOBS_LOCK:
+        return dict(_JOBS.get(job_id, {}))
 
 @chat_api_bp.get("/sessions")
 @login_required
@@ -370,6 +415,125 @@ def get_messages(session_id: str):
     return jsonify({"messages": msgs, "title": title})
 
 
+@chat_api_bp.post("/send_async")
+@login_required
+def send_message_async():
+    """
+    异步发送消息：
+    - 立即返回 job_id
+    - 前端轮询 /api/chat/jobs/<job_id> 获取工具调用进度与最终结果
+    """
+    uid = current_user.id
+    message = (request.form.get("message") or "").strip()
+    session_id = (request.form.get("session_id") or "").strip()
+
+    if not message:
+        return jsonify({"error": "消息不能为空"}), 400
+    if not session_id:
+        return jsonify({"error": "session_id 不能为空"}), 400
+
+    sessions = _get_all_sessions(uid)
+    if not any(s["id"] == session_id for s in sessions):
+        return jsonify({"error": "会话不存在或已被删除，请新建会话后重试。"}), 404
+
+    uploaded_files = request.files.getlist("files")
+    file_parts = []
+    file_names = []
+    for uf in uploaded_files:
+        if uf and uf.filename:
+            try:
+                part = _file_to_part(uf)
+                file_parts.append(part)
+                file_names.append(uf.filename)
+            except Exception as e:
+                current_app.logger.warning("文件处理失败 %s: %s", uf.filename, e)
+
+    history = _get_session_messages(uid, session_id)
+    _add_message(uid, session_id, "user", message, {"files": file_names, "tool_calls": []})
+
+    job_id = str(uuid.uuid4())
+    _set_job(
+        job_id,
+        status="running",
+        user_id=uid,
+        session_id=session_id,
+        created_at=datetime.now().isoformat(),
+        tool_events=[],
+        tool_calls=[],
+    )
+
+    def _run():
+        executor = ThreadPoolExecutor(max_workers=1)
+        try:
+            future = executor.submit(
+                _generate_response,
+                message,
+                history,
+                file_parts,
+                lambda t: _append_job_tool(job_id, t, "running"),
+                lambda t: _append_job_tool(job_id, t, "done"),
+            )
+            result = future.result(timeout=CHAT_REQUEST_TIMEOUT_SECONDS)
+            full_response = result["response"]
+            used_tools = result["tool_calls"]
+            _add_message(uid, session_id, "assistant", full_response, {"tool_calls": used_tools})
+
+            all_msgs = _get_session_messages(uid, session_id)
+            sessions2 = _get_all_sessions(uid)
+            current_title = next((s["title"] for s in sessions2 if s["id"] == session_id), "新对话")
+            new_title = None
+            if len(all_msgs) >= 2 and current_title == "新对话":
+                msgs_snapshot = all_msgs[:4]
+
+                def gen_title():
+                    t = _generate_title_from_msgs(msgs_snapshot)
+                    _update_session_title(uid, session_id, t)
+
+                threading.Thread(target=gen_title, daemon=True).start()
+            else:
+                new_title = current_title if current_title != "新对话" else None
+
+            _set_job(
+                job_id,
+                status="done",
+                response=full_response,
+                tool_calls=used_tools,
+                title=new_title,
+                done_at=datetime.now().isoformat(),
+            )
+        except TimeoutError:
+            _set_job(
+                job_id,
+                status="error",
+                error=f"请求处理超时（>{CHAT_REQUEST_TIMEOUT_SECONDS}s）。请精简问题或稍后重试。",
+                done_at=datetime.now().isoformat(),
+            )
+        except Exception as e:
+            current_app.logger.exception("异步生成回复失败")
+            _set_job(
+                job_id,
+                status="error",
+                error=f"生成回复失败: {str(e)}",
+                done_at=datetime.now().isoformat(),
+            )
+        finally:
+            executor.shutdown(wait=False, cancel_futures=True)
+
+    threading.Thread(target=_run, daemon=True).start()
+    return jsonify({"job_id": job_id}), 202
+
+
+@chat_api_bp.get("/jobs/<string:job_id>")
+@login_required
+def get_chat_job(job_id: str):
+    job = _get_job(job_id)
+    if not job:
+        return jsonify({"error": "任务不存在或已过期。"}), 404
+    if job.get("user_id") != current_user.id:
+        return jsonify({"error": "无权访问该任务。"}), 403
+    return jsonify(job)
+
+
 @chat_api_bp.post("/send")
 @login_required
 def send_message():
@@ -402,10 +566,10 @@ def send_message():
             except Exception as e:
                 current_app.logger.warning("文件处理失败 %s: %s", uf.filename, e)
 
-    # 会话必须存在
-    sessions = _get_all_sessions(uid)
-    if not any(s["id"] == session_id for s in sessions):
-        return jsonify({"error": "会话不存在或已被删除，请新建会话后重试。"}), 404
+    # # 会话必须存在
+    # sessions = _get_all_sessions(uid)
+    # if not any(s["id"] == session_id for s in sessions):
+    #     return jsonify({"error": "会话不存在或已被删除，请新建会话后重试。"}), 404
 
     # 获取历史消息（不含本次）
     history = _get_session_messages(uid, session_id)

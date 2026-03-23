@@ -184,6 +184,10 @@
     return data;
   }
 
+  function absoluteApi(path) {
+    return new URL(path, window.location.origin).href;
+  }
+
   function escHtml(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
@@ -411,7 +415,8 @@
 
       // 渲染回复
       const replyText = data.reply_text || '';
-      const imageUrls = data.image_urls || [];
+      const imageUrlsRaw = data.image_urls || [];
+      const imageUrls = imageUrlsRaw.length ? [imageUrlsRaw[imageUrlsRaw.length - 1]] : [];
 
       aiBubbleBody.innerHTML = '';
       if (replyText) {
@@ -495,10 +500,11 @@
         }
         body.appendChild(mdDiv);
       }
-      if (imageUrls.length) {
+      const finalImages = imageUrls.length ? [imageUrls[imageUrls.length - 1]] : [];
+      if (finalImages.length) {
         const imgWrap = document.createElement('div');
         imgWrap.className = 'chart-images';
-        imageUrls.forEach(url => {
+        finalImages.forEach(url => {
           const img = document.createElement('img');
           img.src = url;
           img.className = 'chart-img';
@@ -603,22 +609,15 @@
 
   async function fetchAndRenderProgress(projectName, bubble, forceStopLast) {
     if (!projectName || !bubble) return;
-    const data = await api(`/api/chart/progress/${projectName}`);
-    const records = data.records || [];
+    const data = await api(absoluteApi(`/api/chart/status/${encodeURIComponent(projectName)}`));
     const flow = bubble.querySelector('.status-flow');
     if (!flow) return;
-    renderStatusFlow(flow, records, !!forceStopLast);
+    const done = !!forceStopLast || !!data.finished;
+    renderStatusFlow(flow, data.statuses || [], done);
+    if (done) stopPolling();
   }
 
-  function renderStatusFlow(flowEl, records, forceStopLast) {
-    const statuses = [];
-    for (const r of records) {
-      const s = (r.status || '').trim();
-      if (!s || s === 'user_turn' || s === 'model_turn') continue;
-      if (!statuses.length || statuses[statuses.length - 1] !== s) {
-        statuses.push(s);
-      }
-    }
+  function renderStatusFlow(flowEl, statuses, forceStopLast) {
     if (!statuses.length) {
       flowEl.style.display = 'none';
       return;

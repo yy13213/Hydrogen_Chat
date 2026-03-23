@@ -116,6 +116,9 @@ def _normalize_progress_records(project_name: str, records: list) -> list:
     for r in records or []:
         item = dict(r)
         src_files = item.get("files") or item.get("image_paths") or []
+        # 每句对话只保留最后一张图片，避免同一气泡渲染多图
+        if isinstance(src_files, list) and src_files:
+            src_files = [src_files[-1]]
         render_files = []
         for f in src_files:
             agent_url = _build_agent_image_url(project_name, f)
@@ -126,6 +129,26 @@ def _normalize_progress_records(project_name: str, records: list) -> list:
             item["render_files"] = render_files
         normalized.append(item)
     return normalized
+
+
+def _extract_status_chain(records: list) -> list:
+    """从 jsonl 记录提取去重状态链（排除 user_turn/model_turn）。"""
+    statuses = []
+    for r in records or []:
+        s = (r.get("status") or "").strip()
+        if not s or s in ("user_turn", "model_turn"):
+            continue
+        if not statuses or statuses[-1] != s:
+            statuses.append(s)
+    return statuses
+
+
+def _is_project_finished(records: list) -> bool:
+    """判断项目本轮是否已到最终输出（出现 model_turn）。"""
+    for r in records or []:
+        if r.get("status") == "model_turn":
+            return True
+    return False
 
 
 # ── 用户历史记录文件 ──────────────────────────────────────────
@@ -239,6 +262,9 @@ def _process_chat_response(user_id: int, user_input: str, resp_json: dict) -> di
 
     # 将图片上传到 Cloudinary，替换为 CDN URL
     raw_image_urls = data.get("image_urls") or []
+    # 每句对话只保留最后一张图片
+    if isinstance(raw_image_urls, list) and raw_image_urls:
+        raw_image_urls = [raw_image_urls[-1]]
     cdn_image_urls = []
     for img_url in raw_image_urls:
         cdn_url = _upload_to_cloudinary(img_url)
@@ -403,6 +429,35 @@ def get_progress(project_name):
     data = resp.json()
     data["records"] = _normalize_progress_records(project_name, data.get("records") or [])
     return jsonify(data)
+
+
+@chart_api_bp.route("/status/<project_name>", methods=["GET"])
+@login_required
+def get_status(project_name):
+    """
+    轻量状态接口：仅返回状态链 + 完成标识，供前端高频轮询实时渲染。
+    """
+    resp = _proxy_get(f"/progress/{project_name}")
+    if resp is None:
+        return jsonify({"error": "无法连接到 Chart Agent 服务"}), 503
+    if resp.status_code == 404:
+        return jsonify({"error": "项目不存在"}), 404
+    if resp.status_code != 200:
+        try:
+            detail = resp.json().get("detail", resp.text[:300])
+        except Exception:
+            detail = resp.text[:300]
+        return jsonify({"error": f"获取状态失败：{detail}"}), resp.status_code
+
+    data = resp.json()
+    records = data.get("records") or []
+    statuses = _extract_status_chain(records)
+    finished = _is_project_finished(records)
+    return jsonify({
+        "project_name": project_name,
+        "statuses": statuses,
+        "finished": finished,
+    })
 
 
 @chart_api_bp.route("/projects/<project_name>", methods=["DELETE"])

@@ -21,3 +21,6 @@ __pycache__/
 *.swo
 *~
 Auto_GRPO/unsloth_compiled_cache
+Auto_GRPO/vllm_model
+Auto_GRPO/ollama_model_8bit
+Auto_GRPO/outputs

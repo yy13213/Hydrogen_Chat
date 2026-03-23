@@ -2227,3 +2227,640 @@ a { color: inherit; text-decoration: none; }
 /* 深色主题下 Bootstrap 组件覆盖 */
 .badge { font-weight: 600; }
 
+/* ═══════════════════════════════════════════════════════════
+   HYDROGEN RESEARCH PAGE
+   ═══════════════════════════════════════════════════════════ */
+
+/* Research 页面不需要 site-main 滚动 */
+.site-main:has(.research-page) { overflow: hidden; }
+
+/* ── 整体布局 ── */
+.research-page {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* ── 侧边栏（复用 chat-sidebar 变量） ── */
+.research-sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: var(--bg-1);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── 主内容区 ── */
+.research-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── 欢迎界面 ── */
+.research-welcome {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.research-welcome-glow {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(79,142,247,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.research-welcome-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 0 20px rgba(79,142,247,0.4));
+}
+
+.research-welcome h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+}
+
+.research-welcome p {
+  color: var(--text-2);
+  max-width: 560px;
+  margin-bottom: 28px;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+/* ── 研究输入框 ── */
+.research-input-wrap {
+  width: 100%;
+  max-width: 680px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.research-input-wrap:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow), var(--shadow);
+}
+
+.research-textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  resize: none;
+  min-height: 72px;
+  max-height: 200px;
+  font-family: inherit;
+}
+
+.research-textarea::placeholder { color: var(--text-3); }
+
+.research-submit-btn {
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition), opacity var(--transition);
+}
+
+.research-submit-btn:hover { background: var(--accent-2); transform: translateY(-1px); }
+.research-submit-btn:active { transform: translateY(0); }
+.research-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* ── 欢迎提示词 ── */
+.research-welcome-hints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 20px;
+  max-width: 680px;
+}
+
+/* ── 研究视图 ── */
+.research-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.research-view-header {
+  padding: 16px 24px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-1);
+  flex-shrink: 0;
+}
+
+.research-view-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.research-view-meta {
+  font-size: 0.78rem;
+  color: var(--text-3);
+  margin-top: 3px;
+}
+
+/* ── 三段进度条 ── */
+.research-progress-bar-wrap {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  gap: 0;
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.rpb-segment {
+  flex: 1;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition);
+}
+
+.rpb-segment:hover { background: var(--bg-2); }
+.rpb-segment.rpb-active { background: var(--bg-3); }
+
+.rpb-label {
+  font-size: 0.78rem;
+  color: var(--text-2);
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 500;
+}
+
+.rpb-segment.rpb-active .rpb-label { color: var(--accent); }
+
+.rpb-track {
+  height: 4px;
+  background: var(--bg-4);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.rpb-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 2px;
+  background: var(--accent);
+  transition: width 0.6s ease, background 0.4s ease;
+  position: relative;
+}
+
+.rpb-fill--running {
+  background: var(--accent);
+}
+
+.rpb-fill--running::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -60%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+  animation: rpbScan 1.4s linear infinite;
+}
+
+.rpb-fill--done {
+  background: var(--green) !important;
+}
+
+@keyframes rpbScan {
+  from { left: -60%; }
+  to   { left: 120%; }
+}
+
+/* 段间流动连接线 */
+.rpb-flow {
+  width: 32px;
+  height: 2px;
+  background: var(--bg-4);
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.rpb-flow--active::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  animation: flowMove 1.2s linear infinite;
+}
+
+.rpb-flow--done {
+  background: var(--green);
+}
+
+@keyframes flowMove {
+  from { left: -100%; }
+  to   { left: 100%; }
+}
+
+/* ── Tab 内容区 ── */
+.research-tabs-content {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.research-tab-panel {
+  display: none;
+  height: 100%;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+
+.research-tab-panel.active { display: block; }
+
+.rtab-empty {
+  color: var(--text-3);
+  text-align: center;
+  padding: 60px 20px;
+  font-size: 0.9rem;
+}
+
+/* ── 研究进展树 ── */
+.ptree {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ptree-researcher {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.ptree-researcher-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--bg-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.ptree-r-icon { font-size: 1.1rem; }
+
+.ptree-r-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+  flex: 1;
+}
+
+.ptree-r-count {
+  font-size: 0.75rem;
+  color: var(--text-3);
+  background: var(--bg-4);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.ptree-subs {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ptree-sub {
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.ptree-sub-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  list-style: none;
+  transition: background var(--transition);
+}
+
+.ptree-sub-head::-webkit-details-marker { display: none; }
+.ptree-sub:hover .ptree-sub-head { background: var(--bg-2); }
+.ptree-sub[open] .ptree-sub-head { background: var(--bg-2); }
+
+.ptree-status {
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.ptree-sub-goal {
+  flex: 1;
+  font-size: 0.85rem;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.ptree-sub-badge {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.ptree-badge-running   { background: rgba(251,191,36,0.15);  color: var(--yellow); }
+.ptree-badge-completed { background: rgba(52,211,153,0.15);  color: var(--green); }
+.ptree-badge-failed    { background: rgba(248,113,113,0.15); color: var(--red); }
+.ptree-badge-pending   { background: var(--bg-4); color: var(--text-3); }
+
+.ptree-sub-detail {
+  padding: 10px 14px 12px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ptree-sub-bg {
+  font-size: 0.8rem;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+.ptree-sub-time {
+  display: flex;
+  gap: 16px;
+  font-size: 0.75rem;
+  color: var(--text-3);
+}
+
+.ptree-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.ptree-task {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  background: var(--bg);
+  border-radius: 6px;
+  font-size: 0.78rem;
+}
+
+.ptree-task-icon { flex-shrink: 0; font-size: 0.8rem; }
+
+.ptree-task-agent {
+  color: var(--accent);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.ptree-task-goal {
+  flex: 1;
+  color: var(--text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ptree-task-badge {
+  font-size: 0.68rem;
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* ── 质询记录 ── */
+.doubt-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.doubt-group {
+  padding: 16px 0;
+}
+
+.doubt-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0 4px;
+}
+
+.doubt-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.doubt-parties {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.doubt-doubter {
+  background: rgba(79,142,247,0.15);
+  color: var(--accent);
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+.doubt-doubted {
+  background: rgba(52,211,153,0.12);
+  color: var(--green);
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+.doubt-task-id {
+  font-size: 0.72rem;
+  color: var(--text-3);
+  font-family: monospace;
+}
+
+.doubt-accept-badge {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+.doubt-accepted { background: rgba(52,211,153,0.15); color: var(--green); }
+.doubt-rejected { background: rgba(248,113,113,0.15); color: var(--red); }
+.doubt-pending  { background: rgba(251,191,36,0.15);  color: var(--yellow); }
+
+.doubt-bubble-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.doubt-bubble {
+  flex: 1;
+  min-width: 240px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+}
+
+.doubt-bubble--left  { border-left: 3px solid var(--accent); }
+.doubt-bubble--right { border-left: 3px solid var(--green); }
+
+.doubt-bubble-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-3);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.doubt-bubble--left  .doubt-bubble-label { color: var(--accent); }
+.doubt-bubble--right .doubt-bubble-label { color: var(--green); }
+
+.doubt-bubble-text {
+  font-size: 0.83rem;
+  color: var(--text-2);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.doubt-reason {
+  margin-top: 8px;
+  font-size: 0.78rem;
+  color: var(--text-3);
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  line-height: 1.5;
+}
+
+/* ── 研究报告 ── */
+.report-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.btn-download-report {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background: var(--bg-3);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.btn-download-report:hover {
+  background: var(--bg-4);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.report-body {
+  color: var(--text);
+  line-height: 1.8;
+  font-size: 0.92rem;
+  max-width: 860px;
+}
+
+.report-body h1 { font-size: 1.6rem; font-weight: 700; margin: 1.5em 0 0.6em; color: var(--text); }
+.report-body h2 { font-size: 1.3rem; font-weight: 600; margin: 1.4em 0 0.5em; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+.report-body h3 { font-size: 1.1rem; font-weight: 600; margin: 1.2em 0 0.4em; color: var(--text-2); }
+.report-body h4 { font-size: 1rem; font-weight: 600; margin: 1em 0 0.3em; color: var(--text-2); }
+.report-body p  { margin-bottom: 0.9em; color: var(--text-2); }
+.report-body ul, .report-body ol { padding-left: 1.5em; margin-bottom: 0.9em; color: var(--text-2); }
+.report-body li { margin-bottom: 0.3em; }
+.report-body blockquote { border-left: 3px solid var(--accent); padding-left: 14px; margin: 1em 0; color: var(--text-3); font-style: italic; }
+.report-body code { background: var(--bg-3); color: var(--accent); padding: 2px 6px; border-radius: 4px; font-size: 0.85em; }
+.report-body pre { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; overflow-x: auto; margin-bottom: 1em; }
+.report-body pre code { background: none; padding: 0; color: var(--text); }
+.report-body table { width: 100%; border-collapse: collapse; margin-bottom: 1em; }
+.report-body th, .report-body td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; font-size: 0.85rem; }
+.report-body th { background: var(--bg-3); color: var(--text); font-weight: 600; }
+.report-body td { color: var(--text-2); }
+.report-body a { color: var(--accent); text-decoration: underline; }
+.report-body hr { border: none; border-top: 1px solid var(--border); margin: 1.5em 0; }
+
+/* ── 侧边栏滚动条（research） ── */
+#sidebar-projects::-webkit-scrollbar { width: 3px; }
+#sidebar-projects::-webkit-scrollbar-thumb { background: var(--bg-4); border-radius: 2px; }
+
+/* ── Tab 内容区滚动条 ── */
+.research-tab-panel::-webkit-scrollbar { width: 5px; }
+.research-tab-panel::-webkit-scrollbar-thumb { background: var(--bg-4); border-radius: 2px; }
+
+/* ── c-danger 变量（复用） ── */
+:root { --c-danger: var(--red); }
+

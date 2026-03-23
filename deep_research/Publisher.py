@@ -2,7 +2,7 @@
 Publisher.py — 稿件发布者（主编）
 负责：
 1. 以 shared_memory 和 Researcher_list 为上下文，规划文章章节，分配给 Researcher 撰写
-2. 并行调用所有 Researcher 的记忆（含质疑表中针对自己的质疑、回答及评价），逐章节撰写，存入 article.json
+2. 串行调用 Researcher 逐章撰写：每章完成后，下一章研究员可看到所有前序内容，保证上下文连贯性
 3. 以 article.json 为上下文，调用 Gemini 整理为 Markdown 格式（利用其超长上下文和输出上限）
 4. 对 research_report.md 重命名，输出最终结果
 """
@@ -90,7 +90,6 @@ def _researcher_context(project_dir: str, researcher_id: str) -> str:
     memory = read_jsonl(os.path.join(base, researcher_id, "memory.jsonl"))
     task_list = read_jsonl(os.path.join(base, researcher_id, "task_list.jsonl"))
 
-    # 从质疑表中提取与该 Researcher 相关的记录（被质疑 或 作为质疑者）
     doubt_path = os.path.join(base, "doubt.jsonl")
     all_doubts = read_jsonl(doubt_path)
     relevant_doubts = [
@@ -161,30 +160,67 @@ Researcher任务列表：
 1. 为文章起一个准确的标题
 2. 规划合理的章节（建议5-10章），章节顺序即为文章最终呈现顺序，注意研究的原始问题，不要过于偏离方向。
 3. 大纲必须涵盖背景、技术现状、核心挑战、多维度对比、及未来趋势。
-4. 为每个章节要有深度问题。例如：不要只写“现状”，要要求分析“导致现状的底层驱动因素”。
+4. 为每个章节要有深度问题。例如：不要只写"现状"，要要求分析"导致现状的底层驱动因素"。
 5. 为每个章节分配最合适的 Researcher（尽量安排研究过该主题的 Researcher 撰写对应章节）
 6. 可以重复安排同一个 Researcher 撰写多个章节
 
 注意：章节应覆盖所有重要研究结论，逻辑清晰，层次分明。
 """
-
-
-#TODO 尝试将撰写改为串行，并能看到上一次生成的内容，接着写。
-
         return await _call_gemini_with_retry(prompt, PublisherPlanResponse, self.log)
 
     async def _write_chapters(self, plan: PublisherPlanResponse) -> List[ChapterContent]:
-        async def write_one_chapter(chapter: ChapterPlan) -> ChapterContent:
+        """串行撰写各章节：每章完成后，下一章研究员可看到前序内容，保证上下文连贯性。
+        
+        为避免 prompt 随章节数线性膨胀，采用滑动窗口策略：
+        - 最近 FULL_WINDOW 章：传入完整正文
+        - 更早的章节：只传标题摘要（首200字），供参考但不占用大量 token
+        """
+        FULL_WINDOW = 3  # 最近几章传完整内容
+
+        completed_chapters: List[ChapterContent] = []
+        total = len(plan.chapters)
+
+        for chapter in plan.chapters:
             context = _researcher_context(self.project_dir, chapter.researcher_id)
             shared_ctx = json.dumps(read_jsonl(self.paths["shared_memory"]), ensure_ascii=False, indent=2)
 
-            prompt = f"""你是研究员 {chapter.researcher_id}，正在撰写深度研究报告的一个章节。
+            # 构建前序章节上下文（滑动窗口）
+            if completed_chapters:
+                older = completed_chapters[:-FULL_WINDOW] if len(completed_chapters) > FULL_WINDOW else []
+                recent = completed_chapters[-FULL_WINDOW:]
+
+                parts = []
+                if older:
+                    summary_lines = "\n".join([
+                        f"  - 第{c.chapter_index}章《{c.title}》：{c.content[:200].replace(chr(10), ' ')}……"
+                        for c in older
+                    ])
+                    parts.append(f"【更早章节摘要（仅供参考，勿重复）】\n{summary_lines}")
+
+                recent_text = "\n\n".join([
+                    f"### 第{c.chapter_index}章：{c.title}\n\n{c.content}"
+                    for c in recent
+                ])
+                parts.append(
+                    f"【最近 {len(recent)} 章完整内容（请保持风格一致、自然衔接）】\n\n{recent_text}"
+                )
+
+                preceding_section = (
+                    f"\n\n{'=' * 60}\n"
+                    f"{'  '.join(parts)}\n"
+                    f"{'=' * 60}\n"
+                    f"【前序内容结束，请续写第 {chapter.chapter_index} 章，勿重复上述内容】\n"
+                )
+            else:
+                preceding_section = ""
+
+            prompt = f"""你是研究员 {chapter.researcher_id}，正在串行撰写深度研究报告，当前负责第 {chapter.chapter_index} 章（共 {total} 章）。
 
 文章标题：{plan.article_title}
-章节序号：{chapter.chapter_index}
+章节序号：{chapter.chapter_index} / {total}
 章节标题：{chapter.title}
 章节说明：{chapter.description}
-
+{preceding_section}
 你的完整研究上下文（包含研究记忆、任务列表、质疑记录）：
 {context}
 
@@ -193,23 +229,24 @@ Researcher任务列表：
 
 撰写要求：
 1. 内容要详实、有据可查，引用具体的研究结论和数据
-2. 逻辑清晰，语言专业流畅
+2. 逻辑清晰，语言专业流畅，与前序章节自然衔接
 3. 充分利用你的研究记忆中的数据和结论
-4. 章节内容要与章节说明高度契合
+4. 章节内容要与章节说明高度契合，不要重复前序章节已详细阐述的内容
 5. 【重要】你的上下文中包含 doubt_records（质疑记录）：
-   - 若你是"被质疑方"（role: 被质疑方）：在撰写时主动吸收质疑中指出的问题，对已被接受的质疑（accepted: true）在正文中予以修正或补充说明；对未被接受的质疑（accepted: false）可在正文中简要说明你的立场
-   - 若你是"质疑方"（role: 质疑方）：在撰写时可引用你提出的质疑及对方的回答，增强论证的严谨性
-   - 通过质疑-回答-评价的过程，使章节内容更加严谨、客观、有说服力
-   如果你的研究结论曾被质疑且你给出了回答，可以将该辩证过程（即“为什么这个结论是可靠的”）内化到正文中，体现报告的严谨性。
+   - 若你是"被质疑方"（role: 被质疑方）：主动吸收质疑中指出的问题，对已被接受的质疑（accepted: true）在正文中予以修正或补充说明；对未被接受的质疑（accepted: false）可简要说明你的立场
+   - 若你是"质疑方"（role: 质疑方）：可引用你提出的质疑及对方的回答，增强论证的严谨性
+   - 将质疑-回答-评价的辩证过程内化到正文中，体现报告的严谨性
 """
             result: ChapterContent = await _call_gemini_with_retry(prompt, ChapterContent, self.log)
             result.chapter_index = chapter.chapter_index
             result.title = chapter.title
-            self.log.info(f"章节 {chapter.chapter_index}《{chapter.title}》撰写完成")
-            return result
+            completed_chapters.append(result)
+            self.log.info(
+                f"章节 {chapter.chapter_index}/{total}"
+                f"《{chapter.title}》撰写完成（{chapter.researcher_id}）"
+            )
 
-        chapters = await asyncio.gather(*[write_one_chapter(c) for c in plan.chapters])
-        return sorted(chapters, key=lambda c: c.chapter_index)
+        return completed_chapters
 
     async def _compile_report(self, article_data: dict) -> str:
         """调用 Gemini 将 article.json 整理为完整 Markdown，利用其超长上下文和输出上限"""
@@ -245,10 +282,10 @@ Researcher任务列表：
 2. 紧接标题后撰写"执行摘要"（200-400字），概括核心结论和研究价值
 3. 保持原有章节结构，使用二级标题（##）标注各章节，尽可能保留各个章节的内容，不要删减内容。
 4. 优化语言表达，消除重复内容，确保全文对同一技术或现象的称呼一致，使行文流畅自然、前后呼应
-5. “在构建大纲时，请不仅考虑‘是什么’，更要要求探讨‘为什么’以及‘如果...会怎样’
+5. 在构建大纲时，请不仅考虑"是什么"，更要要求探讨"为什么"以及"如果...会怎样"
 6. 对各章节中因质疑而修正的内容，确保修正后的表述清晰准确
-7. 文章是要争议性话题给出了平衡的视角，从多个方面发分析问题。
-8. 在报告末尾添加"综合结论"章节（## 综合结论），结论是否具有前瞻性和行动建议，综合所有章节得出最终判断
+7. 文章对争议性话题给出平衡的视角，从多个方面分析问题
+8. 在报告末尾添加"综合结论"章节（## 综合结论），结论具有前瞻性和行动建议，综合所有章节得出最终判断
 9. 直接输出完整 Markdown 内容，不要输出任何解释性文字或代码块标记
 """
 

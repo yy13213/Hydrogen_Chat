@@ -1,0 +1,634 @@
+{% extends "base.html" %}
+{% block title %}Hydrogen Research · HydrogenX{% endblock %}
+
+{% block navbar %}
+<nav class="app-navbar">
+  <div class="nav-inner">
+    <a class="brand-mark" href="{{ url_for('dashboard.workspace') }}">
+      <span class="brand-mark__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5"/>
+          <line x1="12" y1="2" x2="12" y2="22"/>
+          <line x1="2" y1="8.5" x2="22" y2="8.5"/>
+          <line x1="2" y1="15.5" x2="22" y2="15.5"/>
+        </svg>
+      </span>
+      <span class="brand-mark__text">
+        <span class="brand-mark__title">Hydrogen Research</span>
+        <span class="brand-mark__sub">Deep Research Framework</span>
+      </span>
+    </a>
+    <div class="nav-actions">
+      <a class="nav-link-item" href="{{ url_for('dashboard.workspace') }}">
+        <i class="bi bi-grid"></i> 工作台
+      </a>
+      <span class="user-pill">
+        <i class="bi bi-person-circle"></i>
+        {{ current_user.username }}
+      </span>
+    </div>
+  </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="research-page" id="research-app">
+
+  <!-- ── 侧边栏 ── -->
+  <aside class="research-sidebar" id="research-sidebar">
+    <div class="sidebar-head">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-icon">🔬</div>
+        <span>Deep Research</span>
+      </div>
+      <button class="btn-new-chat" id="btn-new-research" title="新建研究">
+        <i class="bi bi-plus-lg"></i>
+      </button>
+    </div>
+
+    <div class="sidebar-sessions" id="sidebar-projects">
+      <div class="sidebar-section-label">历史研究</div>
+      <div id="project-list">
+        <div class="sidebar-empty">加载中…</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── 主内容区 ── -->
+  <div class="research-main" id="research-main">
+
+    <!-- 欢迎 / 输入界面 -->
+    <div class="research-welcome" id="research-welcome">
+      <div class="research-welcome-glow"></div>
+      <div class="research-welcome-icon">🔬</div>
+      <h2>Hydrogen Research</h2>
+      <p>基于多智能体的深度研究框架，自动规划子研究、并行执行、质询验证，最终生成完整研究报告。</p>
+      <div class="research-input-wrap" id="research-input-wrap">
+        <textarea class="research-textarea" id="research-textarea"
+          placeholder="输入研究问题，例如：分析2025年全球人工智能芯片市场的竞争格局与未来趋势…"
+          rows="3"></textarea>
+        <button class="research-submit-btn" id="research-submit-btn">
+          <i class="bi bi-rocket-takeoff"></i>
+          <span>开始深度研究</span>
+        </button>
+      </div>
+      <div class="research-welcome-hints">
+        <span class="hint-chip" data-text="分析2025年全球人工智能芯片市场的竞争格局与未来趋势">🤖 AI芯片市场分析</span>
+        <span class="hint-chip" data-text="氢能源技术的最新研究进展与商业化路径">⚡ 氢能源技术进展</span>
+        <span class="hint-chip" data-text="大语言模型在医疗领域的应用现状与挑战">🏥 LLM医疗应用</span>
+        <span class="hint-chip" data-text="量子计算对现有密码学体系的威胁与应对策略">🔐 量子计算安全</span>
+      </div>
+    </div>
+
+    <!-- 研究进行中界面 -->
+    <div class="research-view" id="research-view" style="display:none">
+
+      <!-- 顶部标题栏（研究进行中时显示） -->
+      <div class="research-view-header" id="research-view-header">
+        <div class="research-view-title" id="research-view-title">研究进行中…</div>
+        <div class="research-view-meta" id="research-view-meta"></div>
+      </div>
+
+      <!-- 三段进度条 -->
+      <div class="research-progress-bar-wrap" id="progress-bar-wrap">
+        <div class="rpb-segment" id="rpb-progress" data-tab="tab-progress">
+          <div class="rpb-label"><i class="bi bi-diagram-3"></i> 研究进展</div>
+          <div class="rpb-track"><div class="rpb-fill" id="rpb-fill-progress"></div></div>
+        </div>
+        <div class="rpb-flow" id="rpb-flow-1"></div>
+        <div class="rpb-segment" id="rpb-doubt" data-tab="tab-doubt">
+          <div class="rpb-label"><i class="bi bi-chat-square-quote"></i> 质询记录</div>
+          <div class="rpb-track"><div class="rpb-fill" id="rpb-fill-doubt"></div></div>
+        </div>
+        <div class="rpb-flow" id="rpb-flow-2"></div>
+        <div class="rpb-segment" id="rpb-report" data-tab="tab-report">
+          <div class="rpb-label"><i class="bi bi-file-earmark-text"></i> 研究报告</div>
+          <div class="rpb-track"><div class="rpb-fill" id="rpb-fill-report"></div></div>
+        </div>
+      </div>
+
+      <!-- Tab 内容区 -->
+      <div class="research-tabs-content">
+
+        <!-- Tab: 研究进展 -->
+        <div class="research-tab-panel active" id="tab-progress">
+          <div class="rtab-inner" id="progress-tree">
+            <div class="rtab-empty">研究启动后将在此显示进展树…</div>
+          </div>
+        </div>
+
+        <!-- Tab: 质询记录 -->
+        <div class="research-tab-panel" id="tab-doubt">
+          <div class="rtab-inner" id="doubt-list">
+            <div class="rtab-empty">质询记录将在研究完成后显示…</div>
+          </div>
+        </div>
+
+        <!-- Tab: 研究报告 -->
+        <div class="research-tab-panel" id="tab-report">
+          <div class="rtab-inner" id="report-content">
+            <div class="rtab-empty">报告生成后将在此显示…</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
+<script>
+(() => {
+  // ── Config ──────────────────────────────────────────────
+  const CSRF = document.querySelector('meta[name="csrf-token"]').content;
+  const POLL_INTERVAL_MS   = 4000;
+  const MAX_POLL_FAILURES  = 15;
+  const MAX_POLL_TOTAL_MS  = 240000;
+
+  // ── DOM refs ────────────────────────────────────────────
+  const projectList       = document.getElementById('project-list');
+  const btnNew            = document.getElementById('btn-new-research');
+  const researchWelcome   = document.getElementById('research-welcome');
+  const researchView      = document.getElementById('research-view');
+  const researchTextarea  = document.getElementById('research-textarea');
+  const researchSubmit    = document.getElementById('research-submit-btn');
+  const researchInputWrap = document.getElementById('research-input-wrap');
+  const viewTitle         = document.getElementById('research-view-title');
+  const viewMeta          = document.getElementById('research-view-meta');
+  const progressTree      = document.getElementById('progress-tree');
+  const doubtList         = document.getElementById('doubt-list');
+  const reportContent     = document.getElementById('report-content');
+
+  // Progress bar fills
+  const fillProgress = document.getElementById('rpb-fill-progress');
+  const fillDoubt    = document.getElementById('rpb-fill-doubt');
+  const fillReport   = document.getElementById('rpb-fill-report');
+  const flowBar1     = document.getElementById('rpb-flow-1');
+  const flowBar2     = document.getElementById('rpb-flow-2');
+
+  // ── State ────────────────────────────────────────────────
+  let currentProject = null;
+  let pollTimer      = null;
+  let pollFailures   = 0;
+  let pollStartTime  = 0;
+  let activeTab      = 'tab-progress';
+
+  // ── marked config ────────────────────────────────────────
+  marked.setOptions({ breaks: true, gfm: true });
+
+  // ── API helper ───────────────────────────────────────────
+  async function api(url, opts = {}) {
+    const headers = {
+      'Accept': 'application/json',
+      'X-CSRFToken': CSRF,
+      ...(opts.headers || {})
+    };
+    if (!(opts.body instanceof FormData) && !headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
+    }
+    const res = await fetch(url, { credentials: 'same-origin', headers, ...opts });
+    const text = await res.text();
+    let data = {};
+    try { data = text ? JSON.parse(text) : {}; } catch (_) {}
+    if (!res.ok) {
+      const err = new Error(data.error || `HTTP ${res.status}`);
+      err.status = res.status;
+      throw err;
+    }
+    return data;
+  }
+
+  async function apiText(url) {
+    const res = await fetch(url, {
+      credentials: 'same-origin',
+      headers: { 'X-CSRFToken': CSRF }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.text();
+  }
+
+  // ── Tab 切换 ─────────────────────────────────────────────
+  function switchTab(tabId) {
+    activeTab = tabId;
+    document.querySelectorAll('.research-tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    document.querySelectorAll('.rpb-segment').forEach(s => {
+      s.classList.toggle('rpb-active', s.dataset.tab === tabId);
+    });
+  }
+
+  document.querySelectorAll('.rpb-segment').forEach(seg => {
+    seg.addEventListener('click', () => switchTab(seg.dataset.tab));
+  });
+
+  // ── 侧边栏项目列表 ───────────────────────────────────────
+  async function loadProjects() {
+    try {
+      const data = await api('/api/research/projects');
+      renderProjectList(data.projects || []);
+    } catch (e) {
+      projectList.innerHTML = `<div class="sidebar-empty" style="color:var(--c-danger)">加载失败</div>`;
+    }
+  }
+
+  function renderProjectList(projects) {
+    if (!projects.length) {
+      projectList.innerHTML = `<div class="sidebar-empty">暂无历史研究</div>`;
+      return;
+    }
+    projectList.innerHTML = projects.map(p => {
+      const icon = { completed: '✅', running: '⏳', failed: '❌' }[p.status] || '❓';
+      const label = (p.question || p.project_dir).slice(0, 32) + ((p.question || '').length > 32 ? '…' : '');
+      const active = currentProject === p.project_dir ? ' active' : '';
+      return `<div class="session-item${active}" data-pid="${escHtml(p.project_dir)}" title="${escHtml(p.question || p.project_dir)}">
+        <span class="session-icon">${icon}</span>
+        <span class="session-title">${escHtml(label)}</span>
+      </div>`;
+    }).join('');
+
+    projectList.querySelectorAll('.session-item').forEach(el => {
+      el.addEventListener('click', () => openProject(el.dataset.pid));
+    });
+  }
+
+  // ── 打开/加载项目 ────────────────────────────────────────
+  async function openProject(projectDir) {
+    currentProject = projectDir;
+    showView();
+    switchTab('tab-progress');
+    startPolling(projectDir);
+    loadProjects(); // 刷新侧边栏高亮
+  }
+
+  // ── 显示/隐藏视图 ────────────────────────────────────────
+  function showWelcome() {
+    researchWelcome.style.display = '';
+    researchView.style.display = 'none';
+    researchInputWrap.style.display = '';
+  }
+
+  function showView() {
+    researchWelcome.style.display = 'none';
+    researchView.style.display = '';
+  }
+
+  // ── 提交新研究 ───────────────────────────────────────────
+  async function submitResearch() {
+    const question = researchTextarea.value.trim();
+    if (!question) return;
+
+    researchSubmit.disabled = true;
+    researchSubmit.innerHTML = '<i class="bi bi-hourglass-split"></i> <span>启动中…</span>';
+
+    try {
+      const data = await api('/api/research/start', {
+        method: 'POST',
+        body: JSON.stringify({ question })
+      });
+      const projectDir = data.project_dir;
+      if (!projectDir) throw new Error('未获得项目ID');
+
+      // 隐藏输入框，切换到研究视图
+      researchTextarea.value = '';
+      currentProject = projectDir;
+      showView();
+      viewTitle.textContent = question.slice(0, 60) + (question.length > 60 ? '…' : '');
+      viewMeta.textContent = `项目 ID：${projectDir}`;
+      switchTab('tab-progress');
+      loadProjects();
+      startPolling(projectDir);
+    } catch (e) {
+      alert('启动失败：' + e.message);
+      researchSubmit.disabled = false;
+      researchSubmit.innerHTML = '<i class="bi bi-rocket-takeoff"></i> <span>开始深度研究</span>';
+    }
+  }
+
+  researchSubmit.addEventListener('click', submitResearch);
+  researchTextarea.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitResearch(); }
+  });
+
+  // 提示词快捷填充
+  document.querySelectorAll('.hint-chip[data-text]').forEach(chip => {
+    chip.addEventListener('click', () => {
+      researchTextarea.value = chip.dataset.text;
+      researchTextarea.focus();
+    });
+  });
+
+  // 新建按钮
+  btnNew.addEventListener('click', () => {
+    stopPolling();
+    currentProject = null;
+    showWelcome();
+    researchSubmit.disabled = false;
+    researchSubmit.innerHTML = '<i class="bi bi-rocket-takeoff"></i> <span>开始深度研究</span>';
+    loadProjects();
+  });
+
+  // ── 轮询 ─────────────────────────────────────────────────
+  function startPolling(projectDir) {
+    stopPolling();
+    pollFailures = 0;
+    pollStartTime = Date.now();
+    doPoll(projectDir);
+  }
+
+  function stopPolling() {
+    if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
+  }
+
+  async function doPoll(projectDir) {
+    if (projectDir !== currentProject) return;
+    const elapsed = Date.now() - pollStartTime;
+    if (elapsed > MAX_POLL_TOTAL_MS) {
+      viewMeta.textContent = '轮询超时，请手动刷新';
+      return;
+    }
+
+    try {
+      const progress = await api(`/api/research/progress/${projectDir}`);
+      pollFailures = 0;
+      await renderProgress(projectDir, progress);
+
+      const status = progress.status;
+      if (status === 'completed' || status === 'failed') {
+        updateProgressBars(progress, true);
+        loadProjects();
+        return; // 停止轮询
+      }
+    } catch (e) {
+      pollFailures++;
+      if (pollFailures >= MAX_POLL_FAILURES) {
+        viewMeta.textContent = `连接失败（${e.message}），已停止轮询`;
+        return;
+      }
+    }
+
+    pollTimer = setTimeout(() => doPoll(projectDir), POLL_INTERVAL_MS);
+  }
+
+  // ── 渲染进展 ─────────────────────────────────────────────
+  async function renderProgress(projectDir, progress) {
+    const status = progress.status || 'unknown';
+    const question = progress.researcher_list?.[0]?.background || '';
+
+    viewMeta.textContent = `状态：${statusLabel(status)}  ·  子研究：${progress.progress?.total_sub_researches || 0}  ·  已完成：${progress.progress?.completed || 0}`;
+
+    updateProgressBars(progress, status === 'completed');
+
+    // 获取详情
+    let detail = {};
+    try {
+      detail = await api(`/api/research/detail/${projectDir}`);
+    } catch (_) {}
+
+    renderProgressTree(detail, progress);
+    renderDoubts(detail.doubts || []);
+
+    // 如果有报告，加载报告
+    if (progress.has_report) {
+      await loadReport(projectDir);
+    }
+  }
+
+  // ── 进度条更新 ───────────────────────────────────────────
+  function updateProgressBars(progress, isCompleted) {
+    const total = progress.progress?.total_sub_researches || 0;
+    const completed = progress.progress?.completed || 0;
+    const pct = total > 0 ? Math.round((completed / total) * 100) : (isCompleted ? 100 : 0);
+
+    const hasDoubts = (progress.doubts_count || 0) > 0;
+    const hasReport = progress.has_report;
+    const status = progress.status;
+
+    // 研究进展进度条
+    setBarState(fillProgress, flowBar1, pct, isCompleted && !hasDoubts && !hasReport);
+
+    // 质询记录进度条
+    if (hasDoubts || status === 'completed') {
+      setBarState(fillDoubt, flowBar2, hasReport ? 100 : (hasDoubts ? 60 : 0), hasReport);
+    } else {
+      setBarState(fillDoubt, flowBar2, 0, false);
+    }
+
+    // 报告进度条
+    if (hasReport) {
+      setBarState(fillReport, null, 100, true);
+    } else {
+      setBarState(fillReport, null, 0, false);
+    }
+  }
+
+  function setBarState(fill, flowEl, pct, done) {
+    fill.style.width = pct + '%';
+    fill.classList.toggle('rpb-fill--done', done);
+    fill.classList.toggle('rpb-fill--running', !done && pct > 0);
+    if (flowEl) {
+      flowEl.classList.toggle('rpb-flow--active', pct > 0 && !done);
+      flowEl.classList.toggle('rpb-flow--done', done);
+    }
+  }
+
+  // ── 研究进展树 ───────────────────────────────────────────
+  function renderProgressTree(detail, progress) {
+    const researcherList = detail.researcher_list || progress.researcher_list || [];
+    const researcherTasks = detail.researcher_tasks || {};
+
+    if (!researcherList.length) {
+      progressTree.innerHTML = `<div class="rtab-empty">研究启动中，等待 Planner 规划子研究…</div>`;
+      return;
+    }
+
+    // 按 researcher_id 分组
+    const grouped = {};
+    for (const sub of researcherList) {
+      const rid = sub.researcher_id || 'Unknown';
+      if (!grouped[rid]) grouped[rid] = [];
+      grouped[rid].push(sub);
+    }
+
+    let html = '<div class="ptree">';
+    for (const [rid, subs] of Object.entries(grouped).sort()) {
+      const allDone = subs.every(s => s.status === 'completed');
+      const anyRunning = subs.some(s => s.status === 'running');
+      const rIcon = allDone ? '✅' : anyRunning ? '⏳' : '🔵';
+      html += `<div class="ptree-researcher">
+        <div class="ptree-researcher-head">
+          <span class="ptree-r-icon">${rIcon}</span>
+          <span class="ptree-r-name">${escHtml(rid)}</span>
+          <span class="ptree-r-count">${subs.length} 个子研究</span>
+        </div>
+        <div class="ptree-subs">`;
+
+      for (const sub of subs) {
+        const st = sub.status || 'pending';
+        const stIcon = { completed: '✅', running: '⏳', failed: '❌', pending: '○' }[st] || '○';
+        const stClass = `ptree-status--${st}`;
+        const subId = sub.sub_research_id || '';
+        const tasks = (researcherTasks[rid] || []).filter(t => t.sub_research_id === subId);
+
+        html += `<details class="ptree-sub">
+          <summary class="ptree-sub-head">
+            <span class="ptree-status ${stClass}">${stIcon}</span>
+            <span class="ptree-sub-goal">${escHtml(sub.goal || '（无目标）')}</span>
+            <span class="ptree-sub-badge ptree-badge-${st}">${statusLabel(st)}</span>
+          </summary>
+          <div class="ptree-sub-detail">
+            <div class="ptree-sub-bg"><b>背景：</b>${escHtml((sub.background || '').slice(0, 200))}${(sub.background || '').length > 200 ? '…' : ''}</div>
+            <div class="ptree-sub-time">
+              <span>开始：${fmtTime(sub.start_time)}</span>
+              <span>结束：${fmtTime(sub.end_time)}</span>
+            </div>`;
+
+        if (tasks.length) {
+          html += `<div class="ptree-tasks">`;
+          for (const task of tasks) {
+            const ts = task.status || 'pending';
+            const tIcon = { completed: '✅', running: '⏳', failed: '❌', pending: '○' }[ts] || '○';
+            html += `<div class="ptree-task">
+              <span class="ptree-task-icon">${tIcon}</span>
+              <span class="ptree-task-agent">[${escHtml(task.agent_class || '?')}]</span>
+              <span class="ptree-task-goal">${escHtml((task.goal || '').slice(0, 100))}</span>
+              <span class="ptree-task-badge ptree-badge-${ts}">${statusLabel(ts)}</span>
+            </div>`;
+          }
+          html += `</div>`;
+        }
+
+        html += `</div></details>`;
+      }
+
+      html += `</div></div>`;
+    }
+    html += '</div>';
+    progressTree.innerHTML = html;
+  }
+
+  // ── 质询记录 ─────────────────────────────────────────────
+  function renderDoubts(doubts) {
+    if (!doubts.length) {
+      doubtList.innerHTML = `<div class="rtab-empty">质询记录将在研究完成后显示…</div>`;
+      return;
+    }
+
+    let html = `<div class="doubt-feed">`;
+    for (let i = 0; i < doubts.length; i++) {
+      const d = doubts[i];
+      const accepted = d.accepted;
+      const acceptIcon = accepted === true ? '✅' : accepted === false ? '❌' : '⏳';
+      const acceptLabel = accepted === true ? '已接受' : accepted === false ? '已拒绝' : '待定';
+      const acceptClass = accepted === true ? 'doubt-accepted' : accepted === false ? 'doubt-rejected' : 'doubt-pending';
+
+      html += `<div class="doubt-group">
+        <div class="doubt-meta">
+          <span class="doubt-parties">
+            <span class="doubt-doubter">${escHtml(d.doubter || '?')}</span>
+            <i class="bi bi-arrow-right"></i>
+            <span class="doubt-doubted">${escHtml(d.doubted || '?')}</span>
+          </span>
+          <span class="doubt-task-id">任务 ${escHtml((d.task_id || '').slice(0, 8))}</span>
+          <span class="doubt-accept-badge ${acceptClass}">${acceptIcon} ${acceptLabel}</span>
+        </div>
+
+        <div class="doubt-bubble-row">
+          <div class="doubt-bubble doubt-bubble--left">
+            <div class="doubt-bubble-label"><i class="bi bi-question-circle"></i> 质疑</div>
+            <div class="doubt-bubble-text">${escHtml(d.doubt_content || '（无）')}</div>
+          </div>
+          ${d.answer_content ? `<div class="doubt-bubble doubt-bubble--right">
+            <div class="doubt-bubble-label"><i class="bi bi-reply"></i> 回答</div>
+            <div class="doubt-bubble-text">${escHtml(d.answer_content)}</div>
+          </div>` : ''}
+        </div>
+
+        ${d.reason ? `<div class="doubt-reason"><i class="bi bi-info-circle"></i> ${escHtml(d.reason)}</div>` : ''}
+      </div>`;
+
+      if (i < doubts.length - 1) {
+        html += `<div class="doubt-divider"></div>`;
+      }
+    }
+    html += `</div>`;
+    doubtList.innerHTML = html;
+  }
+
+  // ── 研究报告 ─────────────────────────────────────────────
+  async function loadReport(projectDir) {
+    try {
+      const mdText = await apiText(`/api/research/report/${projectDir}`);
+      const html = marked.parse(mdText);
+      reportContent.innerHTML = `
+        <div class="report-actions">
+          <button class="btn-download-report" id="btn-download-pdf" onclick="downloadPdf()">
+            <i class="bi bi-file-earmark-pdf"></i> 导出 PDF
+          </button>
+        </div>
+        <div class="report-body" id="report-body">${html}</div>`;
+      // 切换报告 tab 高亮
+      fillReport.style.width = '100%';
+      fillReport.classList.add('rpb-fill--done');
+    } catch (e) {
+      if (!e.message.includes('404')) {
+        reportContent.innerHTML = `<div class="rtab-empty" style="color:var(--c-danger)">加载报告失败：${escHtml(e.message)}</div>`;
+      }
+    }
+  }
+
+  // ── PDF 导出 ─────────────────────────────────────────────
+  window.downloadPdf = function() {
+    const reportBody = document.getElementById('report-body');
+    if (!reportBody) return;
+
+    // 使用 print 方式导出 PDF（浏览器原生）
+    const printWin = window.open('', '_blank');
+    printWin.document.write(`<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<title>研究报告</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; max-width: 900px; margin: 40px auto; color: #1a1a1a; line-height: 1.7; }
+  h1,h2,h3,h4 { margin-top: 1.5em; }
+  pre { background: #f5f5f5; padding: 1em; border-radius: 4px; overflow-x: auto; }
+  code { background: #f0f0f0; padding: 2px 5px; border-radius: 3px; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #ddd; padding: 8px 12px; }
+  th { background: #f5f5f5; }
+  blockquote { border-left: 4px solid #ccc; margin: 0; padding-left: 1em; color: #555; }
+  @media print { body { margin: 20px; } }
+</style>
+</head><body>${reportBody.innerHTML}</body></html>`);
+    printWin.document.close();
+    printWin.focus();
+    setTimeout(() => { printWin.print(); }, 500);
+  };
+
+  // ── 工具函数 ─────────────────────────────────────────────
+  function escHtml(s) {
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function fmtTime(iso) {
+    if (!iso) return '—';
+    try {
+      return new Date(iso).toLocaleString('zh-CN', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    } catch (_) { return iso; }
+  }
+
+  function statusLabel(s) {
+    return { running: '运行中', completed: '已完成', failed: '失败', pending: '等待中', unknown: '未知' }[s] || s;
+  }
+
+  // ── 初始化 ───────────────────────────────────────────────
+  loadProjects();
+  showWelcome();
+
+})();
+</script>
+{% endblock %}

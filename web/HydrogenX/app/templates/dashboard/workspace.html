@@ -51,21 +51,21 @@
     </div>
 
     <!-- Hydrogen Research -->
-    <div class="workspace-tile workspace-tile--research">
+    <div class="workspace-tile workspace-tile--research" onclick="location.href='{{ url_for('dashboard.research') }}'">
       <div class="wtile-header">
         <span class="wtile-num">Module 03</span>
-        <span class="wtile-status wtile-status--soon">Coming Soon</span>
+        <span class="wtile-status wtile-status--live">Live</span>
       </div>
       <div class="wtile-icon wtile-icon--research">
-        <i class="bi bi-journal-text"></i>
+        <i class="bi bi-diagram-3"></i>
       </div>
       <div class="wtile-title">Hydrogen Research</div>
       <div class="wtile-desc">
-        聚合研究任务、资料整理、洞察沉淀与工作流管理，为氢能科研团队提供系统化的知识管理平台。
+        基于多智能体的深度研究框架，自动规划子研究、并行执行、质询验证，最终生成完整研究报告。
       </div>
-      <span class="wtile-enter" style="cursor:default;">
-        敬请期待 <i class="bi bi-clock"></i>
-      </span>
+      <a href="{{ url_for('dashboard.research') }}" class="wtile-enter" onclick="event.stopPropagation()">
+        进入 Research <i class="bi bi-arrow-right"></i>
+      </a>
     </div>
 
     <!-- Hydrogen Assistant -->

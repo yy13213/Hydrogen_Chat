@@ -45,6 +45,10 @@ _JOBS_LOCK = threading.Lock()
 _EXECUTOR = ThreadPoolExecutor(max_workers=4)
 
 
+def _new_project_name() -> str:
+    return datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+
+
 def _upload_to_cloudinary(image_url_on_agent: str) -> str:
     """
     将 chart_agent 返回的相对图片 URL 下载后上传到 Cloudinary，
@@ -116,9 +120,6 @@ def _normalize_progress_records(project_name: str, records: list) -> list:
     for r in records or []:
         item = dict(r)
         src_files = item.get("files") or item.get("image_paths") or []
-        # 每句对话只保留最后一张图片，避免同一气泡渲染多图
-        if isinstance(src_files, list) and src_files:
-            src_files = [src_files[-1]]
         render_files = []
         for f in src_files:
             agent_url = _build_agent_image_url(project_name, f)
@@ -126,29 +127,38 @@ def _normalize_progress_records(project_name: str, records: list) -> list:
             cdn_url = _upload_to_cloudinary(agent_url)
             render_files.append(cdn_url)
         if render_files:
-            item["render_files"] = render_files
+            # 仅保留最后生成的一张图，避免单条回复堆叠多图
+            item["render_files"] = [render_files[-1]]
+            if item.get("status") == "model_turn":
+                # 历史记录渲染统一走图床链接
+                item["files"] = [render_files[-1]]
         normalized.append(item)
     return normalized
 
 
-def _extract_status_chain(records: list) -> list:
-    """从 jsonl 记录提取去重状态链（排除 user_turn/model_turn）。"""
-    statuses = []
+def _build_live_status_payload(project_name: str, records: list) -> dict:
+    """构建实时状态链：之前状态为 done，最后一个状态为 running（直到产出 model_turn）。"""
+    status_list = []
+    has_model_turn = any((r.get("status") == "model_turn") for r in records or [])
+    latest_model = None
     for r in records or []:
-        s = (r.get("status") or "").strip()
-        if not s or s in ("user_turn", "model_turn"):
-            continue
-        if not statuses or statuses[-1] != s:
-            statuses.append(s)
-    return statuses
-
-
-def _is_project_finished(records: list) -> bool:
-    """判断项目本轮是否已到最终输出（出现 model_turn）。"""
-    for r in records or []:
+        st = (r.get("status") or "").strip()
+        if st and st not in ("user_turn", "model_turn"):
+            if not status_list or status_list[-1]["label"] != st:
+                status_list.append({"label": st, "state": "done"})
         if r.get("status") == "model_turn":
-            return True
-    return False
+            latest_model = {
+                "text": r.get("text", ""),
+                "files": (r.get("render_files") or r.get("files") or [])[:1],
+            }
+    if status_list:
+        status_list[-1]["state"] = "done" if has_model_turn else "running"
+    return {
+        "project_name": project_name,
+        "statuses": status_list,
+        "is_done": bool(has_model_turn),
+        "latest_model": latest_model,
+    }
 
 
 # ── 用户历史记录文件 ──────────────────────────────────────────
@@ -262,14 +272,11 @@ def _process_chat_response(user_id: int, user_input: str, resp_json: dict) -> di
 
     # 将图片上传到 Cloudinary，替换为 CDN URL
     raw_image_urls = data.get("image_urls") or []
-    # 每句对话只保留最后一张图片
-    if isinstance(raw_image_urls, list) and raw_image_urls:
-        raw_image_urls = [raw_image_urls[-1]]
     cdn_image_urls = []
     for img_url in raw_image_urls:
         cdn_url = _upload_to_cloudinary(img_url)
         cdn_image_urls.append(cdn_url)
-    data["image_urls"] = cdn_image_urls
+    data["image_urls"] = [cdn_image_urls[-1]] if cdn_image_urls else []
     return data
 
 
@@ -378,6 +385,9 @@ def chat_async():
     project_name = (request.form.get("project_name") or "").strip() or None
     if not user_input:
         return jsonify({"error": "消息不能为空"}), 400
+    if not project_name:
+        # 立即分配项目名，便于前端立刻轮询 jsonl 进度
+        project_name = _new_project_name()
 
     forwarded_files = _prepare_forwarded_files()
     job_id = uuid.uuid4().hex[:16]
@@ -431,11 +441,12 @@ def get_progress(project_name):
     return jsonify(data)
 
 
-@chart_api_bp.route("/status/<project_name>", methods=["GET"])
+@chart_api_bp.route("/live/<project_name>", methods=["GET"])
 @login_required
-def get_status(project_name):
+def get_live(project_name):
     """
-    轻量状态接口：仅返回状态链 + 完成标识，供前端高频轮询实时渲染。
+    实时状态轮询接口（用于前端 status 链动画）。
+    返回绝对可渲染图片链接、状态链、是否完成、最新模型回复摘要。
     """
     resp = _proxy_get(f"/progress/{project_name}")
     if resp is None:
@@ -447,17 +458,11 @@ def get_status(project_name):
             detail = resp.json().get("detail", resp.text[:300])
         except Exception:
             detail = resp.text[:300]
-        return jsonify({"error": f"获取状态失败：{detail}"}), resp.status_code
+        return jsonify({"error": f"获取实时状态失败：{detail}"}), resp.status_code
 
     data = resp.json()
-    records = data.get("records") or []
-    statuses = _extract_status_chain(records)
-    finished = _is_project_finished(records)
-    return jsonify({
-        "project_name": project_name,
-        "statuses": statuses,
-        "finished": finished,
-    })
+    records = _normalize_progress_records(project_name, data.get("records") or [])
+    return jsonify(_build_live_status_payload(project_name, records))
 
 
 @chart_api_bp.route("/projects/<project_name>", methods=["DELETE"])

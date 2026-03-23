@@ -131,6 +131,7 @@
   const MAX_POLL_FAIL  = 15;
   const MAX_POLL_MS    = 240000;
   const USER_INITIAL   = '{{ current_user.username[0].upper() }}';
+  const ORIGIN         = window.location.origin;
 
   // ── DOM refs ────────────────────────────────────────────
   const sessionList   = document.getElementById('session-list');
@@ -164,6 +165,7 @@
 
   // ── API helper ───────────────────────────────────────────
   async function api(url, opts = {}) {
+    const finalUrl = /^https?:\/\//i.test(url) ? url : `${ORIGIN}${url.startsWith('/') ? url : '/' + url}`;
     const headers = {
       'Accept': 'application/json',
       'X-CSRFToken': CSRF,
@@ -172,7 +174,7 @@
     if (!(opts.body instanceof FormData) && !headers['Content-Type']) {
       headers['Content-Type'] = 'application/json';
     }
-    const res = await fetch(url, { credentials: 'same-origin', headers, ...opts });
+    const res = await fetch(finalUrl, { credentials: 'same-origin', headers, ...opts });
     const text = await res.text();
     let data = {};
     try { data = text ? JSON.parse(text) : {}; } catch (_) {}
@@ -182,10 +184,6 @@
       throw err;
     }
     return data;
-  }
-
-  function absoluteApi(path) {
-    return new URL(path, window.location.origin).href;
   }
 
   function escHtml(s) {
@@ -395,6 +393,10 @@
           method: 'POST',
           body: formData,
         });
+        if (kickoff?.project_name) {
+          currentProject = kickoff.project_name;
+          startProgressPolling(currentProject, aiBubble);
+        }
         data = await pollChartJob(kickoff?.job_id);
       } catch (err) {
         // 兼容旧后端：若无异步接口，降级到同步 /chat
@@ -415,8 +417,7 @@
 
       // 渲染回复
       const replyText = data.reply_text || '';
-      const imageUrlsRaw = data.image_urls || [];
-      const imageUrls = imageUrlsRaw.length ? [imageUrlsRaw[imageUrlsRaw.length - 1]] : [];
+      const imageUrls = data.image_urls || [];
 
       aiBubbleBody.innerHTML = '';
       if (replyText) {
@@ -426,10 +427,11 @@
         streamText(mdDiv, replyText, () => {});
       }
       // 渲染图片
-      if (imageUrls.length) {
+      const onlyLastImage = imageUrls.length ? [imageUrls[imageUrls.length - 1]] : [];
+      if (onlyLastImage.length) {
         const imgWrap = document.createElement('div');
         imgWrap.className = 'chart-images';
-        imageUrls.forEach(url => {
+        onlyLastImage.forEach(url => {
           const img = document.createElement('img');
           img.src = url;
           img.className = 'chart-img';
@@ -500,11 +502,10 @@
         }
         body.appendChild(mdDiv);
       }
-      const finalImages = imageUrls.length ? [imageUrls[imageUrls.length - 1]] : [];
-      if (finalImages.length) {
+      if (imageUrls.length) {
         const imgWrap = document.createElement('div');
         imgWrap.className = 'chart-images';
-        finalImages.forEach(url => {
+        imageUrls.forEach(url => {
           const img = document.createElement('img');
           img.src = url;
           img.className = 'chart-img';
@@ -609,12 +610,10 @@
 
   async function fetchAndRenderProgress(projectName, bubble, forceStopLast) {
     if (!projectName || !bubble) return;
-    const data = await api(absoluteApi(`/api/chart/status/${encodeURIComponent(projectName)}`));
+    const data = await api(`/api/chart/live/${projectName}`);
     const flow = bubble.querySelector('.status-flow');
     if (!flow) return;
-    const done = !!forceStopLast || !!data.finished;
-    renderStatusFlow(flow, data.statuses || [], done);
-    if (done) stopPolling();
+    renderStatusFlow(flow, data.statuses || [], !!forceStopLast || !!data.is_done);
   }
 
   function renderStatusFlow(flowEl, statuses, forceStopLast) {
@@ -623,18 +622,17 @@
       return;
     }
 
-    const sig = statuses.join('|') + '|' + (forceStopLast ? 'done' : 'run');
+    const sig = statuses.map(s => `${s.label}:${s.state}`).join('|') + '|' + (forceStopLast ? 'done' : 'run');
     if (sig === lastStatusSig && flowEl.dataset.rendered === '1') return;
     lastStatusSig = sig;
 
     flowEl.style.display = 'flex';
     flowEl.dataset.rendered = '1';
     flowEl.innerHTML = statuses.map((s, i) => {
-      const isLast = i === statuses.length - 1;
-      const running = isLast && !forceStopLast;
+      const running = s.state === 'running' && !forceStopLast;
       const cls = running ? 'tool-badge tool-badge--running' : 'tool-badge';
       const arrow = i < statuses.length - 1 ? '<span class=\"status-arrow\">→</span>' : '';
-      return `<span class=\"${cls}\" data-tool=\"status\">${escHtml(s)}</span>${arrow}`;
+      return `<span class=\"${cls}\" data-tool=\"status\">${escHtml(s.label || '')}</span>${arrow}`;
     }).join('');
   }
 
